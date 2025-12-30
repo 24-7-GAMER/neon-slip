@@ -267,7 +267,7 @@
     position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
     pointer-events:none; opacity:0; transition: opacity .25s ease;
     background: rgba(4,6,12,.55);
-    z-index:5;
+    z-index:20;
   }
   .mods-panel.active{ pointer-events:auto; opacity:1; }
   .mods-box{
@@ -374,6 +374,15 @@
   body[data-danger="1"] .meter-fill{ filter: brightness(1.4); }
   body[data-state="play"] .ui{ pointer-events:none; }
   body[data-state="dying"] .ui{ pointer-events:none; }
+  .itch-embed{
+    position:fixed; right:12px; bottom:12px;
+    z-index:8; opacity:.9; transition: opacity .2s ease;
+  }
+  .itch-embed iframe{ display:block; border:0; }
+  body[data-state="play"] .itch-embed,
+  body[data-state="dying"] .itch-embed{
+    opacity:0; pointer-events:none;
+  }
 </style>
 </head>
 <body>
@@ -500,6 +509,10 @@
     <div id="breakdownStats" class="hint">---</div>
     <div class="btn" id="closeBreakdown">Close</div>
   </div>
+</div>
+
+<div class="itch-embed">
+  <iframe frameborder="0" src="https://itch.io/embed/4157033" width="552" height="167"><a href="https://247-gamer.itch.io/neon-slip">NEON Slip by 24.7-GAMER</a></iframe>
 </div>
 
 <audio id="menuMusic" src="menu.mp3" preload="auto" loop></audio>
