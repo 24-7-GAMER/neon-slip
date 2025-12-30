@@ -1,4 +1,19 @@
 <!doctype html>
+<!--
+  UPDATE NOTES:
+  - Added meta-progression (Neon Shards) + upgrade/mods screen.
+  - Added run modifiers (positive/negative) with pre-run preview.
+  - Added combo decay, style bonuses, floating score popups, and run breakdown.
+  - Added announcer text, special streak moments, and theme-specific UI styling.
+  - Added key rebinding, motion/streamer/color-blind toggles, and feature flags.
+-->
+<!--
+  CHANGELOG:
+  - Added settings panel, pause overlay, tutorial tooltip, and new best celebration.
+  - Added run themes (Aurora/Pulse/Glitch) with palette + pacing influence.
+  - Added ready-go intro, combo/near-miss UI, and richer WebAudio SFX.
+  - Added cached speedlines/noise for performance and extra polish.
+-->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -24,7 +39,8 @@
   canvas{ display:block; width:100vw; height:100vh; }
   .ui{
     position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
-    pointer-events:none;
+    pointer-events:auto;
+    z-index:6;
   }
   .panel{
     pointer-events:auto;
@@ -142,6 +158,211 @@
     opacity:.75;
   }
   .audio-toggle:hover{ opacity:1; }
+  .prompt{
+    margin-top:12px;
+    font-size:12px;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    color:var(--neon);
+    animation: promptPulse 1.8s ease-in-out infinite;
+  }
+  @keyframes promptPulse{
+    0%{ opacity:.5; transform: translateY(0); }
+    50%{ opacity:1; transform: translateY(-2px); }
+    100%{ opacity:.5; transform: translateY(0); }
+  }
+  .settings-panel, .pause-panel{
+    position:fixed; inset:0;
+    display:flex; align-items:center; justify-content:center;
+    background: rgba(4,6,12,.6);
+    pointer-events:none; opacity:0;
+    transition: opacity .25s ease;
+    z-index:12;
+  }
+  .settings-panel.active, .pause-panel.active{
+    pointer-events:auto; opacity:1;
+  }
+  .settings-box, .pause-box{
+    background: linear-gradient(180deg, rgba(10,16,30,.95), rgba(6,10,20,.95));
+    border:1px solid rgba(25,247,255,.35);
+    box-shadow: 0 0 28px rgba(25,247,255,.25);
+    padding:20px 22px; border-radius:14px; min-width:260px;
+  }
+  .settings-row{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:10px; margin:10px 0; font-size:12px; text-transform:uppercase;
+  }
+  .settings-row input[type="range"]{ width:140px; }
+  .settings-actions{ display:flex; gap:10px; justify-content:center; margin-top:12px; }
+  .toggle{
+    border:1px solid rgba(25,247,255,.4);
+    padding:6px 10px; border-radius:8px; cursor:pointer;
+    background: rgba(25,247,255,.1);
+  }
+  .overlay-text{
+    position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
+    pointer-events:none; font-size:36px; letter-spacing:4px; text-transform:uppercase;
+    text-shadow: 0 0 18px rgba(25,247,255,.8);
+    opacity:0; transform: scale(0.95);
+    transition: opacity .2s ease, transform .2s ease;
+  }
+  .overlay-text.show{ opacity:1; transform: scale(1); }
+  .near-pop{
+    position:fixed; left:50%; top:58%;
+    transform: translate(-50%, -50%) scale(0.9);
+    pointer-events:none; opacity:0;
+    color:var(--danger); font-size:20px; letter-spacing:2px;
+    text-shadow: 0 0 12px rgba(255,59,122,.8);
+  }
+  .near-pop.show{
+    animation: nearPop .5s ease;
+  }
+  @keyframes nearPop{
+    0%{ opacity:0; transform: translate(-50%, -50%) scale(0.8); }
+    40%{ opacity:1; transform: translate(-50%, -58%) scale(1.05); }
+    100%{ opacity:0; transform: translate(-50%, -70%) scale(0.95); }
+  }
+  .combo{
+    position:fixed; left:50%; top:18%;
+    transform: translate(-50%, -50%) scale(0.95);
+    pointer-events:none; opacity:0;
+    color:var(--neon); font-size:14px; letter-spacing:2px;
+    text-shadow: 0 0 10px rgba(25,247,255,.7);
+  }
+  .combo.show{ opacity:1; transform: translate(-50%, -50%) scale(1); transition: opacity .2s ease; }
+  .tutorial{
+    position:fixed; left:50%; bottom:18%;
+    transform: translateX(-50%);
+    background: rgba(10,14,24,.85);
+    border:1px solid rgba(25,247,255,.35);
+    padding:10px 14px; border-radius:10px;
+    font-size:12px; letter-spacing:1px; text-transform:uppercase;
+    box-shadow: 0 0 16px rgba(25,247,255,.2);
+    opacity:0; transition: opacity .3s ease;
+  }
+  .tutorial.show{ opacity:1; }
+  .best-burst{
+    position:fixed; right:18px; top:60px;
+    font-size:12px; letter-spacing:2px; text-transform:uppercase;
+    color:#ffd86b; text-shadow: 0 0 12px rgba(255,216,107,.8);
+    opacity:0;
+  }
+  .best-burst.show{ animation: bestBurst 1.2s ease; }
+  @keyframes bestBurst{
+    0%{ opacity:0; transform: translateY(8px) scale(0.9); }
+    30%{ opacity:1; transform: translateY(0) scale(1.05); }
+    100%{ opacity:0; transform: translateY(-8px) scale(1); }
+  }
+  body.high-contrast{
+    --bg: #020207;
+    --bg2: #0b0f1e;
+    --text: #f0fbff;
+  }
+  body.colorblind{
+    --neon: #2be2ff;
+    --neon2: #ffd166;
+    --danger: #06d6a0;
+  }
+  .mods-panel{
+    position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
+    pointer-events:none; opacity:0; transition: opacity .25s ease;
+    background: rgba(4,6,12,.55);
+    z-index:5;
+  }
+  .mods-panel.active{ pointer-events:auto; opacity:1; }
+  .mods-box{
+    background: linear-gradient(180deg, rgba(10,16,30,.95), rgba(6,10,20,.95));
+    border:1px solid rgba(25,247,255,.35);
+    box-shadow: 0 0 28px rgba(25,247,255,.25);
+    padding:18px 20px; border-radius:14px; min-width:280px;
+    text-align:center;
+  }
+  .modifier-badge{
+    display:inline-block; padding:6px 10px; margin:6px 4px;
+    border-radius:10px; border:1px solid rgba(25,247,255,.4);
+    background: rgba(25,247,255,.08); font-size:11px; letter-spacing:1px;
+  }
+  .modifier-badge.positive{ color:#7dffb2; }
+  .modifier-badge.negative{ color:#ff8aa5; }
+  .announcer{
+    position:fixed; left:50%; top:30%;
+    transform: translate(-50%, -50%) scale(0.9);
+    pointer-events:none; opacity:0;
+    font-size:22px; letter-spacing:3px; text-transform:uppercase;
+    text-shadow: 0 0 14px rgba(25,247,255,.8);
+  }
+  .announcer.show{ animation: announce .7s ease; }
+  @keyframes announce{
+    0%{ opacity:0; transform: translate(-50%, -50%) scale(0.85); }
+    35%{ opacity:1; transform: translate(-50%, -55%) scale(1.05); }
+    100%{ opacity:0; transform: translate(-50%, -70%) scale(0.95); }
+  }
+  .score-pop{
+    position:fixed; left:50%; top:50%;
+    transform: translate(-50%, -50%);
+    pointer-events:none; opacity:0;
+    font-size:12px; letter-spacing:1px; text-transform:uppercase;
+    color:var(--neon); text-shadow: 0 0 10px rgba(25,247,255,.7);
+  }
+  .score-pop.show{ animation: scorePop .7s ease; }
+  @keyframes scorePop{
+    0%{ opacity:0; transform: translate(-50%, -30%) scale(0.9); }
+    30%{ opacity:1; transform: translate(-50%, -40%) scale(1.05); }
+    100%{ opacity:0; transform: translate(-50%, -65%) scale(0.95); }
+  }
+  .upgrades-panel{
+    position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
+    pointer-events:none; opacity:0; transition: opacity .25s ease;
+    background: rgba(4,6,12,.6);
+    z-index:12;
+  }
+  .upgrades-panel.active{ pointer-events:auto; opacity:1; }
+  .upgrades-box{
+    background: linear-gradient(180deg, rgba(10,16,30,.95), rgba(6,10,20,.95));
+    border:1px solid rgba(25,247,255,.35);
+    box-shadow: 0 0 28px rgba(25,247,255,.25);
+    padding:18px 20px; border-radius:14px; width:min(520px, 90vw);
+  }
+  .upgrade-grid{
+    display:grid; grid-template-columns:1fr 1fr; gap:10px;
+  }
+  .upgrade-card{
+    border:1px solid rgba(25,247,255,.35);
+    border-radius:12px; padding:10px; background: rgba(25,247,255,.06);
+    font-size:11px; text-transform:uppercase; letter-spacing:1px;
+  }
+  .upgrade-card .btn{ margin-top:8px; width:100%; }
+  .currency{
+    font-size:12px; letter-spacing:1px; text-transform:uppercase;
+    color:#7dffb2; margin-bottom:8px;
+  }
+  .rebind{
+    display:flex; align-items:center; justify-content:space-between;
+    margin:8px 0; font-size:11px; text-transform:uppercase;
+  }
+  .rebind-key{
+    border:1px solid rgba(25,247,255,.4);
+    padding:4px 8px; border-radius:8px;
+    background: rgba(25,247,255,.1); cursor:pointer;
+  }
+  .breakdown-panel{
+    position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
+    pointer-events:none; opacity:0; transition: opacity .25s ease;
+    background: rgba(4,6,12,.6);
+    z-index:12;
+  }
+  .breakdown-panel.active{ pointer-events:auto; opacity:1; }
+  .breakdown-box{
+    background: linear-gradient(180deg, rgba(10,16,30,.95), rgba(6,10,20,.95));
+    border:1px solid rgba(25,247,255,.35);
+    box-shadow: 0 0 28px rgba(25,247,255,.25);
+    padding:18px 20px; border-radius:14px; min-width:260px;
+    text-align:center;
+  }
+  .feature-toggle{
+    display:flex; align-items:center; justify-content:space-between;
+    margin:8px 0; font-size:11px; text-transform:uppercase;
+  }
   @media (min-width: 700px){
     .hud{ font-size:13.5px; padding:14px 18px; }
     .hud-value{ font-size:18px; }
@@ -151,6 +372,8 @@
   body[data-state="dying"] .hud{ opacity:.2; }
   body[data-state="over"] .hud{ opacity:.7; }
   body[data-danger="1"] .meter-fill{ filter: brightness(1.4); }
+  body[data-state="play"] .ui{ pointer-events:none; }
+  body[data-state="dying"] .ui{ pointer-events:none; }
 </style>
 </head>
 <body>
@@ -180,7 +403,10 @@
     <div class="title neon-title">Neon Slip</div>
     <div>Move left/right to slip through the neon gates.</div>
     <div class="hint">Keys: A/D or Arrows. Touch: drag or tap.</div>
+    <div class="prompt">Press Space / Click to Start</div>
     <div class="btn">Tap to Start</div>
+    <div class="btn" id="openUpgrades">Upgrades</div>
+    <div class="btn" id="openSettings">Settings</div>
   </div>
   <div id="overPanel" class="panel hidden">
     <div class="title">Crashed</div>
@@ -188,6 +414,91 @@
     <div>Best: <span id="finalBest">0</span></div>
     <div class="btn">Try Again</div>
     <div class="hint">Instant restart keeps the flow.</div>
+    <div class="btn" id="openUpgradesOver">Upgrades</div>
+    <div class="btn" id="openSettingsOver">Settings</div>
+  </div>
+</div>
+
+<div id="settingsPanel" class="settings-panel">
+  <div class="settings-box">
+    <div class="title">Settings</div>
+    <div class="settings-row"><span>Music</span><input id="musicVol" type="range" min="0" max="1" step="0.01"></div>
+    <div class="settings-row"><span>SFX</span><input id="sfxVol" type="range" min="0" max="1" step="0.01"></div>
+    <div class="settings-row"><span>Shake</span>
+      <select id="shakeLevel" class="toggle">
+        <option value="low">Low</option>
+        <option value="med">Med</option>
+        <option value="high">High</option>
+      </select>
+    </div>
+    <div class="settings-row"><span>High Contrast</span><button id="contrastToggle" class="toggle">Off</button></div>
+    <div class="settings-actions">
+      <div id="closeSettings" class="btn">Close</div>
+    </div>
+  </div>
+</div>
+
+<div id="pausePanel" class="pause-panel">
+  <div class="pause-box">
+    <div class="title">Paused</div>
+    <div class="settings-actions">
+      <div id="resumeBtn" class="btn">Resume</div>
+      <div id="restartBtn" class="btn">Restart</div>
+      <div id="quitBtn" class="btn">Quit</div>
+    </div>
+  </div>
+</div>
+
+<div id="readyGo" class="overlay-text">Ready</div>
+<div id="nearPop" class="near-pop">NEAR!</div>
+<div id="comboPop" class="combo">Combo x2</div>
+<div id="tutorial" class="tutorial">Slip through gaps. Near the edge = bonus.</div>
+<div id="bestBurst" class="best-burst">New Best!</div>
+<div id="announcer" class="announcer">FLOW</div>
+<div id="scorePop" class="score-pop">+10</div>
+
+<div id="modsPanel" class="mods-panel">
+  <div class="mods-box">
+    <div class="title">Run Modifiers</div>
+    <div id="themeLabel" class="hint">Theme: Aurora</div>
+    <div id="modPos" class="modifier-badge positive">Positive</div>
+    <div id="modNeg" class="modifier-badge negative">Negative</div>
+    <div class="hint">Balanced, fair modifiers. Readable patterns.</div>
+    <div id="closeMods" class="btn">Continue</div>
+  </div>
+</div>
+
+<div id="upgradesPanel" class="upgrades-panel">
+  <div class="upgrades-box">
+    <div class="title">Upgrades / Mods</div>
+    <div id="currency" class="currency">Neon Shards: 0</div>
+    <div class="upgrade-grid" id="upgradeGrid"></div>
+    <div class="rebind">
+      <span>Left Key</span><span id="rebindLeft" class="rebind-key">A</span>
+    </div>
+    <div class="rebind">
+      <span>Right Key</span><span id="rebindRight" class="rebind-key">D</span>
+    </div>
+    <div class="feature-toggle"><span>Motion Intensity</span>
+      <select id="motionLevel" class="toggle">
+        <option value="low">Low</option>
+        <option value="med">Med</option>
+        <option value="high">High</option>
+      </select>
+    </div>
+    <div class="feature-toggle"><span>Color-Blind</span><button id="colorBlindToggle" class="toggle">Off</button></div>
+    <div class="feature-toggle"><span>Streamer Mode</span><button id="streamerToggle" class="toggle">Off</button></div>
+    <div class="settings-actions">
+      <div id="closeUpgrades" class="btn">Close</div>
+    </div>
+  </div>
+</div>
+
+<div id="breakdownPanel" class="breakdown-panel">
+  <div class="breakdown-box">
+    <div class="title">Run Breakdown</div>
+    <div id="breakdownStats" class="hint">---</div>
+    <div class="btn" id="closeBreakdown">Close</div>
   </div>
 </div>
 
@@ -210,6 +521,44 @@
   const audioToggleEl = document.getElementById("audioToggle");
   const menuMusic = document.getElementById("menuMusic");
   const gameMusic = document.getElementById("gameMusic");
+  const openSettingsEl = document.getElementById("openSettings");
+  const openSettingsOverEl = document.getElementById("openSettingsOver");
+  const openUpgradesEl = document.getElementById("openUpgrades");
+  const openUpgradesOverEl = document.getElementById("openUpgradesOver");
+  const settingsPanelEl = document.getElementById("settingsPanel");
+  const closeSettingsEl = document.getElementById("closeSettings");
+  const musicVolEl = document.getElementById("musicVol");
+  const sfxVolEl = document.getElementById("sfxVol");
+  const shakeLevelEl = document.getElementById("shakeLevel");
+  const contrastToggleEl = document.getElementById("contrastToggle");
+  const pausePanelEl = document.getElementById("pausePanel");
+  const resumeBtnEl = document.getElementById("resumeBtn");
+  const restartBtnEl = document.getElementById("restartBtn");
+  const quitBtnEl = document.getElementById("quitBtn");
+  const readyGoEl = document.getElementById("readyGo");
+  const nearPopEl = document.getElementById("nearPop");
+  const comboPopEl = document.getElementById("comboPop");
+  const tutorialEl = document.getElementById("tutorial");
+  const bestBurstEl = document.getElementById("bestBurst");
+  const announcerEl = document.getElementById("announcer");
+  const scorePopEl = document.getElementById("scorePop");
+  const modsPanelEl = document.getElementById("modsPanel");
+  const modPosEl = document.getElementById("modPos");
+  const modNegEl = document.getElementById("modNeg");
+  const themeLabelEl = document.getElementById("themeLabel");
+  const closeModsEl = document.getElementById("closeMods");
+  const upgradesPanelEl = document.getElementById("upgradesPanel");
+  const upgradeGridEl = document.getElementById("upgradeGrid");
+  const currencyEl = document.getElementById("currency");
+  const closeUpgradesEl = document.getElementById("closeUpgrades");
+  const rebindLeftEl = document.getElementById("rebindLeft");
+  const rebindRightEl = document.getElementById("rebindRight");
+  const motionLevelEl = document.getElementById("motionLevel");
+  const colorBlindToggleEl = document.getElementById("colorBlindToggle");
+  const streamerToggleEl = document.getElementById("streamerToggle");
+  const breakdownPanelEl = document.getElementById("breakdownPanel");
+  const breakdownStatsEl = document.getElementById("breakdownStats");
+  const closeBreakdownEl = document.getElementById("closeBreakdown");
 
   let w, h, dpr;
   function resize(){
@@ -219,9 +568,9 @@
     canvas.width = Math.floor(w * dpr);
     canvas.height = Math.floor(h * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    initVisualCaches();
   }
   window.addEventListener("resize", resize);
-  resize();
 
   const state = {
     mode: "start",
@@ -253,7 +602,28 @@
     zoom: 0,
     audioUnlocked: false,
     audioMuted: false,
-    audioFade: null
+    audioFade: null,
+    combo: 0,
+    comboTimer: 0,
+    nearTimer: 0,
+    readyTimer: 0,
+    paused: false,
+    theme: null,
+    speedLines: [],
+    noiseCanvas: null,
+    playerHistory: [],
+    visualTime: 0,
+    gateCount: 0,
+    shards: 0,
+    upgrades: {},
+    runMods: { pos: null, neg: null, speedMul: 1, gapMul: 1, echo: false, mirror: false, pulse: false, patternBias: 0 },
+    bestCombo: 0,
+    nearCount: 0,
+    intensityPeak: 1,
+    rebind: { left: "KeyA", right: "KeyD" },
+    awaitingBind: null,
+    upgradeEffects: { controlBoost: 1, comboExtend: 1, glowBoost: 1, trailShift: 0, gatePulse: 0 },
+    announceCooldown: 0
   };
 
   const player = {
@@ -282,6 +652,7 @@
     - baseGapMin/Max, gapShrinkPerIntensityMin/Max, minGapMin/Max: gap pressure.
     - minPassIntervalMin/Max, maxPassIntervalMin/Max: reaction windows.
     - patternBiasStrengthMin/Max, patternPeriodMin/Max: anti-camping drift/push.
+    - directorWindowSec, directorStrength: anti-camping director bias.
     - orbTelegraphMin/Max, orbSpeedMin/Max, orbMinIntervalMin/Max: dash orbs.
   */
   const TUNING = {
@@ -316,6 +687,8 @@
     patternBiasStrengthMax: 140,
     patternPeriodMin: 2.2,
     patternPeriodMax: 4.2,
+    directorWindowSec: 2.6,
+    directorStrength: 0.22,
     jitterHigh: 0.6,
     jitterLow: 0.22,
     orbTelegraphMin: 0.16,
@@ -359,13 +732,94 @@
     deathZoom: 0.035,
     visualSpeedBoost: 0.55,
     speedLineCount: 26,
-    speedLineAlpha: 0.12
+    speedLineAlpha: 0.12,
+    maxParticles: 180
   };
 
   const AUDIO = {
     menuVolume: 0.45,
     gameVolume: 0.65,
     crossfadeMs: 650
+  };
+
+  const SETTINGS = {
+    musicVolume: 0.8,
+    sfxVolume: 0.7,
+    shake: "med",
+    highContrast: false,
+    motion: "med",
+    colorBlind: false,
+    streamer: false
+  };
+
+  const FEATURE_FLAGS = {
+    progression: true,
+    modifiers: true,
+    announcer: true,
+    scorePopups: true,
+    comboDecay: true
+  };
+
+  // Theme system: per-run visual palette + pacing feel.
+  const THEMES = [
+    {
+      name: "Aurora",
+      palette: { neonA: [25, 247, 255], neonB: [138, 91, 255], neonC: [70, 255, 180] },
+      bg: { a: "#05090f", b: "#0d1430" },
+      pacingBias: 0.92,
+      glowBoost: 1.1,
+      meterHue: 190
+    },
+    {
+      name: "Pulse",
+      palette: { neonA: [255, 80, 120], neonB: [255, 200, 80], neonC: [25, 247, 255] },
+      bg: { a: "#0b0407", b: "#1c0c14" },
+      pacingBias: 1.08,
+      glowBoost: 1.2,
+      meterHue: 340
+    },
+    {
+      name: "Glitch",
+      palette: { neonA: [130, 255, 220], neonB: [255, 80, 200], neonC: [80, 140, 255] },
+      bg: { a: "#05060c", b: "#0b0f1e" },
+      pacingBias: 1.0,
+      glowBoost: 1.3,
+      meterHue: 280
+    }
+  ];
+
+  /*
+    Progression: earn currency and buy light upgrades (no pay-to-win).
+  */
+  const PROGRESSION = {
+    currencyName: "Neon Shards",
+    earnScore: 0.01,
+    earnNear: 2,
+    earnCombo: 1
+  };
+
+  const UPGRADES = [
+    { id: "control", name: "Control Assist", cost: 120, desc: "Slightly steadier control feel.", level: 0, max: 3 },
+    { id: "glow", name: "Gate Clarity", cost: 90, desc: "Sharper gate glow visibility.", level: 0, max: 3 },
+    { id: "combo", name: "Combo Window", cost: 80, desc: "Combo decays slower.", level: 0, max: 3 },
+    { id: "trail", name: "Trail Tint", cost: 70, desc: "Cosmetic trail hue shift.", level: 0, max: 3 },
+    { id: "pulse", name: "Gate Pulse", cost: 110, desc: "Cosmetic pulse style.", level: 0, max: 2 }
+  ];
+
+  /*
+    Modifiers: one positive + one negative each run.
+  */
+  const MODIFIERS = {
+    positive: [
+      { id: "hyper", name: "Hyper Drift", desc: "Faster scroll, wider gaps.", apply: (m) => { m.speedMul *= 1.15; m.gapMul *= 1.1; } },
+      { id: "echo", name: "Echo Gates", desc: "Decoy gates fade out.", apply: (m) => { m.echo = true; } },
+      { id: "flow", name: "Flow Assist", desc: "Smoother patterns.", apply: (m) => { m.patternBias += 0.08; } }
+    ],
+    negative: [
+      { id: "tight", name: "Tight Slip", desc: "Smaller gaps, slower scroll.", apply: (m) => { m.gapMul *= 0.9; m.speedMul *= 0.92; } },
+      { id: "mirror", name: "Mirror Bias", desc: "Subtle left/right pull.", apply: (m) => { m.mirror = true; } },
+      { id: "pulse", name: "Pulse Locks", desc: "Rhythmic bursts.", apply: (m) => { m.pulse = true; } }
+    ]
   };
 
   function clamp(value, min, max){
@@ -397,9 +851,35 @@
     return list[Math.floor(r * list.length)];
   }
 
+  function initVisualCaches(){
+    state.speedLines = [];
+    for (let i = 0; i < POLISH.speedLineCount; i++){
+      state.speedLines.push({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        len: 12 + Math.random() * 24
+      });
+    }
+    const noise = document.createElement("canvas");
+    noise.width = 128;
+    noise.height = 128;
+    const nctx = noise.getContext("2d");
+    const img = nctx.createImageData(noise.width, noise.height);
+    for (let i = 0; i < img.data.length; i += 4){
+      const v = Math.random() * 255;
+      img.data[i] = v;
+      img.data[i + 1] = v;
+      img.data[i + 2] = v;
+      img.data[i + 3] = 80;
+    }
+    nctx.putImageData(img, 0, 0);
+    state.noiseCanvas = noise;
+  }
+
   function generateRunProfile(){
     state.runSeed = (Date.now() ^ (Math.random() * 1e9)) >>> 0;
     state.rng = mulberry32(state.runSeed);
+    state.theme = randPick(THEMES);
     const rampSeconds = randRange(TUNING.rampSecondsMin, TUNING.rampSecondsMax);
     const baseSpeed = randRange(TUNING.baseSpeedMin, TUNING.baseSpeedMax);
     const speedGrowthScale = randRange(TUNING.speedGrowthScaleMin, TUNING.speedGrowthScaleMax);
@@ -412,14 +892,25 @@
     const minGap = randRange(TUNING.minGapMin, TUNING.minGapMax);
     const minPassInterval = randRange(TUNING.minPassIntervalMin, TUNING.minPassIntervalMax);
     const maxPassInterval = randRange(TUNING.maxPassIntervalMin, TUNING.maxPassIntervalMax);
-    const patternMode = randPick(["drift", "push", "oscillate"]);
+    let patternMode = randPick(["drift", "push", "oscillate"]);
     const patternBiasStrength = randRange(TUNING.patternBiasStrengthMin, TUNING.patternBiasStrengthMax);
     const patternPeriod = randRange(TUNING.patternPeriodMin, TUNING.patternPeriodMax);
     const patternPhase = randRange(0, Math.PI * 2);
-    const pacingStyle = randPick(["steady", "swell", "burst"]);
+    let pacingStyle = randPick(["steady", "swell", "burst"]);
     const orbSpeed = randRange(TUNING.orbSpeedMin, TUNING.orbSpeedMax);
     const orbMinInterval = randRange(TUNING.orbMinIntervalMin, TUNING.orbMinIntervalMax);
     const orbYBandOffset = randRange(TUNING.orbYBandOffsetMin, TUNING.orbYBandOffsetMax);
+
+    if (state.theme.name === "Aurora"){
+      patternMode = "drift";
+      pacingStyle = "steady";
+    } else if (state.theme.name === "Pulse"){
+      patternMode = "push";
+      pacingStyle = "burst";
+    } else if (state.theme.name === "Glitch"){
+      patternMode = "oscillate";
+      pacingStyle = "swell";
+    }
 
     state.runProfile = {
       rampSeconds,
@@ -443,6 +934,146 @@
       orbMinInterval,
       orbYBandOffset
     };
+    applyTheme();
+  }
+
+  function applyTheme(){
+    if (!state.theme) return;
+    const t = state.theme;
+    const root = document.documentElement;
+    const palette = SETTINGS.colorBlind
+      ? { neonA: [43, 226, 255], neonB: [255, 209, 102], neonC: [6, 214, 160], bg: { a: "#040610", b: "#0b1226" } }
+      : t.palette;
+    root.style.setProperty("--neon", `rgb(${palette.neonA.join(",")})`);
+    root.style.setProperty("--neon2", `rgb(${palette.neonB.join(",")})`);
+    root.style.setProperty("--danger", `rgb(${palette.neonC.join(",")})`);
+    root.style.setProperty("--bg", t.bg.a);
+    root.style.setProperty("--bg2", t.bg.b);
+    intensityFillEl.style.background = `linear-gradient(90deg, rgba(${palette.neonA.join(",")},.9), rgba(${palette.neonB.join(",")},.95), rgba(${palette.neonC.join(",")},.9))`;
+  }
+
+  // Settings: persisted UX controls.
+  function loadSettings(){
+    const stored = localStorage.getItem("neonSettings");
+    if (stored){
+      try{
+        const data = JSON.parse(stored);
+        Object.assign(SETTINGS, data);
+      } catch {}
+    }
+    applySettings();
+  }
+
+  function applySettings(){
+    musicVolEl.value = SETTINGS.musicVolume;
+    sfxVolEl.value = SETTINGS.sfxVolume;
+    shakeLevelEl.value = SETTINGS.shake;
+    contrastToggleEl.textContent = SETTINGS.highContrast ? "On" : "Off";
+    document.body.classList.toggle("high-contrast", SETTINGS.highContrast);
+    motionLevelEl.value = SETTINGS.motion;
+    colorBlindToggleEl.textContent = SETTINGS.colorBlind ? "On" : "Off";
+    streamerToggleEl.textContent = SETTINGS.streamer ? "On" : "Off";
+    document.body.classList.toggle("colorblind", SETTINGS.colorBlind);
+    if (!state.audioMuted){
+      menuMusic.volume = AUDIO.menuVolume * SETTINGS.musicVolume;
+      gameMusic.volume = AUDIO.gameVolume * SETTINGS.musicVolume;
+    }
+  }
+
+  function saveSettings(){
+    localStorage.setItem("neonSettings", JSON.stringify(SETTINGS));
+  }
+
+  // Progression: currency + upgrades + keybinds.
+  function loadProgress(){
+    const stored = localStorage.getItem("neonProgress");
+    if (stored){
+      try{
+        const data = JSON.parse(stored);
+        state.shards = data.shards || 0;
+        state.upgrades = data.upgrades || {};
+        if (data.rebind) state.rebind = data.rebind;
+      } catch {}
+    }
+    for (const up of UPGRADES){
+      if (state.upgrades[up.id] == null) state.upgrades[up.id] = 0;
+      up.level = state.upgrades[up.id];
+    }
+    updateUpgradeUI();
+  }
+
+  function saveProgress(){
+    localStorage.setItem("neonProgress", JSON.stringify({
+      shards: state.shards,
+      upgrades: state.upgrades,
+      rebind: state.rebind
+    }));
+  }
+
+  function updateUpgradeUI(){
+    currencyEl.textContent = `${PROGRESSION.currencyName}: ${state.shards}`;
+    upgradeGridEl.innerHTML = "";
+    for (const up of UPGRADES){
+      const card = document.createElement("div");
+      card.className = "upgrade-card";
+      card.innerHTML = `<div>${up.name}</div><div class="hint">${up.desc}</div><div class="hud-divider"></div><div>Level ${up.level}/${up.max}</div>`;
+      const btn = document.createElement("div");
+      btn.className = "btn";
+      btn.textContent = up.level >= up.max ? "Maxed" : `Buy (${up.cost})`;
+      btn.addEventListener("click", () => {
+        if (up.level >= up.max) return;
+        if (state.shards < up.cost) return;
+        state.shards -= up.cost;
+        up.level += 1;
+        state.upgrades[up.id] = up.level;
+        saveProgress();
+        updateUpgradeUI();
+        sfxClick();
+      });
+      card.appendChild(btn);
+      upgradeGridEl.appendChild(card);
+    }
+    rebindLeftEl.textContent = state.rebind.left.replace("Key","").replace("Arrow","Arrow ");
+    rebindRightEl.textContent = state.rebind.right.replace("Key","").replace("Arrow","Arrow ");
+  }
+
+  function applyUpgrades(){
+    const control = state.upgrades.control || 0;
+    const combo = state.upgrades.combo || 0;
+    const glow = state.upgrades.glow || 0;
+    const trail = state.upgrades.trail || 0;
+    const pulse = state.upgrades.pulse || 0;
+    state.upgradeEffects = {
+      controlBoost: 1 + control * 0.05,
+      comboExtend: 1 + combo * 0.2,
+      glowBoost: 1 + glow * 0.08,
+      trailShift: trail * 0.12,
+      gatePulse: pulse
+    };
+  }
+
+  function selectRunMods(){
+    if (!FEATURE_FLAGS.modifiers){
+      state.runMods = { pos: null, neg: null, speedMul: 1, gapMul: 1, echo: false, mirror: false, pulse: false, patternBias: 0 };
+      return;
+    }
+    const pos = randPick(MODIFIERS.positive);
+    const neg = randPick(MODIFIERS.negative);
+    const mods = { pos, neg, speedMul: 1, gapMul: 1, echo: false, mirror: false, pulse: false, patternBias: 0, mirrorDir: Math.random() < 0.5 ? -1 : 1 };
+    pos.apply(mods);
+    neg.apply(mods);
+    state.runMods = mods;
+    modPosEl.textContent = `${pos.name} (+)`;
+    modNegEl.textContent = `${neg.name} (-)`;
+    if (state.theme) themeLabelEl.textContent = `Theme: ${state.theme.name}`;
+  }
+
+  function announce(text){
+    if (!FEATURE_FLAGS.announcer || SETTINGS.streamer) return;
+    announcerEl.textContent = text;
+    announcerEl.classList.remove("show");
+    void announcerEl.offsetWidth;
+    announcerEl.classList.add("show");
   }
 
   function intensity(){
@@ -479,7 +1110,7 @@
   }
 
   function resetGame(){
-    generateRunProfile();
+    applyUpgrades();
     state.time = 0;
     state.score = 0;
     gates.length = 0;
@@ -507,6 +1138,17 @@
     state.deathTimer = 0;
     state.freeze = 0;
     state.zoom = 0;
+    state.combo = 0;
+    state.comboTimer = 0;
+    state.nearTimer = 0;
+    state.readyTimer = 0.7;
+    state.paused = false;
+    state.playerHistory = [];
+    state.gateCount = 0;
+    state.bestCombo = 0;
+    state.nearCount = 0;
+    state.intensityPeak = 1;
+    state.announceCooldown = 0;
     intensityEl.textContent = "1.0";
     intensityFillEl.style.transform = "scaleX(0)";
     spawnGate(-80, true);
@@ -515,11 +1157,33 @@
   function setMode(mode){
     state.mode = mode;
     document.body.setAttribute("data-state", mode);
+    if (mode !== "play") readyGoEl.classList.remove("show");
     if (mode === "start" || mode === "over"){
+      generateRunProfile();
+      selectRunMods();
+      modsPanelEl.classList.add("active");
       playMenuMusic();
     } else if (mode === "play"){
+      modsPanelEl.classList.remove("active");
       playGameMusic();
     }
+  }
+
+  function setPaused(isPaused){
+    state.paused = isPaused;
+    pausePanelEl.classList.toggle("active", isPaused);
+  }
+
+  function shakeScale(){
+    if (SETTINGS.shake === "low") return 0.6;
+    if (SETTINGS.shake === "high") return 1.2;
+    return 1;
+  }
+
+  function motionScale(){
+    if (SETTINGS.motion === "low") return 0.6;
+    if (SETTINGS.motion === "high") return 1.25;
+    return 1;
   }
 
   function startGame(){
@@ -528,6 +1192,14 @@
     resetGame();
     state.flash = 0.06;
     state.zoom = 0.01;
+    readyGoEl.textContent = "Ready";
+    readyGoEl.classList.add("show");
+    breakdownPanelEl.classList.remove("active");
+    if (!localStorage.getItem("neonTutSeen")){
+      tutorialEl.classList.add("show");
+      setTimeout(() => tutorialEl.classList.remove("show"), 3500);
+      localStorage.setItem("neonTutSeen", "1");
+    }
     if (!state.loggedParams){
       const profile = state.runProfile;
       const maxGapShift = player.speed * profile.minPassInterval * TUNING.reachFactor;
@@ -560,14 +1232,30 @@
 
   function gameOver(){
     setMode("over");
-    if (state.score > state.best){
+    const isNewBest = state.score > state.best;
+    if (isNewBest){
       state.best = state.score;
       localStorage.setItem("neonBest", state.best);
+    }
+    if (FEATURE_FLAGS.progression){
+      const earned = Math.floor(state.score * PROGRESSION.earnScore) +
+        state.nearCount * PROGRESSION.earnNear +
+        state.bestCombo * PROGRESSION.earnCombo;
+      state.shards += earned;
+      saveProgress();
+      updateUpgradeUI();
     }
     finalScoreEl.textContent = state.score;
     finalBestEl.textContent = state.best;
     scoreEl.textContent = state.score;
     bestEl.textContent = state.best;
+    breakdownStatsEl.textContent = `Best Combo: ${state.bestCombo} | Near Misses: ${state.nearCount} | Peak Intensity: x${state.intensityPeak.toFixed(1)}`;
+    breakdownPanelEl.classList.add("active");
+    if (isNewBest){
+      bestBurstEl.classList.remove("show");
+      void bestBurstEl.offsetWidth;
+      bestBurstEl.classList.add("show");
+    }
 
     // Monetization hook: show interstitial ad between runs here.
     showInterstitialAd();
@@ -605,6 +1293,22 @@
     return strength * Math.sin(phase * 0.65 + Math.sin(phase) * 0.35);
   }
 
+  // Director: track recent average x to bias future gaps.
+  function recordPlayerX(){
+    state.playerHistory.push({ x: player.x, t: state.time });
+    const cutoff = state.time - TUNING.directorWindowSec;
+    while (state.playerHistory.length && state.playerHistory[0].t < cutoff){
+      state.playerHistory.shift();
+    }
+  }
+
+  function avgPlayerX(){
+    if (!state.playerHistory.length) return player.x;
+    let sum = 0;
+    for (const p of state.playerHistory) sum += p.x;
+    return sum / state.playerHistory.length;
+  }
+
   function chooseGapCenter(gapW, passETA, intensityN){
     const minCenter = 40 + gapW / 2;
     const maxCenter = w - 40 - gapW / 2;
@@ -613,9 +1317,12 @@
     if (state.lastGapCenter != null && state.lastPassETA != null){
       const timeDelta = Math.max(0.05, passETA - state.lastPassETA);
       const maxShift = player.speed * timeDelta * TUNING.reachFactor;
-      const bias = 0.55 + intensityN * 0.25;
+      const bias = 0.55 + intensityN * 0.25 + state.runMods.patternBias;
       const patternCenter = clamp(w * 0.5 + patternOffset(), minCenter, maxCenter);
-      const target = lerp(patternCenter, player.x, 0.2);
+      const avgX = avgPlayerX();
+      const dir = Math.sign(patternCenter - avgX) || 1;
+      const directorPush = dir * TUNING.directorStrength * (maxCenter - minCenter);
+      const target = lerp(patternCenter + directorPush, player.x, 0.2);
       const blended = state.lastGapCenter * bias + target * (1 - bias);
       const jitterScale = lerp(TUNING.jitterHigh, TUNING.jitterLow, intensityN);
       const jitter = (randRange(-1, 1)) * maxShift * jitterScale;
@@ -631,10 +1338,12 @@
     const intensityN = intensityNorm();
     const intensityVal = intensity();
     const p = state.runProfile;
-    const gapW = Math.max(p.minGap, p.baseGap - (intensityVal - 1) * p.gapShrinkPerIntensity);
+    let gapW = Math.max(p.minGap, p.baseGap - (intensityVal - 1) * p.gapShrinkPerIntensity);
+    if (state.gateCount < 12) gapW += 20;
+    gapW = Math.max(p.minGap, gapW * state.runMods.gapMul);
     const y = yOverride != null ? yOverride : -40;
     const playerY = player.y();
-    let speed = Math.max(p.baseSpeed, speedAtTime());
+    let speed = Math.max(p.baseSpeed, speedAtTime()) * state.runMods.speedMul;
     let passETA = state.time + (playerY - y) / speed;
 
     if (state.lastPassETA != null){
@@ -657,8 +1366,10 @@
     const gapX = gapCenter - gapW / 2;
     gates.push({
       y,
-      gapX, gapW, speed, passed:false, passETA
+      gapX, gapW, speed, passed:false, passETA,
+      echo: state.runMods.echo && randRange(0, 1) < 0.2
     });
+    state.gateCount += 1;
     state.lastPassETA = passETA;
     state.lastGapCenter = gapCenter;
   }
@@ -678,6 +1389,10 @@
       const phase = (state.time % cycle) / cycle;
       interval *= phase < 0.35 ? 0.78 : 1.05;
     }
+    if (state.theme) interval *= state.theme.pacingBias;
+    if (state.runMods.pulse){
+      interval *= 0.85 + 0.2 * Math.sin(state.time * 2.4);
+    }
     interval = clamp(interval, minInterval, Math.max(minInterval, maxInterval));
     state.spawnTimer = (state.spawnTimer || 0) - dt;
     if (state.spawnTimer <= 0){
@@ -695,27 +1410,69 @@
         const inside = px > g.gapX && px < g.gapX + g.gapW;
         if (!inside){
           sfxCrash();
-          state.shake = POLISH.deathShake;
-          state.shakePower = 14;
+          state.shake = POLISH.deathShake * shakeScale();
+          state.shakePower = 14 * shakeScale();
           beginDeath();
           return;
         } else {
+          const center = g.gapX + g.gapW / 2;
+          const centerDist = Math.abs(px - center);
           const edgeDist = Math.min(
             Math.abs(px - g.gapX),
             Math.abs(px - (g.gapX + g.gapW))
           );
-          const bonus = edgeDist < 18 ? 8 : edgeDist < 35 ? 4 : 2;
+          let bonus = edgeDist < 18 ? 8 : edgeDist < 35 ? 4 : 2;
+          let style = "";
+          if (centerDist < 6){
+            bonus += 6;
+            style = "PERFECT";
+          }
+          if (edgeDist <= TUNING.nearMissThreshold){
+            bonus += 4;
+            style = "RISK";
+          }
           state.score += 10 + bonus;
           state.scorePulse = POLISH.pulseTime;
           sfxPass();
           spawnParticles(px, g.y);
-          state.shake = POLISH.nearMissShake;
-          state.shakePower = 4;
+          state.shake = POLISH.nearMissShake * shakeScale();
+          state.shakePower = 4 * shakeScale();
           if (edgeDist <= TUNING.nearMissThreshold){
             state.slowMo = TUNING.slowMoTime;
             state.flash = 0.12;
             state.dangerPulse = POLISH.pulseTime;
+            state.nearTimer = 0.4;
+            if (!SETTINGS.streamer){
+              nearPopEl.classList.remove("show");
+              void nearPopEl.offsetWidth;
+              nearPopEl.classList.add("show");
+            }
+            sfxNear();
+            state.combo = Math.max(0, state.combo - 1);
+            state.comboTimer = 0.6 * state.upgradeEffects.comboExtend;
+            state.nearCount += 1;
+          } else {
+            state.combo += 1;
+            state.comboTimer = 1.2 * state.upgradeEffects.comboExtend;
+            if (state.combo >= 2 && !SETTINGS.streamer){
+              comboPopEl.textContent = `Combo x${state.combo}`;
+              comboPopEl.classList.add("show");
+            }
+            state.score += Math.min(3, state.combo);
           }
+          if (FEATURE_FLAGS.scorePopups && !SETTINGS.streamer){
+            scorePopEl.textContent = style ? `${style} +${bonus}` : `+${bonus}`;
+            scorePopEl.classList.remove("show");
+            void scorePopEl.offsetWidth;
+            scorePopEl.classList.add("show");
+          }
+          if (state.combo === 5) announce("FLOW");
+          if (state.combo === 8){
+            announce("ULTRA");
+            state.flash = Math.max(state.flash, 0.18);
+          }
+          if (state.combo === 10) announce("PERFECT");
+          state.bestCombo = Math.max(state.bestCombo, state.combo);
         }
       }
 
@@ -789,8 +1546,8 @@
         const hit = (dx * dx + dy * dy) <= (o.r + player.r) * (o.r + player.r);
         if (hit){
           sfxCrash();
-          state.shake = POLISH.deathShake;
-          state.shakePower = 14;
+          state.shake = POLISH.deathShake * shakeScale();
+          state.shakePower = 14 * shakeScale();
           beginDeath();
           return;
         }
@@ -799,20 +1556,23 @@
   }
 
   function updatePlayer(dt){
+    const controlBoost = state.upgradeEffects.controlBoost || 1;
     const move = (input.right ? 1 : 0) - (input.left ? 1 : 0);
     if (player.targetX != null){
       const dx = player.targetX - player.x;
-      const desired = clamp(dx * 8, -player.speed, player.speed);
-      const dv = clamp(desired - player.vx, -player.accel * dt, player.accel * dt);
+      let desired = clamp(dx * 8, -player.speed, player.speed);
+      if (state.runMods.mirror) desired += state.runMods.mirrorDir * 40;
+      const dv = clamp(desired - player.vx, -player.accel * controlBoost * dt, player.accel * controlBoost * dt);
       player.vx += dv;
       player.x += player.vx * dt;
     } else if (move !== 0){
-      const desired = move * player.speed;
-      const dv = clamp(desired - player.vx, -player.accel * dt, player.accel * dt);
+      let desired = move * player.speed;
+      if (state.runMods.mirror) desired += state.runMods.mirrorDir * 40;
+      const dv = clamp(desired - player.vx, -player.accel * controlBoost * dt, player.accel * controlBoost * dt);
       player.vx += dv;
       player.x += player.vx * dt;
     } else {
-      const dv = clamp(-player.vx, -player.friction * dt, player.friction * dt);
+      const dv = clamp(-player.vx, -player.friction * controlBoost * dt, player.friction * controlBoost * dt);
       player.vx += dv;
       if (Math.abs(player.vx) < 6) player.vx = 0;
       player.x += player.vx * dt;
@@ -821,7 +1581,9 @@
   }
 
   function spawnParticles(x, y){
-    for (let i = 0; i < 10; i++){
+    const count = Math.max(4, Math.floor(10 * motionScale()));
+    for (let i = 0; i < count; i++){
+      if (particles.length >= POLISH.maxParticles) break;
       particles.push({
         x, y,
         vx: (Math.random() - 0.5) * 160,
@@ -844,7 +1606,8 @@
 
   function updateTrail(dt){
     trail.push({ x: player.x, y: player.y(), life: 1 });
-    while (trail.length > POLISH.trailLength) trail.shift();
+    const maxLen = Math.max(4, Math.floor(POLISH.trailLength * motionScale()));
+    while (trail.length > maxLen) trail.shift();
     for (let i = trail.length - 1; i >= 0; i--){
       trail[i].life -= dt * POLISH.trailFade;
       if (trail[i].life <= 0) trail.splice(i, 1);
@@ -858,6 +1621,13 @@
 
     if (state.scorePulse > 0) state.scorePulse -= dt;
     if (state.dangerPulse > 0) state.dangerPulse -= dt;
+    if (state.comboTimer > 0) state.comboTimer -= dt;
+    if (FEATURE_FLAGS.comboDecay && state.comboTimer <= 0 && state.combo > 0){
+      state.combo -= 1;
+      state.comboTimer = 0.6 * state.upgradeEffects.comboExtend;
+      if (state.combo <= 1) comboPopEl.classList.remove("show");
+    }
+    if (state.comboTimer <= 0) comboPopEl.classList.remove("show");
 
     scoreEl.textContent = Math.floor(state.uiScore);
     bestEl.textContent = Math.floor(state.uiBest);
@@ -876,6 +1646,7 @@
   function unlockAudio(){
     if (state.audioUnlocked) return;
     state.audioUnlocked = true;
+    initAudio();
     menuMusic.volume = 0;
     gameMusic.volume = 0;
     if (!state.audioMuted){
@@ -887,7 +1658,7 @@
     if (state.audioFade) cancelAnimationFrame(state.audioFade);
     const start = performance.now();
     const fromStart = from ? from.volume : 0;
-    const toTarget = to === menuMusic ? AUDIO.menuVolume : AUDIO.gameVolume;
+    const toTarget = (to === menuMusic ? AUDIO.menuVolume : AUDIO.gameVolume) * SETTINGS.musicVolume;
     if (to && to.paused) to.play().catch(() => {});
 
     function step(now){
@@ -920,7 +1691,7 @@
     if (!gameMusic.paused){
       crossfade(gameMusic, menuMusic, AUDIO.crossfadeMs);
     } else {
-      menuMusic.volume = state.audioMuted ? 0 : AUDIO.menuVolume;
+      menuMusic.volume = state.audioMuted ? 0 : AUDIO.menuVolume * SETTINGS.musicVolume;
     }
   }
 
@@ -932,7 +1703,7 @@
     if (!menuMusic.paused){
       crossfade(menuMusic, gameMusic, AUDIO.crossfadeMs);
     } else {
-      gameMusic.volume = state.audioMuted ? 0 : AUDIO.gameVolume;
+      gameMusic.volume = state.audioMuted ? 0 : AUDIO.gameVolume * SETTINGS.musicVolume;
     }
   }
 
@@ -968,12 +1739,13 @@
 
     ctx.clearRect(0, 0, w, h);
 
-    const speedFactor = 1 + intensityNorm() * POLISH.visualSpeedBoost;
+    const motion = motionScale();
+    const speedFactor = 1 + intensityNorm() * POLISH.visualSpeedBoost * motion;
     const anchorY = player.y();
     const renderY = (y) => anchorY + (y - anchorY) * speedFactor;
 
     // Animated background glow
-    const drift = state.time * POLISH.bgDriftSpeed * speedFactor;
+    const drift = state.visualTime * POLISH.bgDriftSpeed * speedFactor;
     const gx = w * 0.6 + Math.sin(drift * 1.3) * 120;
     const gy = h * 0.2 + Math.cos(drift * 0.9) * 90;
     const radial = ctx.createRadialGradient(gx, gy, 60, gx, gy, Math.max(w, h));
@@ -996,18 +1768,28 @@
     ctx.globalAlpha = 1;
 
     const tint = intensityNorm();
-    const neonR = Math.round(25 + (255 - 25) * tint);
-    const neonG = Math.round(247 + (59 - 247) * tint);
-    const neonB = Math.round(255 + (122 - 255) * tint);
+    const theme = state.theme || THEMES[0];
+    const a = theme.palette.neonA;
+    const b = theme.palette.neonB;
+    const c = theme.palette.neonC;
+    const mix = tint < 0.5 ? tint * 2 : (tint - 0.5) * 2;
+    const from = tint < 0.5 ? a : b;
+    const to = tint < 0.5 ? b : c;
+    const neonR = Math.round(from[0] + (to[0] - from[0]) * mix);
+    const neonG = Math.round(from[1] + (to[1] - from[1]) * mix);
+    const neonB = Math.round(from[2] + (to[2] - from[2]) * mix);
     const neonColor = `rgb(${neonR},${neonG},${neonB})`;
     const neonGlow = `rgba(${neonR},${neonG},${neonB},0.9)`;
+    const glowBoost = (theme.glowBoost || 1) * (state.upgradeEffects.glowBoost || 1);
+    const pulseBoost = state.upgradeEffects.gatePulse || 0;
 
     // Gates
     for (const g of gates){
       const gy = renderY(g.y);
       ctx.shadowColor = `rgba(${neonR},${neonG},${neonB},0.6)`;
-      ctx.shadowBlur = 10;
-      ctx.fillStyle = `rgba(${neonR},${neonG},${neonB},0.18)`;
+      ctx.shadowBlur = 10 * glowBoost;
+      const pulse = pulseBoost ? (0.16 + 0.04 * Math.sin(state.visualTime * 6)) : 0.18;
+      ctx.fillStyle = `rgba(${neonR},${neonG},${neonB},${pulse})`;
       ctx.fillRect(0, gy, g.gapX, 16);
       ctx.fillRect(g.gapX + g.gapW, gy, w, 16);
 
@@ -1015,6 +1797,14 @@
       ctx.fillRect(0, gy - 18, g.gapX, 18);
       ctx.fillRect(g.gapX + g.gapW, gy - 18, w, 18);
       ctx.globalAlpha = 1;
+
+      if (g.echo){
+        ctx.globalAlpha = 0.22;
+        ctx.fillStyle = `rgba(${neonR},${neonG},${neonB},0.12)`;
+        ctx.fillRect(0, gy - 36, g.gapX, 10);
+        ctx.fillRect(g.gapX + g.gapW, gy - 36, w, 10);
+        ctx.globalAlpha = 1;
+      }
 
       ctx.fillStyle = neonGlow;
       ctx.fillRect(g.gapX - 2, gy - 2, 4, 20);
@@ -1045,13 +1835,17 @@
     }
 
     // Player trail
+    const trailShift = state.upgradeEffects.trailShift || 0;
+    const trailR = Math.round(neonR + (255 - neonR) * trailShift);
+    const trailG = Math.round(neonG + (neonB - neonG) * trailShift);
+    const trailB = Math.round(neonB + (neonG - neonB) * trailShift);
     for (let i = 0; i < trail.length; i++){
       const t = trail[i];
       const alpha = (i / trail.length) * 0.35 * t.life;
       ctx.globalAlpha = alpha;
       ctx.beginPath();
       ctx.arc(t.x, t.y, 9, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(${neonR},${neonG},${neonB},0.6)`;
+      ctx.fillStyle = `rgba(${trailR},${trailG},${trailB},0.6)`;
       ctx.fill();
     }
     ctx.globalAlpha = 1;
@@ -1065,7 +1859,7 @@
     ctx.closePath();
     ctx.fillStyle = neonColor;
     ctx.shadowColor = neonColor;
-    ctx.shadowBlur = 16 + Math.sin(state.time * 6) * 2;
+    ctx.shadowBlur = (16 + Math.sin(state.visualTime * 6) * 2) * glowBoost;
     ctx.fill();
     ctx.shadowBlur = 0;
 
@@ -1077,7 +1871,7 @@
     }
     ctx.globalAlpha = 1;
 
-    if (state.flash > 0){
+    if (state.flash > 0 && !SETTINGS.streamer){
       ctx.globalAlpha = state.flash;
       ctx.fillStyle = "rgba(25,247,255,0.25)";
       ctx.fillRect(0, 0, w, h);
@@ -1085,36 +1879,35 @@
     }
 
     // Scanlines
-    ctx.globalAlpha = POLISH.scanlineAlpha;
+    ctx.globalAlpha = POLISH.scanlineAlpha * motion;
     ctx.fillStyle = "rgba(6,10,20,0.45)";
     for (let y = 0; y < h; y += 4){
-      ctx.fillRect(0, y + (state.time * 20 * speedFactor) % 4, w, 1);
+      ctx.fillRect(0, y + (state.visualTime * 20 * speedFactor) % 4, w, 1);
     }
     ctx.globalAlpha = 1;
 
-    // Subtle noise
-    ctx.globalAlpha = POLISH.noiseAlpha;
-    ctx.fillStyle = "rgba(255,255,255,0.15)";
-    for (let i = 0; i < 80; i++){
-      const nx = Math.random() * w;
-      const ny = Math.random() * h;
-      ctx.fillRect(nx, ny, 1, 1);
+    // Subtle noise (cached)
+    if (state.noiseCanvas){
+      ctx.globalAlpha = POLISH.noiseAlpha * motion;
+      const nx = (state.visualTime * 40) % state.noiseCanvas.width;
+      const ny = (state.visualTime * 26) % state.noiseCanvas.height;
+      ctx.drawImage(state.noiseCanvas, -nx, -ny, w + state.noiseCanvas.width, h + state.noiseCanvas.height);
+      ctx.globalAlpha = 1;
     }
-    ctx.globalAlpha = 1;
 
-    // Speed lines
-    const speedAlpha = POLISH.speedLineAlpha * intensityNorm();
-    if (speedAlpha > 0){
+    // Speed lines (cached)
+    const speedAlpha = POLISH.speedLineAlpha * intensityNorm() * motion;
+    if (speedAlpha > 0 && state.speedLines.length){
       ctx.globalAlpha = speedAlpha;
       ctx.strokeStyle = "rgba(25,247,255,0.5)";
       ctx.lineWidth = 1;
-      for (let i = 0; i < POLISH.speedLineCount; i++){
-        const x = Math.random() * w;
-        const len = 18 + Math.random() * 26 * speedFactor;
-        const y = Math.random() * h;
+      const offset = (state.visualTime * 220 * speedFactor) % h;
+      for (const line of state.speedLines){
+        const y = (line.y + offset) % h;
+        const len = line.len * speedFactor;
         ctx.beginPath();
-        ctx.moveTo(x, y);
-        ctx.lineTo(x, y + len);
+        ctx.moveTo(line.x, y);
+        ctx.lineTo(line.x, y + len);
         ctx.stroke();
       }
       ctx.globalAlpha = 1;
@@ -1142,22 +1935,50 @@
     const dt = Math.min(0.033, (ts - state.lastTime) / 1000 || 0);
     const timeScale = state.slowMo > 0 ? TUNING.slowMoScale : 1;
     state.lastTime = ts;
+    state.visualTime += dt;
+
+    if (state.paused){
+      updateHud(dt);
+      draw();
+      requestAnimationFrame(loop);
+      return;
+    }
 
     if (state.mode === "play"){
       state.time += dt;
       const dtScaled = dt * timeScale;
       state.score += Math.floor(dtScaled * 8);
+      state.intensityPeak = Math.max(state.intensityPeak, intensity());
+      if (state.announceCooldown > 0) state.announceCooldown -= dt;
+      if (intensityNorm() > 0.85 && state.announceCooldown <= 0){
+        announce("DANGER");
+        state.announceCooldown = 4;
+      }
       updatePlayer(dtScaled);
       updateGates(dtScaled);
       updateOrbs(dtScaled);
       updateParticles(dtScaled);
       updateTrail(dtScaled);
+      recordPlayerX();
 
       if (state.shake > 0) state.shake -= dt;
       if (state.slowMo > 0) state.slowMo -= dt;
       if (state.flash > 0) state.flash -= dt;
       if (state.glitch > 0) state.glitch -= dt;
       if (state.zoom > 0) state.zoom = Math.max(0, state.zoom - dt * 0.08);
+
+      if (state.readyTimer > 0){
+        state.readyTimer -= dt;
+        if (state.readyTimer > 0.35){
+          readyGoEl.textContent = "Ready";
+          readyGoEl.classList.add("show");
+        } else if (state.readyTimer > 0){
+          readyGoEl.textContent = "Go";
+          readyGoEl.classList.add("show");
+        } else {
+          readyGoEl.classList.remove("show");
+        }
+      }
     } else if (state.mode === "dying"){
       if (state.deathTimer > 0){
         state.deathTimer -= dt;
@@ -1177,27 +1998,59 @@
 
   // Audio
   let audioCtx = null;
+  let sfxGain = null;
   function initAudio(){
     if (!audioCtx){
       const Ctx = window.AudioContext || window.webkitAudioContext;
       if (Ctx) audioCtx = new Ctx();
+      if (audioCtx){
+        sfxGain = audioCtx.createGain();
+        sfxGain.gain.value = 1;
+        sfxGain.connect(audioCtx.destination);
+      }
     }
+    if (audioCtx && audioCtx.state === "suspended") audioCtx.resume().catch(() => {});
   }
-  function beep(freq, duration){
+  function playTone(freq, duration, type, volume){
     if (!audioCtx) return;
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
-    osc.type = "sawtooth";
+    osc.type = type;
     osc.frequency.value = freq;
-    gain.gain.value = 0.08;
+    gain.gain.value = volume * SETTINGS.sfxVolume;
     osc.connect(gain);
-    gain.connect(audioCtx.destination);
+    gain.connect(sfxGain);
     osc.start();
-    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+    gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
     osc.stop(audioCtx.currentTime + duration);
   }
-  function sfxPass(){ beep(620, 0.12); }
-  function sfxCrash(){ beep(180, 0.25); }
+  function playNoise(duration, volume){
+    if (!audioCtx) return;
+    const buffer = audioCtx.createBuffer(1, audioCtx.sampleRate * duration, audioCtx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * volume;
+    const src = audioCtx.createBufferSource();
+    src.buffer = buffer;
+    const gain = audioCtx.createGain();
+    gain.gain.value = SETTINGS.sfxVolume;
+    src.connect(gain);
+    gain.connect(sfxGain);
+    src.start();
+  }
+  function sfxPass(){
+    playTone(680, 0.08, "triangle", 0.08);
+    playTone(920, 0.06, "sine", 0.06);
+  }
+  function sfxNear(){
+    playTone(840, 0.05, "square", 0.05);
+  }
+  function sfxCrash(){
+    playTone(180, 0.18, "sawtooth", 0.14);
+    playNoise(0.12, 0.12);
+  }
+  function sfxClick(){
+    playTone(520, 0.04, "triangle", 0.05);
+  }
 
   // Monetization hook: cosmetic skins could change player color/glow here.
   // Example: swap player color based on owned cosmetics.
@@ -1212,16 +2065,29 @@
   // Input
   window.addEventListener("keydown", (e) => {
     unlockAudio();
-    if (e.code === "ArrowLeft" || e.code === "KeyA") input.left = true;
-    if (e.code === "ArrowRight" || e.code === "KeyD") input.right = true;
+    if (state.awaitingBind){
+      state.rebind[state.awaitingBind] = e.code;
+      state.awaitingBind = null;
+      updateUpgradeUI();
+      saveProgress();
+      return;
+    }
+    if (e.code === state.rebind.left) input.left = true;
+    if (e.code === state.rebind.right) input.right = true;
     if (e.code === "KeyM"){
       setMuted(!state.audioMuted);
+    }
+    if (e.code === "KeyP" || e.code === "Escape"){
+      if (state.mode === "play"){
+        setPaused(!state.paused);
+        sfxClick();
+      }
     }
     if (state.mode !== "play" && (e.code === "Space" || e.code === "Enter")) startGame();
   });
   window.addEventListener("keyup", (e) => {
-    if (e.code === "ArrowLeft" || e.code === "KeyA") input.left = false;
-    if (e.code === "ArrowRight" || e.code === "KeyD") input.right = false;
+    if (e.code === state.rebind.left) input.left = false;
+    if (e.code === state.rebind.right) input.right = false;
   });
 
   canvas.addEventListener("pointerdown", (e) => {
@@ -1245,8 +2111,116 @@
     unlockAudio();
     setMuted(!state.audioMuted);
   });
+  openSettingsEl.addEventListener("click", (e) => {
+    e.stopPropagation();
+    sfxClick();
+    modsPanelEl.classList.remove("active");
+    settingsPanelEl.classList.add("active");
+  });
+  openSettingsOverEl.addEventListener("click", (e) => {
+    e.stopPropagation();
+    sfxClick();
+    modsPanelEl.classList.remove("active");
+    settingsPanelEl.classList.add("active");
+  });
+  openUpgradesEl.addEventListener("click", (e) => {
+    e.stopPropagation();
+    sfxClick();
+    modsPanelEl.classList.remove("active");
+    upgradesPanelEl.classList.add("active");
+    updateUpgradeUI();
+  });
+  openUpgradesOverEl.addEventListener("click", (e) => {
+    e.stopPropagation();
+    sfxClick();
+    modsPanelEl.classList.remove("active");
+    upgradesPanelEl.classList.add("active");
+    updateUpgradeUI();
+  });
+  closeSettingsEl.addEventListener("click", (e) => {
+    e.stopPropagation();
+    sfxClick();
+    settingsPanelEl.classList.remove("active");
+  });
+  closeUpgradesEl.addEventListener("click", () => {
+    sfxClick();
+    upgradesPanelEl.classList.remove("active");
+  });
+  closeModsEl.addEventListener("click", () => {
+    sfxClick();
+    modsPanelEl.classList.remove("active");
+  });
+  resumeBtnEl.addEventListener("click", () => {
+    sfxClick();
+    setPaused(false);
+  });
+  restartBtnEl.addEventListener("click", () => {
+    sfxClick();
+    setPaused(false);
+    startGame();
+  });
+  quitBtnEl.addEventListener("click", () => {
+    sfxClick();
+    setPaused(false);
+    setMode("start");
+    startPanel.classList.remove("hidden");
+    startPanel.classList.add("enter");
+  });
+  closeBreakdownEl.addEventListener("click", () => {
+    sfxClick();
+    breakdownPanelEl.classList.remove("active");
+  });
+  musicVolEl.addEventListener("input", () => {
+    SETTINGS.musicVolume = parseFloat(musicVolEl.value);
+    saveSettings();
+    if (!state.audioMuted){
+      if (state.mode === "play"){
+        gameMusic.volume = AUDIO.gameVolume * SETTINGS.musicVolume;
+      } else {
+        menuMusic.volume = AUDIO.menuVolume * SETTINGS.musicVolume;
+      }
+    }
+  });
+  sfxVolEl.addEventListener("input", () => {
+    SETTINGS.sfxVolume = parseFloat(sfxVolEl.value);
+    saveSettings();
+  });
+  shakeLevelEl.addEventListener("change", () => {
+    SETTINGS.shake = shakeLevelEl.value;
+    saveSettings();
+  });
+  contrastToggleEl.addEventListener("click", () => {
+    SETTINGS.highContrast = !SETTINGS.highContrast;
+    applySettings();
+    saveSettings();
+  });
+  motionLevelEl.addEventListener("change", () => {
+    SETTINGS.motion = motionLevelEl.value;
+    saveSettings();
+  });
+  colorBlindToggleEl.addEventListener("click", () => {
+    SETTINGS.colorBlind = !SETTINGS.colorBlind;
+    applySettings();
+    applyTheme();
+    saveSettings();
+  });
+  streamerToggleEl.addEventListener("click", () => {
+    SETTINGS.streamer = !SETTINGS.streamer;
+    applySettings();
+    saveSettings();
+  });
+  rebindLeftEl.addEventListener("click", () => {
+    state.awaitingBind = "left";
+    rebindLeftEl.textContent = "Press key...";
+  });
+  rebindRightEl.addEventListener("click", () => {
+    state.awaitingBind = "right";
+    rebindRightEl.textContent = "Press key...";
+  });
 
-  generateRunProfile();
+  resize();
+  loadSettings();
+  loadProgress();
   setMode("start");
   startPanel.classList.add("enter");
   setTimeout(() => startPanel.classList.remove("enter"), 600);
