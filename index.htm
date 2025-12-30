@@ -48,7 +48,19 @@
     border:1px solid rgba(25,247,255,.35);
     box-shadow: 0 0 25px rgba(25,247,255,.2), inset 0 0 30px rgba(138,91,255,.15);
     padding:24px 28px; border-radius:14px; text-align:center; max-width:320px;
+    position:relative; overflow:hidden;
     transition: opacity .35s ease, transform .35s ease;
+  }
+  .panel::after{
+    content:""; position:absolute; inset:-40%;
+    background: conic-gradient(from 0deg, rgba(25,247,255,.15), rgba(138,91,255,.0), rgba(255,59,122,.15), rgba(25,247,255,.15));
+    animation: panelGlow 8s linear infinite;
+    pointer-events:none;
+  }
+  .panel > *{ position:relative; z-index:1; }
+  @keyframes panelGlow{
+    0%{ transform: rotate(0deg); }
+    100%{ transform: rotate(360deg); }
   }
   .panel.enter{
     animation: panelIn .55s ease;
@@ -102,7 +114,10 @@
     border:1px solid rgba(25,247,255,.5);
     background: rgba(25,247,255,.1);
     color:var(--text); border-radius:10px; cursor:pointer;
+    box-shadow: 0 0 10px rgba(25,247,255,.12);
+    transition: transform .12s ease, box-shadow .12s ease;
   }
+  .btn:hover{ transform: translateY(-1px); box-shadow: 0 0 16px rgba(25,247,255,.25); }
   .hint{ font-size:12px; opacity:.8; margin-top:8px; }
   .hidden{ opacity:0; transform: translateY(14px) scale(0.98); pointer-events:none; position:absolute; }
   .hud{
@@ -112,6 +127,7 @@
     font-size:12.5px; letter-spacing:1px; text-transform:uppercase;
     text-shadow: 0 0 8px rgba(25,247,255,.45);
     transition: opacity .3s ease;
+    animation: hudBreath 4s ease-in-out infinite;
   }
   .hud-block{
     display:flex; flex-direction:column; gap:3px;
@@ -140,12 +156,23 @@
     box-shadow: 0 0 10px rgba(25,247,255,.6);
     transform: scaleX(0);
     transition: transform .12s ease, filter .12s ease;
+    background-size: 200% 100%;
+    animation: meterShimmer 3.5s linear infinite;
   }
   .hud-sub{
     font-size:11px; opacity:.85;
   }
   .hud-divider{
     width:100%; height:1px; background: linear-gradient(90deg, rgba(25,247,255,0), rgba(25,247,255,.35), rgba(25,247,255,0));
+  }
+  @keyframes hudBreath{
+    0%{ text-shadow: 0 0 6px rgba(25,247,255,.35); }
+    50%{ text-shadow: 0 0 10px rgba(25,247,255,.6); }
+    100%{ text-shadow: 0 0 6px rgba(25,247,255,.35); }
+  }
+  @keyframes meterShimmer{
+    0%{ background-position:0% 50%; }
+    100%{ background-position:100% 50%; }
   }
   .audio-toggle{
     margin-top:6px;
@@ -335,6 +362,10 @@
   .currency{
     font-size:12px; letter-spacing:1px; text-transform:uppercase;
     color:#7dffb2; margin-bottom:8px;
+  }
+  .shard-icon{
+    width:36px; height:36px; vertical-align:middle; margin-left:8px;
+    image-rendering: auto;
   }
   .rebind{
     display:flex; align-items:center; justify-content:space-between;
@@ -581,7 +612,7 @@
       </div>
       <div class="slide">
         <h3>Progression</h3>
-        <p>Earn Neon Shards from score, near-misses, combos.</p>
+        <p>Earn Neon Shards <img src="shard.png" alt="Shard" class="shard-icon"> from score, near-misses, combos.</p>
         <p>Spend in Upgrades for better clarity and feel.</p>
       </div>
       <div class="slide">
@@ -720,6 +751,7 @@
     theme: null,
     speedLines: [],
     noiseCanvas: null,
+    starCanvas: null,
     playerHistory: [],
     visualTime: 0,
     gateCount: 0,
@@ -844,7 +876,13 @@
     visualSpeedBoost: 0.55,
     speedLineCount: 26,
     speedLineAlpha: 0.12,
-    maxParticles: 180
+    maxParticles: 180,
+    starAlpha: 0.22,
+    starSpeed: 12,
+    vignetteAlpha: 0.35,
+    gateStreakAlpha: 0.12,
+    gateStreakLen: 30,
+    uiGlowPulse: 0.12
   };
 
   const AUDIO = {
@@ -971,6 +1009,20 @@
         len: 12 + Math.random() * 24
       });
     }
+    const stars = document.createElement("canvas");
+    stars.width = 256;
+    stars.height = 256;
+    const sctx = stars.getContext("2d");
+    sctx.fillStyle = "rgba(255,255,255,0.8)";
+    for (let i = 0; i < 120; i++){
+      const x = Math.random() * stars.width;
+      const y = Math.random() * stars.height;
+      const r = Math.random() < 0.1 ? 1.6 : 1;
+      sctx.globalAlpha = Math.random() * 0.8;
+      sctx.fillRect(x, y, r, r);
+    }
+    sctx.globalAlpha = 1;
+    state.starCanvas = stars;
     const noise = document.createElement("canvas");
     noise.width = 128;
     noise.height = 128;
@@ -1159,7 +1211,7 @@
   }
 
   function updateUpgradeUI(){
-    currencyEl.textContent = `${PROGRESSION.currencyName}: ${state.shards}`;
+    currencyEl.innerHTML = `${PROGRESSION.currencyName}: ${state.shards} <img src="shard.png" alt="Shard" class="shard-icon">`;
     upgradeGridEl.innerHTML = "";
     for (const up of UPGRADES){
       const card = document.createElement("div");
@@ -1709,22 +1761,23 @@
 
   function updatePlayer(dt){
     const controlBoost = state.upgradeEffects.controlBoost || 1;
+    const intensityBoost = 1 + intensityNorm() * 0.35;
     const move = (input.right ? 1 : 0) - (input.left ? 1 : 0);
     if (player.targetX != null){
       const dx = player.targetX - player.x;
-      let desired = clamp(dx * 8, -player.speed, player.speed);
+      let desired = clamp(dx * 8, -player.speed * intensityBoost, player.speed * intensityBoost);
       if (state.runMods.mirror) desired += state.runMods.mirrorDir * 40;
-      const dv = clamp(desired - player.vx, -player.accel * controlBoost * dt, player.accel * controlBoost * dt);
+      const dv = clamp(desired - player.vx, -player.accel * controlBoost * intensityBoost * dt, player.accel * controlBoost * intensityBoost * dt);
       player.vx += dv;
       player.x += player.vx * dt;
     } else if (move !== 0){
-      let desired = move * player.speed;
+      let desired = move * player.speed * intensityBoost;
       if (state.runMods.mirror) desired += state.runMods.mirrorDir * 40;
-      const dv = clamp(desired - player.vx, -player.accel * controlBoost * dt, player.accel * controlBoost * dt);
+      const dv = clamp(desired - player.vx, -player.accel * controlBoost * intensityBoost * dt, player.accel * controlBoost * intensityBoost * dt);
       player.vx += dv;
       player.x += player.vx * dt;
     } else {
-      const dv = clamp(-player.vx, -player.friction * controlBoost * dt, player.friction * controlBoost * dt);
+      const dv = clamp(-player.vx, -player.friction * controlBoost * intensityBoost * dt, player.friction * controlBoost * intensityBoost * dt);
       player.vx += dv;
       if (Math.abs(player.vx) < 6) player.vx = 0;
       player.x += player.vx * dt;
@@ -1896,6 +1949,15 @@
     const anchorY = player.y();
     const renderY = (y) => anchorY + (y - anchorY) * speedFactor;
 
+    // Starfield (cached)
+    if (state.starCanvas){
+      ctx.globalAlpha = POLISH.starAlpha * motion;
+      const sx = (state.visualTime * POLISH.starSpeed) % state.starCanvas.width;
+      const sy = (state.visualTime * POLISH.starSpeed * 0.6) % state.starCanvas.height;
+      ctx.drawImage(state.starCanvas, -sx, -sy, w + state.starCanvas.width, h + state.starCanvas.height);
+      ctx.globalAlpha = 1;
+    }
+
     // Animated background glow
     const drift = state.visualTime * POLISH.bgDriftSpeed * speedFactor;
     const gx = w * 0.6 + Math.sin(drift * 1.3) * 120;
@@ -1910,8 +1972,9 @@
     // Background grid glow
     ctx.globalAlpha = 0.14;
     ctx.strokeStyle = "#1a2a44";
+    const gridOffset = (state.visualTime * 12 * speedFactor) % (h / 12);
     for (let i = 0; i < 12; i++){
-      const y = (i / 12) * h;
+      const y = (i / 12) * h + gridOffset;
       ctx.beginPath();
       ctx.moveTo(0, y);
       ctx.lineTo(w, y);
@@ -1961,6 +2024,10 @@
       ctx.fillStyle = neonGlow;
       ctx.fillRect(g.gapX - 2, gy - 2, 4, 20);
       ctx.fillRect(g.gapX + g.gapW - 2, gy - 2, 4, 20);
+      ctx.globalAlpha = POLISH.gateStreakAlpha * motion;
+      ctx.fillRect(g.gapX - 1, gy - POLISH.gateStreakLen, 2, POLISH.gateStreakLen);
+      ctx.fillRect(g.gapX + g.gapW - 1, gy - POLISH.gateStreakLen, 2, POLISH.gateStreakLen);
+      ctx.globalAlpha = 1;
       ctx.shadowBlur = 0;
     }
 
@@ -1983,6 +2050,14 @@
         ctx.shadowBlur = 10;
         ctx.fill();
         ctx.shadowBlur = 0;
+        ctx.globalAlpha = 0.18;
+        ctx.strokeStyle = "rgba(255, 59, 122, 0.8)";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(o.x - Math.sign(o.vx) * 18, oy);
+        ctx.lineTo(o.x - Math.sign(o.vx) * 34, oy);
+        ctx.stroke();
+        ctx.globalAlpha = 1;
       }
     }
 
@@ -1995,8 +2070,12 @@
       const t = trail[i];
       const alpha = (i / trail.length) * 0.35 * t.life;
       ctx.globalAlpha = alpha;
+      const size = 7;
       ctx.beginPath();
-      ctx.arc(t.x, t.y, 9, 0, Math.PI * 2);
+      ctx.moveTo(t.x, t.y - size);
+      ctx.lineTo(t.x - size + 1, t.y + size - 1);
+      ctx.lineTo(t.x + size - 1, t.y + size - 1);
+      ctx.closePath();
       ctx.fillStyle = `rgba(${trailR},${trailG},${trailB},0.6)`;
       ctx.fill();
     }
@@ -2079,6 +2158,22 @@
       ctx.globalAlpha = 1;
       ctx.globalCompositeOperation = "source-over";
     }
+
+    // Intensity wash
+    const wash = intensityNorm() * 0.08 * motion;
+    if (wash > 0){
+      ctx.globalAlpha = wash;
+      ctx.fillStyle = `rgba(${neonR},${neonG},${neonB},0.35)`;
+      ctx.fillRect(0, 0, w, h);
+      ctx.globalAlpha = 1;
+    }
+
+    // Vignette
+    const vg = ctx.createRadialGradient(w * 0.5, h * 0.55, Math.min(w, h) * 0.2, w * 0.5, h * 0.55, Math.max(w, h) * 0.7);
+    vg.addColorStop(0, "rgba(0,0,0,0)");
+    vg.addColorStop(1, `rgba(0,0,0,${POLISH.vignetteAlpha})`);
+    ctx.fillStyle = vg;
+    ctx.fillRect(0, 0, w, h);
 
     ctx.restore();
   }
