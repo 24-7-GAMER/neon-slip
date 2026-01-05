@@ -47,8 +47,6 @@
     -webkit-user-select: none;
     user-select: none;
     -webkit-tap-highlight-color: transparent;
-    -webkit-touch-callout: none;
-    -webkit-text-size-adjust: 100%;
   }
   canvas{ display:block; width:100vw; height:100vh; touch-action:none; }
   .ui{
@@ -2396,9 +2394,6 @@
   canvas.addEventListener("touchstart", preventTouchScroll, { passive: false });
   canvas.addEventListener("touchmove", preventTouchScroll, { passive: false });
   canvas.addEventListener("touchend", preventTouchScroll, { passive: false });
-  canvas.addEventListener("gesturestart", preventTouchScroll, { passive: false });
-  canvas.addEventListener("gesturechange", preventTouchScroll, { passive: false });
-  canvas.addEventListener("gestureend", preventTouchScroll, { passive: false });
 
   startPanel.addEventListener("click", startGame);
   overPanel.addEventListener("click", startGame);
