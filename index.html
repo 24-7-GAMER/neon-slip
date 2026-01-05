@@ -35,8 +35,13 @@
     overflow:hidden; color:var(--text);
     font-family: "Trebuchet MS","Lucida Console","Courier New",monospace;
     letter-spacing: .5px;
+    overscroll-behavior: none;
+    touch-action: none;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
   }
-  canvas{ display:block; width:100vw; height:100vh; }
+  canvas{ display:block; width:100vw; height:100vh; touch-action:none; }
   .ui{
     position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
     pointer-events:auto;
@@ -2299,6 +2304,25 @@
     playTone(520, 0.04, "triangle", 0.05);
   }
 
+  function handleVisibilityChange(){
+    input.activePointer = false;
+    player.targetX = null;
+    if (document.hidden){
+      if (state.audioFade) cancelAnimationFrame(state.audioFade);
+      menuMusic.pause();
+      gameMusic.pause();
+      if (audioCtx && audioCtx.state === "running") audioCtx.suspend().catch(() => {});
+      return;
+    }
+    if (!state.audioUnlocked || state.audioMuted) return;
+    initAudio();
+    if (state.mode === "play"){
+      playGameMusic();
+    } else {
+      playMenuMusic();
+    }
+  }
+
   // Monetization hook: cosmetic skins could change player color/glow here.
   // Example: swap player color based on owned cosmetics.
   function applyCosmeticSkin(){ /* integrate cosmetic system here */ }
@@ -2337,6 +2361,10 @@
     if (e.code === state.rebind.right) input.right = false;
   });
 
+  const preventTouchScroll = (e) => {
+    if (e.cancelable) e.preventDefault();
+  };
+
   canvas.addEventListener("pointerdown", (e) => {
     initAudio();
     unlockAudio();
@@ -2347,10 +2375,17 @@
   canvas.addEventListener("pointermove", (e) => {
     if (input.activePointer) player.targetX = e.clientX;
   });
+  canvas.addEventListener("pointercancel", () => {
+    input.activePointer = false;
+    player.targetX = null;
+  });
   window.addEventListener("pointerup", () => {
     input.activePointer = false;
     player.targetX = null;
   });
+  canvas.addEventListener("touchstart", preventTouchScroll, { passive: false });
+  canvas.addEventListener("touchmove", preventTouchScroll, { passive: false });
+  canvas.addEventListener("touchend", preventTouchScroll, { passive: false });
 
   startPanel.addEventListener("click", startGame);
   overPanel.addEventListener("click", startGame);
@@ -2417,6 +2452,7 @@
     sfxClick();
     breakdownPanelEl.classList.remove("active");
   });
+  document.addEventListener("visibilitychange", handleVisibilityChange);
   musicVolEl.addEventListener("input", () => {
     SETTINGS.musicVolume = parseFloat(musicVolEl.value);
     saveSettings();
