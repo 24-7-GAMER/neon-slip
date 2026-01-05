@@ -18,6 +18,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="format-detection" content="telephone=no">
 <title>Neon Slip</title>
 <style>
   :root{
@@ -27,6 +30,10 @@
     --neon2: #8a5bff;
     --danger: #ff3b7a;
     --text: #d7f9ff;
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-right: env(safe-area-inset-right, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-left: env(safe-area-inset-left, 0px);
   }
   *{ box-sizing: border-box; }
   html, body{
@@ -44,6 +51,7 @@
   canvas{ display:block; width:100vw; height:100vh; touch-action:none; }
   .ui{
     position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
+    padding: var(--safe-top) var(--safe-right) var(--safe-bottom) var(--safe-left);
     pointer-events:auto;
     z-index:6;
   }
@@ -128,7 +136,7 @@
   .hud{
     position:fixed; top:0; left:0; right:0; pointer-events:none;
     display:grid; grid-template-columns:1fr auto 1fr; align-items:center;
-    padding:12px 14px; gap:10px;
+    padding: calc(12px + var(--safe-top)) calc(14px + var(--safe-right)) 12px calc(14px + var(--safe-left)); gap:10px;
     font-size:12.5px; letter-spacing:1px; text-transform:uppercase;
     text-shadow: 0 0 8px rgba(25,247,255,.45);
     transition: opacity .3s ease;
@@ -641,8 +649,8 @@
   <iframe frameborder="0" src="https://itch.io/embed/4157033" width="552" height="167"><a href="https://247-gamer.itch.io/neon-slip">NEON Slip by 24.7-GAMER</a></iframe>
 </div>
 
-<audio id="menuMusic" src="menu.mp3" preload="auto" loop></audio>
-<audio id="gameMusic" src="game.mp3" preload="auto" loop></audio>
+<audio id="menuMusic" src="menu.mp3" preload="auto" loop playsinline webkit-playsinline></audio>
+<audio id="gameMusic" src="game.mp3" preload="auto" loop playsinline webkit-playsinline></audio>
 
 <script>
 (() => {
