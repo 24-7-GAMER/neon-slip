@@ -1118,9 +1118,9 @@
   const SETTINGS = {
     musicVolume: 0.8,
     sfxVolume: 0.7,
-    shake: "med",
+    shake: "high",
     highContrast: false,
-    motion: "med",
+    motion: "high",
     colorBlind: false,
     streamer: false
   };
@@ -1882,15 +1882,17 @@
     state.mode = mode;
     document.body.setAttribute("data-state", mode);
     if (mode !== "play") readyGoEl.classList.remove("show");
-    if (mode === "start" || mode === "over"){
+    if (mode === "start"){
       generateRunProfile();
       selectRunMods();
       modsPanelEl.classList.add("active");
-      playMenuMusic();
     } else if (mode === "play"){
       modsPanelEl.classList.remove("active");
       playGameMusic();
+      return;
     }
+    // Play menu music for both "start" and "over" modes
+    playMenuMusic();
   }
 
   function setPaused(isPaused){
@@ -3153,7 +3155,14 @@
   canvas.addEventListener("touchend", preventTouchScroll, { passive: false });
 
   startPanel.addEventListener("click", startGame);
-  overPanel.addEventListener("click", startGame);
+  overPanel.addEventListener("click", () => {
+    // Return to main menu after game over
+    setMode("start");
+    overPanel.classList.add("hidden");
+    startPanel.classList.remove("hidden");
+    startPanel.classList.add("enter");
+    setTimeout(() => startPanel.classList.remove("enter"), 600);
+  });
   audioToggleEl.addEventListener("click", () => {
     unlockAudio();
     setMuted(!state.audioMuted);
