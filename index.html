@@ -837,7 +837,7 @@
   const slideshowContentEl = document.getElementById("slideshowContent");
   const slideshowProgressEl = document.getElementById("slideshowProgress");
   const skipSlideshowEl = document.getElementById("skipSlideshow");
-  const nextSlideEl2 = document.getElementById("nextSlide");
+  const nextSlideshowSlideEl = document.getElementById("nextSlide");
   const streakBannerEl = document.getElementById("streakBanner");
   const shieldIndicatorEl = document.getElementById("shieldIndicator");
   const missionTrackerEl = document.getElementById("missionTracker");
@@ -1165,6 +1165,12 @@
     lifetime: 8
   };
 
+  const GAMEPLAY_CONSTANTS = {
+    legendarySpawnChance: 0.05, // 5% chance for legendary modifiers
+    shieldSpawnChance: 0.05, // 5% per upgrade level
+    revivalChance: 0.05 // 5% per upgrade level
+  };
+
   const MISSIONS = {
     pool: [
       { id: "score_1000", name: "Score 1000+", check: () => state.score >= 1000, reward: 50 },
@@ -1481,7 +1487,7 @@
     }
     
     // 5% chance for legendary modifier instead
-    const isLegendary = Math.random() < 0.05;
+    const isLegendary = Math.random() < GAMEPLAY_CONSTANTS.legendarySpawnChance;
     
     if (isLegendary && MODIFIERS.legendary && MODIFIERS.legendary.length > 0){
       const legendary = randPick(MODIFIERS.legendary);
@@ -1608,9 +1614,9 @@
     
     // Update button text
     if (state.slideshowIndex === state.slideshowSlides.length - 1){
-      nextSlideEl2.textContent = "START RUN!";
+      nextSlideshowSlideEl.textContent = "START RUN!";
     } else {
-      nextSlideEl2.textContent = "Next";
+      nextSlideshowSlideEl.textContent = "Next";
     }
   }
 
@@ -1769,9 +1775,10 @@
     state.bossGateTimer = 20;
     state.perfectCount = 0;
     state.streakBonusCount = 0;
+    state.streakCount = 0;
     
     // Check for shield spawn from upgrade
-    if (state.upgrades.shield && Math.random() < (state.upgrades.shield * 0.05)){
+    if (state.upgrades.shield && Math.random() < (state.upgrades.shield * GAMEPLAY_CONSTANTS.shieldSpawnChance)){
       state.hasShield = true;
       shieldIndicatorEl.classList.add("active");
     } else {
@@ -1925,7 +1932,7 @@
     }
     
     // Check for revival upgrade
-    if (state.upgrades.revival && Math.random() < (state.upgrades.revival * 0.05)){
+    if (state.upgrades.revival && Math.random() < (state.upgrades.revival * GAMEPLAY_CONSTANTS.revivalChance)){
       state.flash = 0.15;
       state.shake = 0.2;
       announce("SECOND CHANCE!");
@@ -2962,7 +2969,16 @@
         sfxClick();
       }
     }
-    if (state.mode !== "play" && (e.code === "Space" || e.code === "Enter")) startGame();
+    // Space bar advances slideshow or starts game
+    if (e.code === "Space"){
+      if (state.slideshowActive){
+        e.preventDefault();
+        advanceSlideshow();
+      } else if (state.mode !== "play"){
+        startGame();
+      }
+    }
+    if (state.mode !== "play" && e.code === "Enter") startGame();
   });
   window.addEventListener("keyup", (e) => {
     if (e.code === state.rebind.left) input.left = false;
@@ -3047,17 +3063,9 @@
     closeSlideshow();
   });
   
-  nextSlideEl2.addEventListener("click", () => {
+  nextSlideshowSlideEl.addEventListener("click", () => {
     sfxClick();
     advanceSlideshow();
-  });
-  
-  // Allow space bar to advance slideshow
-  document.addEventListener("keydown", (e) => {
-    if (state.slideshowActive && e.code === "Space"){
-      e.preventDefault();
-      advanceSlideshow();
-    }
   });
   
   resumeBtnEl.addEventListener("click", () => {
