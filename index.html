@@ -775,12 +775,12 @@
         <h3>Power-ups</h3>
         <p>Collect floating power-ups to gain advantages:</p>
         <p class="hint">🛡️ Shield: Blocks one death. Protects you once.</p>
-        <p class="hint">🧲 Magnet: Attracts orbs automatically (8s).</p>
-        <p class="hint">⏰ Time Slow: Slows game to 70% speed (5s).</p>
+        <p class="hint">🧲 Magnet: Auto-attracts orbs for 8 seconds.</p>
+        <p class="hint">⏰ Time Slow: Slows game to 70% speed for 5s.</p>
         <p class="hint">💎 Shard: Instant Neon Shards bonus.</p>
-        <p class="hint">⚡ Dash: Burst speed movement (5s).</p>
-        <p class="hint">✖️ Score Multiplier: 2x score bonus (8s).</p>
-        <p class="hint">🌟 Invincibility: Brief god mode (4s).</p>
+        <p class="hint">⚡ Dash: +50% movement speed for 5 seconds.</p>
+        <p class="hint">✖️ Multiplier: 2x score bonus for 8 seconds.</p>
+        <p class="hint">🌟 Invincibility: God mode for 4 seconds.</p>
       </div>
       <div class="slide">
         <h3>Progression</h3>
@@ -2469,7 +2469,7 @@
   function updatePlayer(dt){
     const controlBoost = state.upgradeEffects.controlBoost || 1;
     const intensityBoost = 1 + intensityNorm() * 0.35;
-    const dashBoost = state.dashActive ? 1.5 : 1; // 50% speed boost when dash is active
+    const dashBoost = state.dashActive ? 1.5 : 1; // 1.5x base speed (+50% boost) when dash is active
     const move = (input.right ? 1 : 0) - (input.left ? 1 : 0);
     if (player.targetX != null){
       const dx = player.targetX - player.x;
