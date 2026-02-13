@@ -198,6 +198,10 @@
     opacity:.75;
   }
   .audio-toggle:hover{ opacity:1; }
+  body[data-state="start"] .audio-toggle,
+  body[data-state="over"] .audio-toggle{
+    opacity:1;
+  }
   .prompt{
     margin-top:12px;
     font-size:12px;
@@ -360,11 +364,19 @@
     width:10px; height:10px; border-radius:50%;
     background: rgba(25,247,255,.25);
     transition: all .3s ease;
+    cursor: pointer;
+  }
+  .progress-dot:hover{
+    background: rgba(25,247,255,.5);
+    transform: scale(1.15);
   }
   .progress-dot.active{
     background: rgba(25,247,255,.85);
     box-shadow: 0 0 12px rgba(25,247,255,.6);
     transform: scale(1.2);
+  }
+  .progress-dot.active:hover{
+    transform: scale(1.25);
   }
   .slideshow-nav{
     display:flex; gap:12px; justify-content:center; margin-top:16px;
@@ -1663,8 +1675,16 @@
     
     // Update progress dots
     slideshowProgressEl.innerHTML = state.slideshowSlides.map((_, i) => 
-      `<div class="progress-dot ${i === state.slideshowIndex ? 'active' : ''}"></div>`
+      `<div class="progress-dot ${i === state.slideshowIndex ? 'active' : ''}" data-slide-index="${i}"></div>`
     ).join('');
+    
+    // Add click handlers to dots
+    slideshowProgressEl.querySelectorAll('.progress-dot').forEach((dot, i) => {
+      dot.addEventListener('click', () => {
+        sfxClick();
+        jumpToSlide(i);
+      });
+    });
     
     // Update button text
     if (state.slideshowIndex === state.slideshowSlides.length - 1){
@@ -1672,6 +1692,11 @@
     } else {
       nextSlideshowSlideEl.textContent = "Next";
     }
+  }
+
+  function jumpToSlide(index){
+    state.slideshowIndex = index;
+    updateSlideshowDisplay();
   }
 
   function advanceSlideshow(){
@@ -3187,7 +3212,12 @@
   closeModsEl.addEventListener("click", () => {
     sfxClick();
     modsPanelEl.classList.remove("active");
-    showModifierSlideshow();
+    // Only show slideshow if tutorial has been completed
+    if (localStorage.getItem("neonTutSeen")){
+      showModifierSlideshow();
+    } else {
+      startGame();
+    }
   });
   
   skipSlideshowEl.addEventListener("click", () => {
