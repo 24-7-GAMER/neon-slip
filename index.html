@@ -324,6 +324,106 @@
   }
   .modifier-badge.positive{ color:#7dffb2; }
   .modifier-badge.negative{ color:#ff8aa5; }
+  .modifier-slideshow{
+    position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
+    pointer-events:none; opacity:0; transition: opacity .3s ease;
+    background: rgba(4,6,12,.85);
+    z-index:25;
+  }
+  .modifier-slideshow.active{ pointer-events:auto; opacity:1; }
+  .slideshow-box{
+    background: linear-gradient(180deg, rgba(10,16,30,.98), rgba(6,10,20,.98));
+    border:1px solid rgba(25,247,255,.35);
+    box-shadow: 0 0 32px rgba(25,247,255,.3);
+    padding:24px 28px; border-radius:14px; width:min(480px, 92vw);
+    text-align:center;
+  }
+  .slideshow-content{
+    min-height:280px; display:flex; flex-direction:column; justify-content:center;
+    animation: slideIn .4s ease;
+  }
+  @keyframes slideIn{
+    0%{ opacity:0; transform: translateX(20px); }
+    100%{ opacity:1; transform: translateX(0); }
+  }
+  .mod-icon{
+    font-size:48px; margin:12px 0;
+  }
+  .mod-desc{
+    font-size:13px; letter-spacing:1px; opacity:.85; margin:14px 0;
+    line-height:1.5;
+  }
+  .slideshow-progress{
+    display:flex; gap:8px; justify-content:center; margin:18px 0 14px;
+  }
+  .progress-dot{
+    width:10px; height:10px; border-radius:50%;
+    background: rgba(25,247,255,.25);
+    transition: all .3s ease;
+  }
+  .progress-dot.active{
+    background: rgba(25,247,255,.85);
+    box-shadow: 0 0 12px rgba(25,247,255,.6);
+    transform: scale(1.2);
+  }
+  .slideshow-nav{
+    display:flex; gap:12px; justify-content:center; margin-top:16px;
+  }
+  .skip-text{
+    font-size:10px; opacity:.6; margin-top:12px; letter-spacing:1px;
+  }
+  .powerup{
+    position:absolute;
+    pointer-events:auto;
+  }
+  .powerup-icon{
+    width:28px; height:28px; border-radius:50%;
+    animation: powerupFloat 2s ease-in-out infinite;
+  }
+  @keyframes powerupFloat{
+    0%, 100%{ transform: translateY(0) rotate(0deg); }
+    50%{ transform: translateY(-8px) rotate(180deg); }
+  }
+  .shield-indicator{
+    position:fixed; right:20px; bottom:80px;
+    font-size:14px; letter-spacing:2px; color:#7dffb2;
+    text-shadow: 0 0 12px rgba(125,255,178,.8);
+    opacity:0; transition: opacity .3s ease;
+  }
+  .shield-indicator.active{ opacity:1; }
+  .streak-banner{
+    position:fixed; left:50%; top:35%;
+    transform: translate(-50%, -50%) scale(0.9);
+    pointer-events:none; opacity:0;
+    font-size:28px; letter-spacing:4px; text-transform:uppercase;
+    color:#ffd86b; text-shadow: 0 0 18px rgba(255,216,107,.9);
+  }
+  .streak-banner.show{ animation: streakBanner 1.2s ease; }
+  @keyframes streakBanner{
+    0%{ opacity:0; transform: translate(-50%, -50%) scale(0.8); }
+    25%{ opacity:1; transform: translate(-50%, -55%) scale(1.15); }
+    75%{ opacity:1; transform: translate(-50%, -55%) scale(1.1); }
+    100%{ opacity:0; transform: translate(-50%, -65%) scale(0.95); }
+  }
+  .mission-tracker{
+    position:fixed; left:20px; bottom:20px;
+    background: rgba(10,14,24,.75);
+    border:1px solid rgba(25,247,255,.3);
+    padding:8px 12px; border-radius:10px;
+    font-size:10px; letter-spacing:1px; opacity:.85;
+    max-width:180px;
+  }
+  .mission-item{
+    margin:4px 0; display:flex; justify-content:space-between;
+  }
+  .mission-complete{ color:#7dffb2; text-decoration:line-through; }
+  .danger-zone{
+    position:absolute; left:0; right:0;
+    background: rgba(255,59,122,.08);
+    border-top:2px solid rgba(255,59,122,.4);
+    border-bottom:2px solid rgba(255,59,122,.4);
+    pointer-events:none;
+  }
   .announcer{
     position:fixed; left:50%; top:30%;
     transform: translate(-50%, -50%) scale(0.9);
@@ -549,6 +649,27 @@
 <div id="bestBurst" class="best-burst">New Best!</div>
 <div id="announcer" class="announcer">FLOW</div>
 <div id="scorePop" class="score-pop">+10</div>
+<div id="streakBanner" class="streak-banner">STREAK BONUS!</div>
+<div id="shieldIndicator" class="shield-indicator">🛡️ SHIELD ACTIVE</div>
+
+<div id="missionTracker" class="mission-tracker" style="display:none;">
+  <div style="font-weight:bold; margin-bottom:6px;">MISSIONS</div>
+  <div id="missionList"></div>
+</div>
+
+<div id="modifierSlideshow" class="modifier-slideshow">
+  <div class="slideshow-box">
+    <div id="slideshowContent" class="slideshow-content">
+      <!-- Dynamic content will be inserted here -->
+    </div>
+    <div class="slideshow-progress" id="slideshowProgress"></div>
+    <div class="slideshow-nav">
+      <div class="btn" id="skipSlideshow">Skip</div>
+      <div class="btn" id="nextSlide">Next</div>
+    </div>
+    <div class="skip-text">Press SPACE to advance</div>
+  </div>
+</div>
 
 <div id="modsPanel" class="mods-panel">
   <div class="mods-box">
@@ -712,6 +833,15 @@
   const nextSlideEl = document.getElementById("nextSlide");
   const slideDotsEl = document.getElementById("slideDots");
   const closeIntroEl = document.getElementById("closeIntro");
+  const modifierSlideshowEl = document.getElementById("modifierSlideshow");
+  const slideshowContentEl = document.getElementById("slideshowContent");
+  const slideshowProgressEl = document.getElementById("slideshowProgress");
+  const skipSlideshowEl = document.getElementById("skipSlideshow");
+  const nextSlideshowSlideEl = document.getElementById("nextSlide");
+  const streakBannerEl = document.getElementById("streakBanner");
+  const shieldIndicatorEl = document.getElementById("shieldIndicator");
+  const missionTrackerEl = document.getElementById("missionTracker");
+  const missionListEl = document.getElementById("missionList");
 
   let w, h, dpr;
   function resize(){
@@ -779,7 +909,21 @@
     upgradeEffects: { controlBoost: 1, comboExtend: 1, glowBoost: 1, trailShift: 0, gatePulse: 0 },
     announceCooldown: 0,
     introRequired: true,
-    slideIndex: 0
+    slideIndex: 0,
+    hasShield: false,
+    magnetActive: false,
+    magnetTimer: 0,
+    powerupTimer: 0,
+    streakCount: 0,
+    dailyChallenge: null,
+    missionProgress: {},
+    achievementsUnlocked: [],
+    slideshowIndex: 0,
+    slideshowActive: false,
+    dangerZoneTimer: 0,
+    bossGateTimer: 0,
+    perfectCount: 0,
+    streakBonusCount: 0
   };
 
   const player = {
@@ -799,6 +943,10 @@
   const particles = [];
   const orbs = [];
   const trail = [];
+  const powerups = [];
+  const dangerZones = [];
+  const missions = [];
+  const achievements = [];
 
   /*
     TUNING (make harder/easier):
@@ -965,22 +1113,85 @@
     { id: "glow", name: "Gate Clarity", cost: 90, desc: "Sharper gate glow visibility.", level: 0, max: 3 },
     { id: "combo", name: "Combo Window", cost: 80, desc: "Combo decays slower.", level: 0, max: 3 },
     { id: "trail", name: "Trail Tint", cost: 70, desc: "Cosmetic trail hue shift.", level: 0, max: 3 },
-    { id: "pulse", name: "Gate Pulse", cost: 110, desc: "Cosmetic pulse style.", level: 0, max: 2 }
+    { id: "pulse", name: "Gate Pulse", cost: 110, desc: "Cosmetic pulse style.", level: 0, max: 2 },
+    { id: "shield", name: "Shield Chance", cost: 150, desc: "5% chance to spawn with shield.", level: 0, max: 5 },
+    { id: "magnet", name: "Magnet Duration", cost: 140, desc: "Magnet lasts longer.", level: 0, max: 3 },
+    { id: "fortune", name: "Powerup Rate", cost: 130, desc: "More frequent powerups.", level: 0, max: 4 },
+    { id: "streak", name: "Streak Bonus", cost: 160, desc: "+10% streak rewards.", level: 0, max: 5 },
+    { id: "danger", name: "Danger Rewards", cost: 170, desc: "Better danger zone bonuses.", level: 0, max: 3 },
+    { id: "starting", name: "Starting Boost", cost: 200, desc: "Begin runs with bonus score.", level: 0, max: 3 },
+    { id: "revival", name: "Second Chance", cost: 300, desc: "5% chance to survive hit (once).", level: 0, max: 2 }
   ];
 
   /*
-    Modifiers: one positive + one negative each run.
+    Modifiers: one positive + one negative each run (or more with upgrades!).
   */
   const MODIFIERS = {
     positive: [
-      { id: "hyper", name: "Hyper Drift", desc: "Faster scroll, wider gaps.", apply: (m) => { m.speedMul *= 1.15; m.gapMul *= 1.1; } },
-      { id: "echo", name: "Echo Gates", desc: "Decoy gates fade out.", apply: (m) => { m.echo = true; } },
-      { id: "flow", name: "Flow Assist", desc: "Smoother patterns.", apply: (m) => { m.patternBias += 0.08; } }
+      { id: "hyper", name: "Hyper Drift", desc: "Faster scroll, wider gaps.", icon: "⚡", apply: (m) => { m.speedMul *= 1.15; m.gapMul *= 1.1; } },
+      { id: "echo", name: "Echo Gates", desc: "Decoy gates fade out.", icon: "👻", apply: (m) => { m.echo = true; } },
+      { id: "flow", name: "Flow Assist", desc: "Smoother patterns.", icon: "🌊", apply: (m) => { m.patternBias += 0.08; } },
+      { id: "fortune", name: "Fortune's Favor", desc: "More powerup spawns.", icon: "🍀", apply: (m) => { m.powerupBoost = 1.6; } },
+      { id: "zen", name: "Zen Mode", desc: "Longer combo windows.", icon: "☯️", apply: (m) => { m.comboBonus = 1.35; } },
+      { id: "vision", name: "Future Vision", desc: "See gates earlier.", icon: "👁️", apply: (m) => { m.visionBoost = 1.15; } },
+      { id: "slipstream", name: "Slipstream", desc: "Smoother movements.", icon: "💨", apply: (m) => { m.smoothMove = 1.25; } },
+      { id: "bonus", name: "Score Rush", desc: "+50% score multiplier.", icon: "💰", apply: (m) => { m.scoreMul = 1.5; } }
     ],
     negative: [
-      { id: "tight", name: "Tight Slip", desc: "Smaller gaps, slower scroll.", apply: (m) => { m.gapMul *= 0.9; m.speedMul *= 0.92; } },
-      { id: "mirror", name: "Mirror Bias", desc: "Subtle left/right pull.", apply: (m) => { m.mirror = true; } },
-      { id: "pulse", name: "Pulse Locks", desc: "Rhythmic bursts.", apply: (m) => { m.pulse = true; } }
+      { id: "tight", name: "Tight Slip", desc: "Smaller gaps, slower scroll.", icon: "🔒", apply: (m) => { m.gapMul *= 0.9; m.speedMul *= 0.92; } },
+      { id: "mirror", name: "Mirror Bias", desc: "Subtle left/right pull.", icon: "🔄", apply: (m) => { m.mirror = true; } },
+      { id: "pulse", name: "Pulse Locks", desc: "Rhythmic bursts.", icon: "💓", apply: (m) => { m.pulse = true; } },
+      { id: "chaos", name: "Chaos Theory", desc: "More random patterns.", icon: "🎲", apply: (m) => { m.chaosMode = true; } },
+      { id: "gravity", name: "Heavy Gravity", desc: "Sluggish controls.", icon: "⬇️", apply: (m) => { m.speedMul *= 0.88; m.controlPenalty = 0.85; } },
+      { id: "fog", name: "Neon Fog", desc: "Reduced visibility.", icon: "🌫️", apply: (m) => { m.fogMode = true; } },
+      { id: "tremor", name: "Screen Tremor", desc: "Constant shaking.", icon: "📳", apply: (m) => { m.tremorMode = true; } },
+      { id: "pressure", name: "Time Pressure", desc: "Faster intensity ramp.", icon: "⏱️", apply: (m) => { m.speedMul *= 1.08; m.gapMul *= 0.95; } }
+    ],
+    legendary: [
+      { id: "godmode", name: "God Mode", desc: "MASSIVE gaps, slow mo.", icon: "👑", apply: (m) => { m.gapMul *= 1.5; m.speedMul *= 0.7; m.scoreMul = 0.5; } },
+      { id: "nightmare", name: "Nightmare", desc: "Tiny gaps, ultra speed.", icon: "😈", apply: (m) => { m.gapMul *= 0.7; m.speedMul *= 1.4; m.scoreMul = 2.5; } },
+      { id: "matrix", name: "Matrix Mode", desc: "Everything in slow mo.", icon: "🕶️", apply: (m) => { m.speedMul *= 0.6; m.scoreMul = 1.8; } }
+    ]
+  };
+
+  const POWERUPS = {
+    types: [
+      { id: "shield", name: "Shield", color: "#7dffb2", icon: "🛡️", duration: 0, effect: "hasShield" },
+      { id: "magnet", name: "Magnet", color: "#ffd86b", icon: "🧲", duration: 8, effect: "magnetActive" },
+      { id: "timeslow", name: "Time Slow", color: "#8a5bff", icon: "⏰", duration: 5, effect: "slowMo" },
+      { id: "shard", name: "Shard", color: "#19f7ff", icon: "💎", duration: 0, effect: "instant" }
+    ],
+    spawnInterval: 12,
+    lifetime: 8
+  };
+
+  const GAMEPLAY_CONSTANTS = {
+    legendarySpawnChance: 0.05, // 5% chance for legendary modifiers
+    shieldSpawnChance: 0.05, // 5% per upgrade level
+    revivalChance: 0.05 // 5% per upgrade level
+  };
+
+  const MISSIONS = {
+    pool: [
+      { id: "score_1000", name: "Score 1000+", check: () => state.score >= 1000, reward: 50 },
+      { id: "combo_5", name: "Combo x5", check: () => state.combo >= 5, reward: 30 },
+      { id: "nearmiss_3", name: "3 Near Misses", check: () => state.nearCount >= 3, reward: 40 },
+      { id: "gates_50", name: "Clear 50 Gates", check: () => state.gateCount >= 50, reward: 60 },
+      { id: "intensity_3", name: "Intensity x3", check: () => intensity() >= 3, reward: 70 },
+      { id: "perfect_10", name: "10 Perfect Passes", check: () => state.perfectCount >= 10, reward: 80 },
+      { id: "survive_60", name: "Survive 60s", check: () => state.time >= 60, reward: 100 }
+    ]
+  };
+
+  const ACHIEVEMENTS = {
+    list: [
+      { id: "first_run", name: "First Run", desc: "Complete your first run", icon: "🎮" },
+      { id: "combo_master", name: "Combo Master", desc: "Reach combo x10", icon: "🔥" },
+      { id: "close_call", name: "Close Call", desc: "Get 10 near misses in one run", icon: "😰" },
+      { id: "survivor", name: "Survivor", desc: "Survive 2 minutes", icon: "⏱️" },
+      { id: "high_roller", name: "High Roller", desc: "Score 5000+ in one run", icon: "💯" },
+      { id: "streak_king", name: "Streak King", desc: "Get 5 streak bonuses", icon: "👑" },
+      { id: "shield_savior", name: "Shield Savior", desc: "Shield saves you from death", icon: "🛡️" }
     ]
   };
 
@@ -1267,18 +1478,163 @@
 
   function selectRunMods(){
     if (!FEATURE_FLAGS.modifiers){
-      state.runMods = { pos: null, neg: null, speedMul: 1, gapMul: 1, echo: false, mirror: false, pulse: false, patternBias: 0 };
+      state.runMods = { 
+        pos: null, neg: null, speedMul: 1, gapMul: 1, echo: false, mirror: false, pulse: false, 
+        patternBias: 0, powerupBoost: 1, comboBonus: 1, visionBoost: 1, smoothMove: 1, scoreMul: 1,
+        chaosMode: false, controlPenalty: 1, fogMode: false, tremorMode: false
+      };
       return;
     }
+    
+    // 5% chance for legendary modifier instead
+    const isLegendary = Math.random() < GAMEPLAY_CONSTANTS.legendarySpawnChance;
+    
+    if (isLegendary && MODIFIERS.legendary && MODIFIERS.legendary.length > 0){
+      const legendary = randPick(MODIFIERS.legendary);
+      const mods = { 
+        pos: legendary, neg: null, speedMul: 1, gapMul: 1, echo: false, mirror: false, pulse: false, 
+        patternBias: 0, mirrorDir: Math.random() < 0.5 ? -1 : 1, powerupBoost: 1, comboBonus: 1,
+        visionBoost: 1, smoothMove: 1, scoreMul: 1, chaosMode: false, controlPenalty: 1, 
+        fogMode: false, tremorMode: false, legendary: true
+      };
+      legendary.apply(mods);
+      state.runMods = mods;
+      modPosEl.textContent = `${legendary.icon || ""} ${legendary.name} (LEGENDARY!)`;
+      modNegEl.textContent = ``;
+      if (state.theme) themeLabelEl.textContent = `Theme: ${state.theme.name}`;
+      return;
+    }
+    
     const pos = randPick(MODIFIERS.positive);
     const neg = randPick(MODIFIERS.negative);
-    const mods = { pos, neg, speedMul: 1, gapMul: 1, echo: false, mirror: false, pulse: false, patternBias: 0, mirrorDir: Math.random() < 0.5 ? -1 : 1 };
+    const mods = { 
+      pos, neg, speedMul: 1, gapMul: 1, echo: false, mirror: false, pulse: false, 
+      patternBias: 0, mirrorDir: Math.random() < 0.5 ? -1 : 1, powerupBoost: 1, comboBonus: 1,
+      visionBoost: 1, smoothMove: 1, scoreMul: 1, chaosMode: false, controlPenalty: 1, 
+      fogMode: false, tremorMode: false, legendary: false
+    };
     pos.apply(mods);
     neg.apply(mods);
     state.runMods = mods;
-    modPosEl.textContent = `${pos.name} (+)`;
-    modNegEl.textContent = `${neg.name} (-)`;
+    modPosEl.textContent = `${pos.icon || ""} ${pos.name} (+)`;
+    modNegEl.textContent = `${neg.icon || ""} ${neg.name} (-)`;
     if (state.theme) themeLabelEl.textContent = `Theme: ${state.theme.name}`;
+  }
+
+  function showModifierSlideshow(){
+    state.slideshowActive = true;
+    state.slideshowIndex = 0;
+    
+    const slides = [];
+    
+    // Welcome slide
+    slides.push({
+      title: "🎮 RUN STARTING",
+      content: `<div style="font-size:16px; margin:20px 0;">Get ready for your next run!</div>
+                <div style="font-size:14px; opacity:0.8;">Let's review what modifiers you got...</div>`
+    });
+    
+    // Theme slide
+    if (state.theme){
+      slides.push({
+        title: `🎨 THEME: ${state.theme.name.toUpperCase()}`,
+        content: `<div style="font-size:14px; margin:20px 0; opacity:0.9;">
+                    This run features the <span style="color:var(--neon);">${state.theme.name}</span> theme!<br><br>
+                    Each theme has unique visuals and pacing.<br>
+                    ${state.theme.name === "Aurora" ? "Steady, smooth flow." : ""}
+                    ${state.theme.name === "Pulse" ? "Fast, burst-paced action." : ""}
+                    ${state.theme.name === "Glitch" ? "Unpredictable, swell patterns." : ""}
+                  </div>`
+      });
+    }
+    
+    // Positive modifier slide
+    if (state.runMods.pos){
+      const mod = state.runMods.pos;
+      slides.push({
+        title: `✨ POSITIVE MODIFIER`,
+        content: `<div class="mod-icon">${mod.icon || "+"}</div>
+                  <div style="font-size:18px; color:#7dffb2; margin:12px 0;">${mod.name}</div>
+                  <div class="mod-desc">${mod.desc}</div>
+                  <div style="font-size:12px; opacity:0.7; margin-top:16px;">This will help you!</div>`
+      });
+    }
+    
+    // Negative modifier slide
+    if (state.runMods.neg){
+      const mod = state.runMods.neg;
+      slides.push({
+        title: `⚠️ NEGATIVE MODIFIER`,
+        content: `<div class="mod-icon">${mod.icon || "-"}</div>
+                  <div style="font-size:18px; color:#ff8aa5; margin:12px 0;">${mod.name}</div>
+                  <div class="mod-desc">${mod.desc}</div>
+                  <div style="font-size:12px; opacity:0.7; margin-top:16px;">An extra challenge to overcome!</div>`
+      });
+    }
+    
+    // Legendary slide
+    if (state.runMods.legendary){
+      slides.push({
+        title: `👑 LEGENDARY MODIFIER!`,
+        content: `<div style="font-size:14px; margin:20px 0; opacity:0.9; color:#ffd86b;">
+                    You got a RARE legendary modifier!<br><br>
+                    These are powerful and game-changing.<br>
+                    Only 5% of runs get these!
+                  </div>`
+      });
+    }
+    
+    // Ready slide
+    slides.push({
+      title: "🚀 READY TO GO!",
+      content: `<div style="font-size:14px; margin:20px 0;">
+                  <div style="margin:10px 0;">✅ Modifiers applied</div>
+                  <div style="margin:10px 0;">✅ Theme set: ${state.theme ? state.theme.name : "Default"}</div>
+                  <div style="margin:10px 0;">✅ Good luck!</div>
+                  <div style="font-size:16px; color:var(--neon); margin-top:24px;">Time to slip through those gates!</div>
+                </div>`
+    });
+    
+    state.slideshowSlides = slides;
+    updateSlideshowDisplay();
+    modifierSlideshowEl.classList.add("active");
+  }
+
+  function updateSlideshowDisplay(){
+    const slide = state.slideshowSlides[state.slideshowIndex];
+    slideshowContentEl.innerHTML = `
+      <div class="title" style="margin-bottom:16px;">${slide.title}</div>
+      ${slide.content}
+    `;
+    
+    // Update progress dots
+    slideshowProgressEl.innerHTML = state.slideshowSlides.map((_, i) => 
+      `<div class="progress-dot ${i === state.slideshowIndex ? 'active' : ''}"></div>`
+    ).join('');
+    
+    // Update button text
+    if (state.slideshowIndex === state.slideshowSlides.length - 1){
+      nextSlideshowSlideEl.textContent = "START RUN!";
+    } else {
+      nextSlideshowSlideEl.textContent = "Next";
+    }
+  }
+
+  function advanceSlideshow(){
+    state.slideshowIndex++;
+    if (state.slideshowIndex >= state.slideshowSlides.length){
+      closeSlideshow();
+    } else {
+      updateSlideshowDisplay();
+    }
+  }
+
+  function closeSlideshow(){
+    modifierSlideshowEl.classList.remove("active");
+    state.slideshowActive = false;
+    // Continue to actual game start
+    modsPanelEl.classList.remove("active");
+    startGame();
   }
 
   function announce(text){
@@ -1322,6 +1678,51 @@
     return p.baseSpeed * (1 + p.speedGrowthScale * growth);
   }
 
+  function initMissions(){
+    // Select 3 random missions for this run
+    const available = [...MISSIONS.pool];
+    missions.length = 0;
+    state.missionProgress = {};
+    
+    for (let i = 0; i < 3 && available.length > 0; i++){
+      const idx = Math.floor(Math.random() * available.length);
+      const mission = available.splice(idx, 1)[0];
+      missions.push({ ...mission, completed: false });
+      state.missionProgress[mission.id] = false;
+    }
+    
+    updateMissionUI();
+  }
+
+  function updateMissionUI(){
+    if (missions.length === 0){
+      missionTrackerEl.style.display = "none";
+      return;
+    }
+    
+    missionTrackerEl.style.display = "block";
+    missionListEl.innerHTML = missions.map(m => `
+      <div class="mission-item ${m.completed ? 'mission-complete' : ''}">
+        <span>${m.name}</span>
+        <span>${m.completed ? '✓' : m.reward + '⭐'}</span>
+      </div>
+    `).join('');
+  }
+
+  function checkMissions(){
+    let anyCompleted = false;
+    missions.forEach(m => {
+      if (!m.completed && m.check()){
+        m.completed = true;
+        state.missionProgress[m.id] = true;
+        state.shards += m.reward;
+        announce(`MISSION: ${m.name}!`);
+        anyCompleted = true;
+      }
+    });
+    if (anyCompleted) updateMissionUI();
+  }
+
   function resetGame(){
     applyUpgrades();
     state.time = 0;
@@ -1330,6 +1731,9 @@
     particles.length = 0;
     orbs.length = 0;
     trail.length = 0;
+    powerups.length = 0;
+    dangerZones.length = 0;
+    missions.length = 0;
     player.x = w * 0.5;
     player.vx = 0;
     player.targetX = null;
@@ -1362,6 +1766,28 @@
     state.nearCount = 0;
     state.intensityPeak = 1;
     state.announceCooldown = 0;
+    state.hasShield = false;
+    state.magnetActive = false;
+    state.magnetTimer = 0;
+    state.powerupTimer = (state.upgrades.fortune || 0) > 0 ? POWERUPS.spawnInterval * 0.7 : POWERUPS.spawnInterval;
+    state.streakCount = 0;
+    state.dangerZoneTimer = 15;
+    state.bossGateTimer = 20;
+    state.perfectCount = 0;
+    state.streakBonusCount = 0;
+    state.streakCount = 0;
+    
+    // Check for shield spawn from upgrade
+    if (state.upgrades.shield && Math.random() < (state.upgrades.shield * GAMEPLAY_CONSTANTS.shieldSpawnChance)){
+      state.hasShield = true;
+      shieldIndicatorEl.classList.add("active");
+    } else {
+      shieldIndicatorEl.classList.remove("active");
+    }
+    
+    // Initialize missions for this run
+    initMissions();
+    
     intensityEl.textContent = "1.0";
     intensityFillEl.style.transform = "scaleX(0)";
     spawnGate(-80, true);
@@ -1487,6 +1913,38 @@
 
   function beginDeath(){
     if (state.mode !== "play") return;
+    
+    // Check for shield protection
+    if (state.hasShield){
+      state.hasShield = false;
+      shieldIndicatorEl.classList.remove("active");
+      state.flash = 0.15;
+      state.shake = 0.2;
+      announce("SHIELD BLOCKED!");
+      sfxClick();
+      
+      // Check for achievement
+      if (!state.achievementsUnlocked.includes("shield_savior")){
+        state.achievementsUnlocked.push("shield_savior");
+        setTimeout(() => announce("ACHIEVEMENT: Shield Savior!"), 800);
+      }
+      return;
+    }
+    
+    // Check for revival upgrade
+    if (state.upgrades.revival && Math.random() < (state.upgrades.revival * GAMEPLAY_CONSTANTS.revivalChance)){
+      state.flash = 0.15;
+      state.shake = 0.2;
+      announce("SECOND CHANCE!");
+      sfxClick();
+      // Give temporary invulnerability
+      setTimeout(() => {
+        state.hasShield = true;
+        shieldIndicatorEl.classList.add("active");
+      }, 100);
+      return;
+    }
+    
     state.freeze = POLISH.deathFreeze;
     state.deathTimer = POLISH.deathUiDelay;
     state.zoom = POLISH.deathZoom;
@@ -1549,6 +2007,99 @@
     }
 
     return clamp(center, minCenter, maxCenter);
+  }
+
+  function spawnPowerup(){
+    const type = randPick(POWERUPS.types);
+    const x = randRange(w * 0.2, w * 0.8);
+    const y = -50;
+    
+    powerups.push({
+      type,
+      x,
+      y,
+      vx: 0,
+      vy: speedAtTime() * state.runMods.speedMul,
+      lifetime: POWERUPS.lifetime,
+      age: 0
+    });
+  }
+
+  function updatePowerups(dt){
+    // Spawn new powerups
+    state.powerupTimer -= dt;
+    const spawnRate = POWERUPS.spawnInterval / (state.runMods.powerupBoost || 1);
+    const fortuneBonus = (state.upgrades.fortune || 0) * 0.1;
+    if (state.powerupTimer <= 0){
+      spawnPowerup();
+      state.powerupTimer = spawnRate * (1 - fortuneBonus);
+    }
+    
+    // Update existing powerups
+    for (let i = powerups.length - 1; i >= 0; i--){
+      const p = powerups[i];
+      p.age += dt;
+      p.y += p.vy * dt;
+      
+      // Remove if too old or off screen
+      if (p.age >= p.lifetime || p.y > h + 100){
+        powerups.splice(i, 1);
+        continue;
+      }
+      
+      // Check collision with player
+      const dx = p.x - player.x;
+      const dy = p.y - player.y();
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      
+      // Magnet effect
+      if (state.magnetActive && dist < 200){
+        const angle = Math.atan2(dy, dx);
+        p.x -= Math.cos(angle) * 300 * dt;
+        p.y -= Math.sin(angle) * 300 * dt;
+      }
+      
+      if (dist < 25){
+        collectPowerup(p);
+        powerups.splice(i, 1);
+      }
+    }
+    
+    // Update magnet timer
+    if (state.magnetActive){
+      state.magnetTimer -= dt;
+      if (state.magnetTimer <= 0){
+        state.magnetActive = false;
+      }
+    }
+  }
+
+  function collectPowerup(powerup){
+    sfxClick();
+    state.flash = 0.05;
+    
+    switch(powerup.type.id){
+      case "shield":
+        state.hasShield = true;
+        shieldIndicatorEl.classList.add("active");
+        announce("SHIELD UP!");
+        break;
+      case "magnet":
+        state.magnetActive = true;
+        const magnetBonus = (state.upgrades.magnet || 0) * 1.5;
+        state.magnetTimer = powerup.type.duration + magnetBonus;
+        announce("MAGNET ACTIVE!");
+        break;
+      case "timeslow":
+        state.slowMo = Math.max(state.slowMo, powerup.type.duration);
+        announce("TIME SLOW!");
+        break;
+      case "shard":
+        const shardAmount = 5 + Math.floor(intensity() * 2);
+        state.shards += shardAmount;
+        announce(`+${shardAmount} SHARDS!`);
+        break;
+    }
   }
 
   function spawnGate(yOverride, easy){
@@ -1643,17 +2194,39 @@
           if (centerDist < 6){
             bonus += 6;
             style = "PERFECT";
+            state.perfectCount += 1;
           }
           if (edgeDist <= TUNING.nearMissThreshold){
             bonus += 4;
             style = "RISK";
           }
-          state.score += 10 + bonus;
+          
+          // Apply score multiplier from modifiers
+          const scoreMultiplier = state.runMods.scoreMul || 1;
+          const baseScore = 10 + bonus;
+          state.score += Math.floor(baseScore * scoreMultiplier);
+          
           state.scorePulse = POLISH.pulseTime;
           sfxPass();
           spawnParticles(px, g.y);
           state.shake = POLISH.nearMissShake * shakeScale();
           state.shakePower = 4 * shakeScale();
+          
+          // Streak tracking - every 10 gates without dying
+          state.streakCount += 1;
+          if (state.streakCount % 10 === 0){
+            const streakBonus = 50 + (state.streakCount / 10) * 25;
+            const upgradeBonus = (state.upgrades.streak || 0) * 0.1;
+            const totalBonus = Math.floor(streakBonus * (1 + upgradeBonus));
+            state.score += totalBonus;
+            state.shards += Math.floor(totalBonus / 10);
+            state.streakBonusCount += 1;
+            streakBannerEl.textContent = `STREAK x${state.streakCount / 10}! +${totalBonus}`;
+            streakBannerEl.classList.remove("show");
+            void streakBannerEl.offsetWidth;
+            streakBannerEl.classList.add("show");
+          }
+          
           if (edgeDist <= TUNING.nearMissThreshold){
             state.slowMo = TUNING.slowMoTime;
             state.flash = 0.12;
@@ -2074,6 +2647,38 @@
       }
     }
 
+    // Powerups
+    for (const p of powerups){
+      const py = renderY(p.y);
+      const fadeAlpha = Math.min(1, (POWERUPS.lifetime - p.age) / 2);
+      ctx.globalAlpha = fadeAlpha;
+      
+      // Draw powerup with icon
+      ctx.shadowColor = p.type.color;
+      ctx.shadowBlur = 14;
+      ctx.fillStyle = p.type.color;
+      ctx.beginPath();
+      ctx.arc(p.x, py, 14, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+      
+      // Draw icon
+      ctx.globalAlpha = 1;
+      ctx.font = "18px Arial";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(p.type.icon, p.x, py);
+      
+      // Glow ring
+      ctx.globalAlpha = fadeAlpha * 0.3;
+      ctx.strokeStyle = p.type.color;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(p.x, py, 20 + Math.sin(state.visualTime * 4) * 3, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
+
     // Player trail
     const trailShift = state.upgradeEffects.trailShift || 0;
     const trailR = Math.round(neonR + (255 - neonR) * trailShift);
@@ -2217,9 +2822,11 @@
       updatePlayer(dtScaled);
       updateGates(dtScaled);
       updateOrbs(dtScaled);
+      updatePowerups(dtScaled);
       updateParticles(dtScaled);
       updateTrail(dtScaled);
       recordPlayerX();
+      checkMissions();
 
       if (state.shake > 0) state.shake -= dt;
       if (state.slowMo > 0) state.slowMo -= dt;
@@ -2362,7 +2969,16 @@
         sfxClick();
       }
     }
-    if (state.mode !== "play" && (e.code === "Space" || e.code === "Enter")) startGame();
+    // Space bar advances slideshow or starts game
+    if (e.code === "Space"){
+      if (state.slideshowActive){
+        e.preventDefault();
+        advanceSlideshow();
+      } else if (state.mode !== "play"){
+        startGame();
+      }
+    }
+    if (state.mode !== "play" && e.code === "Enter") startGame();
   });
   window.addEventListener("keyup", (e) => {
     if (e.code === state.rebind.left) input.left = false;
@@ -2439,7 +3055,19 @@
   closeModsEl.addEventListener("click", () => {
     sfxClick();
     modsPanelEl.classList.remove("active");
+    showModifierSlideshow();
   });
+  
+  skipSlideshowEl.addEventListener("click", () => {
+    sfxClick();
+    closeSlideshow();
+  });
+  
+  nextSlideshowSlideEl.addEventListener("click", () => {
+    sfxClick();
+    advanceSlideshow();
+  });
+  
   resumeBtnEl.addEventListener("click", () => {
     sfxClick();
     setPaused(false);
