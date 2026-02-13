@@ -1673,9 +1673,9 @@
       ${slide.content}
     `;
     
-    // Update progress dots
+    // Update progress dots with keyboard accessibility
     slideshowProgressEl.innerHTML = state.slideshowSlides.map((_, i) => 
-      `<div class="progress-dot ${i === state.slideshowIndex ? 'active' : ''}" data-slide-index="${i}"></div>`
+      `<div class="progress-dot ${i === state.slideshowIndex ? 'active' : ''}" data-slide-index="${i}" tabindex="0" role="button" aria-label="Go to slide ${i + 1}"></div>`
     ).join('');
     
     // Update button text
@@ -1687,6 +1687,8 @@
   }
 
   function jumpToSlide(index){
+    // Bounds checking
+    if (index < 0 || index >= state.slideshowSlides.length) return;
     state.slideshowIndex = index;
     updateSlideshowDisplay();
   }
@@ -3222,9 +3224,21 @@
     advanceSlideshow();
   });
   
-  // Event delegation for slideshow progress dots
+  // Event delegation for slideshow progress dots (click)
   slideshowProgressEl.addEventListener("click", (e) => {
     if (e.target.classList.contains('progress-dot')) {
+      sfxClick();
+      const index = parseInt(e.target.getAttribute('data-slide-index'), 10);
+      if (!isNaN(index)) {
+        jumpToSlide(index);
+      }
+    }
+  });
+  
+  // Event delegation for slideshow progress dots (keyboard)
+  slideshowProgressEl.addEventListener("keydown", (e) => {
+    if (e.target.classList.contains('progress-dot') && (e.key === 'Enter' || e.key === ' ')) {
+      e.preventDefault();
       sfxClick();
       const index = parseInt(e.target.getAttribute('data-slide-index'), 10);
       if (!isNaN(index)) {
