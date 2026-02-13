@@ -1678,14 +1678,6 @@
       `<div class="progress-dot ${i === state.slideshowIndex ? 'active' : ''}" data-slide-index="${i}"></div>`
     ).join('');
     
-    // Add click handlers to dots
-    slideshowProgressEl.querySelectorAll('.progress-dot').forEach((dot, i) => {
-      dot.addEventListener('click', () => {
-        sfxClick();
-        jumpToSlide(i);
-      });
-    });
-    
     // Update button text
     if (state.slideshowIndex === state.slideshowSlides.length - 1){
       nextSlideshowSlideEl.textContent = "START RUN!";
@@ -3228,6 +3220,17 @@
   nextSlideshowSlideEl.addEventListener("click", () => {
     sfxClick();
     advanceSlideshow();
+  });
+  
+  // Event delegation for slideshow progress dots
+  slideshowProgressEl.addEventListener("click", (e) => {
+    if (e.target.classList.contains('progress-dot')) {
+      sfxClick();
+      const index = parseInt(e.target.getAttribute('data-slide-index'), 10);
+      if (!isNaN(index)) {
+        jumpToSlide(index);
+      }
+    }
   });
   
   resumeBtnEl.addEventListener("click", () => {
