@@ -385,12 +385,16 @@
     50%{ transform: translateY(-8px) rotate(180deg); }
   }
   .shield-indicator{
-    position:fixed; right:20px; bottom:80px;
+    position:fixed; right:20px;
     font-size:14px; letter-spacing:2px; color:#7dffb2;
     text-shadow: 0 0 12px rgba(125,255,178,.8);
     opacity:0; transition: opacity .3s ease;
   }
   .shield-indicator.active{ opacity:1; }
+  #shieldIndicator{ bottom:140px; color:#7dffb2; text-shadow: 0 0 12px rgba(125,255,178,.8); }
+  #dashIndicator{ bottom:115px; color:#ff9d00; text-shadow: 0 0 12px rgba(255,157,0,.8); }
+  #multiplierIndicator{ bottom:90px; color:#ff3b7a; text-shadow: 0 0 12px rgba(255,59,122,.8); }
+  #invincibleIndicator{ bottom:65px; color:#ffd700; text-shadow: 0 0 12px rgba(255,215,0,.8); }
   .streak-banner{
     position:fixed; left:50%; top:35%;
     transform: translate(-50%, -50%) scale(0.9);
@@ -588,6 +592,7 @@
     <div class="hud-value" id="best">0</div>
     <div class="hud-divider"></div>
     <div id="audioToggle" class="audio-toggle">Audio On</div>
+    <div id="powerupHelp" class="audio-toggle">❓ Power-ups</div>
   </div>
 </div>
 
@@ -631,6 +636,25 @@
   </div>
 </div>
 
+<div id="powerupInfoPanel" class="settings-panel">
+  <div class="settings-box">
+    <div class="title">Power-ups Guide</div>
+    <div style="text-align:left; padding:10px 0; font-size:13px; line-height:1.8;">
+      <div><strong>🛡️ Shield:</strong> Blocks one death. Protects you once.</div>
+      <div><strong>🧲 Magnet:</strong> Auto-attracts orbs for 8 seconds.</div>
+      <div><strong>⏰ Time Slow:</strong> Slows game to 70% speed for 5s.</div>
+      <div><strong>💎 Shard:</strong> Instant Neon Shards bonus.</div>
+      <div><strong>⚡ Dash:</strong> +50% movement speed for 5 seconds.</div>
+      <div><strong>✖️ Multiplier:</strong> 2x score bonus for 8 seconds.</div>
+      <div><strong>🌟 Invincibility:</strong> God mode for 4 seconds.</div>
+    </div>
+    <div class="hint" style="margin-top:8px;">Power-ups spawn every 12 seconds. Collect them for advantages!</div>
+    <div class="settings-actions">
+      <div id="closePowerupInfo" class="btn">Close</div>
+    </div>
+  </div>
+</div>
+
 <div id="pausePanel" class="pause-panel">
   <div class="pause-box">
     <div class="title">Paused</div>
@@ -651,6 +675,9 @@
 <div id="scorePop" class="score-pop">+10</div>
 <div id="streakBanner" class="streak-banner">STREAK BONUS!</div>
 <div id="shieldIndicator" class="shield-indicator">🛡️ SHIELD ACTIVE</div>
+<div id="dashIndicator" class="shield-indicator">⚡ DASH ACTIVE</div>
+<div id="multiplierIndicator" class="shield-indicator">✖️ 2X SCORE</div>
+<div id="invincibleIndicator" class="shield-indicator">🌟 INVINCIBLE</div>
 
 <div id="missionTracker" class="mission-tracker" style="display:none;">
   <div style="font-weight:bold; margin-bottom:6px;">MISSIONS</div>
@@ -745,6 +772,17 @@
         <p class="hint">Negative: Tight Slip, Mirror Bias, Pulse Locks.</p>
       </div>
       <div class="slide">
+        <h3>Power-ups</h3>
+        <p>Collect floating power-ups to gain advantages:</p>
+        <p class="hint">🛡️ Shield: Blocks one death. Protects you once.</p>
+        <p class="hint">🧲 Magnet: Attracts orbs automatically (8s).</p>
+        <p class="hint">⏰ Time Slow: Slows game to 70% speed (5s).</p>
+        <p class="hint">💎 Shard: Instant Neon Shards bonus.</p>
+        <p class="hint">⚡ Dash: Burst speed movement (5s).</p>
+        <p class="hint">✖️ Score Multiplier: 2x score bonus (8s).</p>
+        <p class="hint">🌟 Invincibility: Brief god mode (4s).</p>
+      </div>
+      <div class="slide">
         <h3>Progression</h3>
         <p>Earn Neon Shards <img src="shard.png" alt="Shard" class="shard-icon"> from score, near-misses, combos.</p>
         <p>Spend in Upgrades for better clarity and feel.</p>
@@ -795,6 +833,9 @@
   const openUpgradesOverEl = document.getElementById("openUpgradesOver");
   const settingsPanelEl = document.getElementById("settingsPanel");
   const closeSettingsEl = document.getElementById("closeSettings");
+  const powerupInfoPanelEl = document.getElementById("powerupInfoPanel");
+  const powerupHelpEl = document.getElementById("powerupHelp");
+  const closePowerupInfoEl = document.getElementById("closePowerupInfo");
   const musicVolEl = document.getElementById("musicVol");
   const sfxVolEl = document.getElementById("sfxVol");
   const shakeLevelEl = document.getElementById("shakeLevel");
@@ -840,6 +881,9 @@
   const nextSlideshowSlideEl = document.getElementById("nextSlide");
   const streakBannerEl = document.getElementById("streakBanner");
   const shieldIndicatorEl = document.getElementById("shieldIndicator");
+  const dashIndicatorEl = document.getElementById("dashIndicator");
+  const multiplierIndicatorEl = document.getElementById("multiplierIndicator");
+  const invincibleIndicatorEl = document.getElementById("invincibleIndicator");
   const missionTrackerEl = document.getElementById("missionTracker");
   const missionListEl = document.getElementById("missionList");
 
@@ -914,6 +958,13 @@
     magnetActive: false,
     magnetTimer: 0,
     powerupTimer: 0,
+    dashActive: false,
+    dashTimer: 0,
+    scoreMultiplier: 1,
+    scoreMultiplierTimer: 0,
+    invincible: false,
+    invincibleTimer: 0,
+    powerupsCollected: 0,
     streakCount: 0,
     dailyChallenge: null,
     missionProgress: {},
@@ -1156,10 +1207,13 @@
 
   const POWERUPS = {
     types: [
-      { id: "shield", name: "Shield", color: "#7dffb2", icon: "🛡️", duration: 0, effect: "hasShield" },
-      { id: "magnet", name: "Magnet", color: "#ffd86b", icon: "🧲", duration: 8, effect: "magnetActive" },
-      { id: "timeslow", name: "Time Slow", color: "#8a5bff", icon: "⏰", duration: 5, effect: "slowMo" },
-      { id: "shard", name: "Shard", color: "#19f7ff", icon: "💎", duration: 0, effect: "instant" }
+      { id: "shield", name: "Shield", color: "#7dffb2", icon: "🛡️", duration: 0, effect: "hasShield", desc: "Blocks one death" },
+      { id: "magnet", name: "Magnet", color: "#ffd86b", icon: "🧲", duration: 8, effect: "magnetActive", desc: "Attracts orbs (8s)" },
+      { id: "timeslow", name: "Time Slow", color: "#8a5bff", icon: "⏰", duration: 5, effect: "slowMo", desc: "Slows time to 70% (5s)" },
+      { id: "shard", name: "Shard", color: "#19f7ff", icon: "💎", duration: 0, effect: "instant", desc: "Instant Neon Shards" },
+      { id: "dash", name: "Dash", color: "#ff9d00", icon: "⚡", duration: 5, effect: "dashActive", desc: "Burst speed movement (5s)" },
+      { id: "multiplier", name: "Score Multiplier", color: "#ff3b7a", icon: "✖️", duration: 8, effect: "scoreMultiplier", desc: "2x score bonus (8s)" },
+      { id: "invincibility", name: "Invincibility", color: "#ffd700", icon: "🌟", duration: 4, effect: "invincible", desc: "God mode (4s)" }
     ],
     spawnInterval: 12,
     lifetime: 8
@@ -1769,6 +1823,13 @@
     state.hasShield = false;
     state.magnetActive = false;
     state.magnetTimer = 0;
+    state.dashActive = false;
+    state.dashTimer = 0;
+    state.scoreMultiplier = 1;
+    state.scoreMultiplierTimer = 0;
+    state.invincible = false;
+    state.invincibleTimer = 0;
+    state.powerupsCollected = 0;
     state.powerupTimer = (state.upgrades.fortune || 0) > 0 ? POWERUPS.spawnInterval * 0.7 : POWERUPS.spawnInterval;
     state.streakCount = 0;
     state.dangerZoneTimer = 15;
@@ -1784,6 +1845,11 @@
     } else {
       shieldIndicatorEl.classList.remove("active");
     }
+    
+    // Clear all power-up indicators
+    dashIndicatorEl.classList.remove("active");
+    multiplierIndicatorEl.classList.remove("active");
+    invincibleIndicatorEl.classList.remove("active");
     
     // Initialize missions for this run
     initMissions();
@@ -1913,6 +1979,15 @@
 
   function beginDeath(){
     if (state.mode !== "play") return;
+    
+    // Check for invincibility
+    if (state.invincible){
+      state.flash = 0.15;
+      state.shake = 0.2;
+      announce("INVINCIBLE!");
+      sfxClick();
+      return;
+    }
     
     // Check for shield protection
     if (state.hasShield){
@@ -2072,11 +2147,39 @@
         state.magnetActive = false;
       }
     }
+    
+    // Update dash timer
+    if (state.dashActive){
+      state.dashTimer -= dt;
+      if (state.dashTimer <= 0){
+        state.dashActive = false;
+        dashIndicatorEl.classList.remove("active");
+      }
+    }
+    
+    // Update score multiplier timer
+    if (state.scoreMultiplier > 1){
+      state.scoreMultiplierTimer -= dt;
+      if (state.scoreMultiplierTimer <= 0){
+        state.scoreMultiplier = 1;
+        multiplierIndicatorEl.classList.remove("active");
+      }
+    }
+    
+    // Update invincibility timer
+    if (state.invincible){
+      state.invincibleTimer -= dt;
+      if (state.invincibleTimer <= 0){
+        state.invincible = false;
+        invincibleIndicatorEl.classList.remove("active");
+      }
+    }
   }
 
   function collectPowerup(powerup){
     sfxClick();
     state.flash = 0.05;
+    state.powerupsCollected++;
     
     switch(powerup.type.id){
       case "shield":
@@ -2098,6 +2201,24 @@
         const shardAmount = 5 + Math.floor(intensity() * 2);
         state.shards += shardAmount;
         announce(`+${shardAmount} SHARDS!`);
+        break;
+      case "dash":
+        state.dashActive = true;
+        state.dashTimer = powerup.type.duration;
+        dashIndicatorEl.classList.add("active");
+        announce("DASH BOOST!");
+        break;
+      case "multiplier":
+        state.scoreMultiplier = 2;
+        state.scoreMultiplierTimer = powerup.type.duration;
+        multiplierIndicatorEl.classList.add("active");
+        announce("2X SCORE!");
+        break;
+      case "invincibility":
+        state.invincible = true;
+        state.invincibleTimer = powerup.type.duration;
+        invincibleIndicatorEl.classList.add("active");
+        announce("INVINCIBLE!");
         break;
     }
   }
@@ -2201,8 +2322,8 @@
             style = "RISK";
           }
           
-          // Apply score multiplier from modifiers
-          const scoreMultiplier = state.runMods.scoreMul || 1;
+          // Apply score multiplier from modifiers and power-ups
+          const scoreMultiplier = (state.runMods.scoreMul || 1) * state.scoreMultiplier;
           const baseScore = 10 + bonus;
           state.score += Math.floor(baseScore * scoreMultiplier);
           
@@ -2348,18 +2469,19 @@
   function updatePlayer(dt){
     const controlBoost = state.upgradeEffects.controlBoost || 1;
     const intensityBoost = 1 + intensityNorm() * 0.35;
+    const dashBoost = state.dashActive ? 1.5 : 1; // 50% speed boost when dash is active
     const move = (input.right ? 1 : 0) - (input.left ? 1 : 0);
     if (player.targetX != null){
       const dx = player.targetX - player.x;
-      let desired = clamp(dx * 8, -player.speed * intensityBoost, player.speed * intensityBoost);
+      let desired = clamp(dx * 8, -player.speed * intensityBoost * dashBoost, player.speed * intensityBoost * dashBoost);
       if (state.runMods.mirror) desired += state.runMods.mirrorDir * 40;
-      const dv = clamp(desired - player.vx, -player.accel * controlBoost * intensityBoost * dt, player.accel * controlBoost * intensityBoost * dt);
+      const dv = clamp(desired - player.vx, -player.accel * controlBoost * intensityBoost * dashBoost * dt, player.accel * controlBoost * intensityBoost * dashBoost * dt);
       player.vx += dv;
       player.x += player.vx * dt;
     } else if (move !== 0){
-      let desired = move * player.speed * intensityBoost;
+      let desired = move * player.speed * intensityBoost * dashBoost;
       if (state.runMods.mirror) desired += state.runMods.mirrorDir * 40;
-      const dv = clamp(desired - player.vx, -player.accel * controlBoost * intensityBoost * dt, player.accel * controlBoost * intensityBoost * dt);
+      const dv = clamp(desired - player.vx, -player.accel * controlBoost * intensityBoost * dashBoost * dt, player.accel * controlBoost * intensityBoost * dashBoost * dt);
       player.vx += dv;
       player.x += player.vx * dt;
     } else {
@@ -3047,6 +3169,16 @@
     e.stopPropagation();
     sfxClick();
     settingsPanelEl.classList.remove("active");
+  });
+  powerupHelpEl.addEventListener("click", (e) => {
+    e.stopPropagation();
+    sfxClick();
+    powerupInfoPanelEl.classList.add("active");
+  });
+  closePowerupInfoEl.addEventListener("click", (e) => {
+    e.stopPropagation();
+    sfxClick();
+    powerupInfoPanelEl.classList.remove("active");
   });
   closeUpgradesEl.addEventListener("click", () => {
     sfxClick();
