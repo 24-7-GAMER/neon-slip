@@ -198,6 +198,10 @@
     opacity:.75;
   }
   .audio-toggle:hover{ opacity:1; }
+  body[data-state="start"] .audio-toggle,
+  body[data-state="over"] .audio-toggle{
+    opacity:1;
+  }
   .prompt{
     margin-top:12px;
     font-size:12px;
@@ -360,11 +364,19 @@
     width:10px; height:10px; border-radius:50%;
     background: rgba(25,247,255,.25);
     transition: all .3s ease;
+    cursor: pointer;
+  }
+  .progress-dot:hover{
+    background: rgba(25,247,255,.5);
+    transform: scale(1.15);
   }
   .progress-dot.active{
     background: rgba(25,247,255,.85);
     box-shadow: 0 0 12px rgba(25,247,255,.6);
     transform: scale(1.2);
+  }
+  .progress-dot.active:hover{
+    transform: scale(1.25);
   }
   .slideshow-nav{
     display:flex; gap:12px; justify-content:center; margin-top:16px;
@@ -1661,9 +1673,9 @@
       ${slide.content}
     `;
     
-    // Update progress dots
+    // Update progress dots with keyboard accessibility
     slideshowProgressEl.innerHTML = state.slideshowSlides.map((_, i) => 
-      `<div class="progress-dot ${i === state.slideshowIndex ? 'active' : ''}"></div>`
+      `<div class="progress-dot ${i === state.slideshowIndex ? 'active' : ''}" data-slide-index="${i}" tabindex="0" role="button" aria-label="Go to slide ${i + 1}"></div>`
     ).join('');
     
     // Update button text
@@ -1672,6 +1684,13 @@
     } else {
       nextSlideshowSlideEl.textContent = "Next";
     }
+  }
+
+  function jumpToSlide(index){
+    // Bounds checking
+    if (index < 0 || index >= state.slideshowSlides.length) return;
+    state.slideshowIndex = index;
+    updateSlideshowDisplay();
   }
 
   function advanceSlideshow(){
@@ -3187,7 +3206,12 @@
   closeModsEl.addEventListener("click", () => {
     sfxClick();
     modsPanelEl.classList.remove("active");
-    showModifierSlideshow();
+    // Only show slideshow if tutorial has been completed
+    if (localStorage.getItem("neonTutSeen")){
+      showModifierSlideshow();
+    } else {
+      startGame();
+    }
   });
   
   skipSlideshowEl.addEventListener("click", () => {
@@ -3198,6 +3222,29 @@
   nextSlideshowSlideEl.addEventListener("click", () => {
     sfxClick();
     advanceSlideshow();
+  });
+  
+  // Event delegation for slideshow progress dots (click)
+  slideshowProgressEl.addEventListener("click", (e) => {
+    if (e.target.classList.contains('progress-dot')) {
+      sfxClick();
+      const index = parseInt(e.target.getAttribute('data-slide-index'), 10);
+      if (!isNaN(index)) {
+        jumpToSlide(index);
+      }
+    }
+  });
+  
+  // Event delegation for slideshow progress dots (keyboard)
+  slideshowProgressEl.addEventListener("keydown", (e) => {
+    if (e.target.classList.contains('progress-dot') && (e.key === 'Enter' || e.key === ' ')) {
+      e.preventDefault();
+      sfxClick();
+      const index = parseInt(e.target.getAttribute('data-slide-index'), 10);
+      if (!isNaN(index)) {
+        jumpToSlide(index);
+      }
+    }
   });
   
   resumeBtnEl.addEventListener("click", () => {
