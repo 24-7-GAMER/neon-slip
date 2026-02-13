@@ -1886,13 +1886,13 @@
       generateRunProfile();
       selectRunMods();
       modsPanelEl.classList.add("active");
-      playMenuMusic();
-    } else if (mode === "over"){
-      playMenuMusic();
     } else if (mode === "play"){
       modsPanelEl.classList.remove("active");
       playGameMusic();
+      return;
     }
+    // Play menu music for both "start" and "over" modes
+    playMenuMusic();
   }
 
   function setPaused(isPaused){
