@@ -681,6 +681,8 @@
   .lb-date{ font-size:9px; color:rgba(215,249,255,.35); letter-spacing:.5px; text-transform:uppercase; white-space:nowrap; flex-shrink:0; }
   .lb-empty{ text-align:center; padding:32px 0; opacity:.45; font-size:12px; letter-spacing:1px; text-transform:uppercase; }
   .lb-your-score{ font-size:12px; letter-spacing:1px; text-transform:uppercase; color:rgba(215,249,255,.55); margin-bottom:6px; flex-shrink:0; }
+  @keyframes lb-spin{ to{ transform:rotate(360deg); } }
+  .lb-loading{ display:inline-block; animation: lb-spin 0.8s linear infinite; }
   /* Leaderboard submit modal */
   .lb-modal{
     position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
@@ -1082,11 +1084,53 @@
   <iframe frameborder="0" src="https://itch.io/embed/4157033" width="552" height="167"><a href="https://247-gamer.itch.io/neon-slip">NEON Slip by 24.7-GAMER</a></iframe>
 </div>
 
+<!-- Firebase SDK (Realtime Database compat) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+
 <audio id="menuMusic" src="menu.mp3" preload="auto" loop playsinline webkit-playsinline></audio>
 <audio id="gameMusic" src="game.mp3" preload="auto" loop playsinline webkit-playsinline></audio>
 
 <script>
 (() => {
+  // =====================================================================
+  // ONLINE LEADERBOARD — FIREBASE CONFIGURATION
+  // =====================================================================
+  // To enable the online leaderboard:
+  //   1. Go to https://console.firebase.google.com and create a project.
+  //   2. Click "Realtime Database" → Create database (start in test mode).
+  //   3. After creation, go to Rules and paste these rules:
+  //      {
+  //        "rules": {
+  //          "leaderboard": {
+  //            ".read": true,
+  //            "$entry": {
+  //              ".write": "!data.exists()",
+  //              ".validate": "newData.hasChildren(['name','score','date'])
+  //                && newData.child('score').isNumber()
+  //                && newData.child('score').val() >= 0
+  //                && newData.child('score').val() <= 10000000
+  //                && newData.child('name').isString()
+  //                && newData.child('name').val().length <= 24"
+  //            }
+  //          }
+  //        }
+  //      }
+  //   4. Under Project Settings → Your apps → Web, copy your config object.
+  //   5. Fill in the values below and save.
+  // Leave databaseURL as "" to fall back to local-only mode.
+  // =====================================================================
+  const FIREBASE_CONFIG = {
+    apiKey:            "",
+    authDomain:        "",
+    databaseURL:       "",   // e.g. "https://your-project-default-rtdb.firebaseio.com"
+    projectId:         "",
+    storageBucket:     "",
+    messagingSenderId: "",
+    appId:             ""
+  };
+  // =====================================================================
+
   const canvas = document.getElementById("game");
   const ctx = canvas.getContext("2d");
 
@@ -3638,60 +3682,64 @@
   // Monetization hook: ads between runs.
   function showInterstitialAd(){ /* integrate ad SDK here */ }
 
-  // Leaderboard (local storage based)
-  const LB_KEY = "neonLeaderboard";
+  // Leaderboard (Firebase Realtime Database — falls back gracefully if not configured)
   const LB_MAX = 50;
   let lbPendingScore = 0;
   let lbPendingPhoto = null;
+  let lbEntries = [];   // local cache for fast re-render
+  let lbDB = null;      // Firebase database reference (null = offline / not configured)
 
-  function loadLeaderboard(){
+  // Initialise Firebase once (safe to call multiple times)
+  (function initFirebase(){
+    if (!FIREBASE_CONFIG.databaseURL) return;
     try {
-      const raw = localStorage.getItem(LB_KEY);
-      return raw ? JSON.parse(raw) : [];
-    } catch(e){ return []; }
+      if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+      lbDB = firebase.database();
+    } catch(e){ lbDB = null; }
+  })();
+
+  // Resize a photo dataURL to a 48×48 JPEG thumbnail (~2 KB) for online storage
+  function resizePhotoForUpload(dataUrl, cb){
+    const img = new Image();
+    img.onload = function(){
+      const canvas = document.createElement("canvas");
+      canvas.width = 48; canvas.height = 48;
+      const c = canvas.getContext("2d");
+      const side = Math.min(img.width, img.height);
+      const sx = (img.width  - side) / 2;
+      const sy = (img.height - side) / 2;
+      c.drawImage(img, sx, sy, side, side, 0, 0, 48, 48);
+      cb(canvas.toDataURL("image/jpeg", 0.6));
+    };
+    img.onerror = function(){ cb(null); };
+    img.src = dataUrl;
   }
 
-  function saveLeaderboard(entries){
-    try {
-      localStorage.setItem(LB_KEY, JSON.stringify(entries));
-    } catch(e){
-      // Storage quota exceeded - try removing photos to free space, then retry
-      const stripped = entries.map(en => ({ name: en.name, score: en.score, date: en.date }));
-      try { localStorage.setItem(LB_KEY, JSON.stringify(stripped)); } catch(e2){}
-    }
-  }
-
-  function addLeaderboardEntry(name, score, photo){
-    const entries = loadLeaderboard();
-    const dateStr = new Date().toLocaleDateString("en-US", { month:"short", day:"numeric", year:"numeric" });
-    entries.push({ name: name.trim().slice(0, 24) || "Anonymous", score, date: dateStr, photo: photo || null });
-    entries.sort((a, b) => b.score - a.score);
-    if (entries.length > LB_MAX) entries.length = LB_MAX;
-    saveLeaderboard(entries);
-    return entries;
-  }
-
-  function renderLeaderboard(){
-    const entries = loadLeaderboard();
+  function renderLeaderboard(loading){
     const lbYourScoreEl = document.getElementById("lbYourScore");
-    if (lbPendingScore > 0){
-      lbYourScoreEl.textContent = `Your last run: ${lbPendingScore.toLocaleString()}`;
-    } else {
-      lbYourScoreEl.textContent = "";
-    }
+    lbYourScoreEl.textContent = lbPendingScore > 0 ? `Your last run: ${lbPendingScore.toLocaleString()}` : "";
     leaderboardListEl.innerHTML = "";
-    if (!entries.length){
-      leaderboardListEl.innerHTML = '<div class="lb-empty">No scores yet.<br>Play a run and submit your name!</div>';
+
+    if (loading){
+      leaderboardListEl.innerHTML = '<div class="lb-empty"><span class="lb-loading">⟳</span> Loading…</div>';
       return;
     }
-    const top = entries.slice(0, 10);
+    if (!lbEntries.length){
+      if (!lbDB){
+        leaderboardListEl.innerHTML = '<div class="lb-empty">⚙️ Leaderboard not set up yet.<br>See Firebase setup instructions in index.html.</div>';
+      } else {
+        leaderboardListEl.innerHTML = '<div class="lb-empty">No scores yet.<br>Play a run and submit your name!</div>';
+      }
+      return;
+    }
+    const top = lbEntries.slice(0, 10);
     top.forEach((e, i) => {
       const row = document.createElement("div");
       row.className = "lb-entry";
       // Rank
       const rank = document.createElement("div");
       rank.className = "lb-rank" + (i === 0 ? " gold" : i === 1 ? " silver" : i === 2 ? " bronze" : "");
-      rank.textContent = i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `#${i+1}`;
+      rank.textContent = i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `#${i + 1}`;
       row.appendChild(rank);
       // Avatar
       if (e.photo){
@@ -3712,11 +3760,11 @@
       const name = document.createElement("div");
       name.className = "lb-name";
       name.textContent = e.name;
-      const score = document.createElement("div");
-      score.className = "lb-score";
-      score.textContent = e.score.toLocaleString();
+      const sc = document.createElement("div");
+      sc.className = "lb-score";
+      sc.textContent = e.score.toLocaleString();
       info.appendChild(name);
-      info.appendChild(score);
+      info.appendChild(sc);
       row.appendChild(info);
       // Date
       const dt = document.createElement("div");
@@ -3727,11 +3775,29 @@
     });
   }
 
+  function loadLeaderboardOnline(){
+    if (!lbDB){
+      renderLeaderboard(false);
+      return;
+    }
+    renderLeaderboard(true);
+    lbDB.ref("leaderboard").orderByChild("score").limitToLast(LB_MAX).once("value")
+      .then(snap => {
+        const raw = snap.val();
+        if (!raw){ lbEntries = []; renderLeaderboard(false); return; }
+        lbEntries = Object.values(raw);
+        lbEntries.sort((a, b) => b.score - a.score);
+        if (lbEntries.length > LB_MAX) lbEntries.length = LB_MAX;
+        renderLeaderboard(false);
+      })
+      .catch(() => { renderLeaderboard(false); });
+  }
+
   function openLeaderboard(e){
     if (e) e.stopPropagation();
     sfxClick();
-    renderLeaderboard();
     leaderboardPanelEl.classList.add("active");
+    loadLeaderboardOnline();
   }
 
   function closeLeaderboard(){
@@ -3756,14 +3822,33 @@
   }
 
   function submitLbEntry(){
-    const name = lbNameInputEl.value.trim() || "Anonymous";
-    addLeaderboardEntry(name, lbPendingScore, lbPendingPhoto);
+    const name = (lbNameInputEl.value.trim() || "Anonymous").slice(0, 24);
+    const score = lbPendingScore;
+    const dateStr = new Date().toLocaleDateString("en-US", { month:"short", day:"numeric", year:"numeric" });
     closeLbModal();
     sfxClick();
-    openLeaderboard(null);
+
+    function doSubmit(photo){
+      const entry = { name, score, date: dateStr };
+      if (photo) entry.photo = photo;
+      if (lbDB){
+        lbDB.ref("leaderboard").push(entry).catch(() => {});
+      }
+      // Update local cache so the leaderboard shows the entry immediately
+      lbEntries.push(entry);
+      lbEntries.sort((a, b) => b.score - a.score);
+      if (lbEntries.length > LB_MAX) lbEntries.length = LB_MAX;
+      openLeaderboard(null);
+    }
+
+    if (lbPendingPhoto){
+      resizePhotoForUpload(lbPendingPhoto, doSubmit);
+    } else {
+      doSubmit(null);
+    }
   }
 
-  // Monetization hook: leaderboard submissions.
+  // Leaderboard hook: show submit modal after game over.
   function submitScore(score){
     showLbModal(score);
   }
