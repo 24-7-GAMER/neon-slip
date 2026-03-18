@@ -38,7 +38,7 @@
   *{ box-sizing: border-box; }
   html, body{
     margin:0; padding:0; width:100%; height:100%;
-    background: radial-gradient(1200px 800px at 70% -10%, #131a33 0%, var(--bg) 45%, #05050a 100%);
+    background: radial-gradient(1400px 900px at 65% -15%, #0d1a3a 0%, var(--bg) 50%, #020308 100%);
     overflow:hidden; color:var(--text);
     font-family: "Trebuchet MS","Lucida Console","Courier New",monospace;
     letter-spacing: .5px;
@@ -57,17 +57,21 @@
   }
   .panel{
     pointer-events:auto;
-    background: linear-gradient(180deg, rgba(15,20,40,.9), rgba(6,10,20,.9));
-    border:1px solid rgba(25,247,255,.35);
-    box-shadow: 0 0 25px rgba(25,247,255,.2), inset 0 0 30px rgba(138,91,255,.15);
-    padding:24px 28px; border-radius:14px; text-align:center; max-width:320px;
+    background: linear-gradient(160deg, rgba(18,26,52,.95), rgba(6,10,20,.97));
+    border:1px solid rgba(25,247,255,.4);
+    box-shadow:
+      0 0 30px rgba(25,247,255,.18),
+      0 0 60px rgba(138,91,255,.12),
+      inset 0 0 40px rgba(138,91,255,.12),
+      inset 0 1px 0 rgba(25,247,255,.25);
+    padding:24px 28px; border-radius:16px; text-align:center; max-width:320px;
     position:relative; overflow:hidden;
     transition: opacity .35s ease, transform .35s ease;
   }
   .panel::after{
     content:""; position:absolute; inset:-40%;
-    background: conic-gradient(from 0deg, rgba(25,247,255,.15), rgba(138,91,255,.0), rgba(255,59,122,.15), rgba(25,247,255,.15));
-    animation: panelGlow 8s linear infinite;
+    background: conic-gradient(from 0deg, rgba(25,247,255,.2), rgba(138,91,255,.05), rgba(255,59,122,.2), rgba(255,157,0,.12), rgba(25,247,255,.2));
+    animation: panelGlow 6s linear infinite;
     pointer-events:none;
   }
   .panel > *{ position:relative; z-index:1; }
@@ -84,53 +88,94 @@
   }
   .title{
     font-size:28px; color:var(--neon); text-transform:uppercase;
-    text-shadow: 0 0 12px rgba(25,247,255,.8);
+    text-shadow:
+      0 0 10px rgba(25,247,255,.9),
+      0 0 24px rgba(25,247,255,.6),
+      0 0 40px rgba(138,91,255,.5);
     font-family: "Impact","Haettenschweiler","Arial Black","Franklin Gothic Heavy",sans-serif;
-    letter-spacing:2px;
+    letter-spacing:3px;
     margin-bottom:8px;
   }
   .neon-title{
-    font-size: clamp(26px, 6vw, 44px);
+    font-size: clamp(30px, 7vw, 52px);
     line-height:1.05;
     color:#19f7ff;
     text-shadow:
-      0 0 6px rgba(25,247,255,.8),
-      0 0 18px rgba(138,91,255,.8),
-      0 0 32px rgba(255,59,122,.6);
-    animation: titleGlow 6s ease-in-out infinite;
+      0 0 4px #fff,
+      0 0 10px rgba(25,247,255,1),
+      0 0 22px rgba(25,247,255,.9),
+      0 0 40px rgba(138,91,255,.8),
+      0 0 60px rgba(255,59,122,.5);
+    animation: titleGlow 5s ease-in-out infinite, neonFlicker 8s step-end infinite;
+    letter-spacing: 4px;
+  }
+  @keyframes neonFlicker{
+    0%,19%,21%,23%,25%,54%,56%,100%{
+      text-shadow:
+        0 0 4px #fff,
+        0 0 10px rgba(25,247,255,1),
+        0 0 22px rgba(25,247,255,.9),
+        0 0 40px rgba(138,91,255,.8),
+        0 0 60px rgba(255,59,122,.5);
+      opacity:1;
+    }
+    20%,22%{
+      text-shadow: none;
+      opacity:.7;
+    }
+    55%{
+      text-shadow:
+        0 0 2px #fff,
+        0 0 6px rgba(25,247,255,.8);
+      opacity:.85;
+    }
   }
   @keyframes titleGlow{
     0%{
       color:#19f7ff;
       text-shadow:
-        0 0 6px rgba(25,247,255,.85),
-        0 0 18px rgba(138,91,255,.6),
-        0 0 30px rgba(255,59,122,.4);
+        0 0 4px #fff,
+        0 0 12px rgba(25,247,255,1),
+        0 0 30px rgba(25,247,255,.9),
+        0 0 50px rgba(138,91,255,.7),
+        0 0 70px rgba(255,59,122,.4);
     }
     50%{
-      color:#8a5bff;
+      color:#b87dff;
       text-shadow:
-        0 0 8px rgba(138,91,255,.9),
-        0 0 22px rgba(25,247,255,.7),
-        0 0 34px rgba(255,59,122,.55);
+        0 0 4px #fff,
+        0 0 14px rgba(138,91,255,1),
+        0 0 30px rgba(138,91,255,.9),
+        0 0 50px rgba(25,247,255,.7),
+        0 0 70px rgba(255,59,122,.5);
     }
     100%{
       color:#19f7ff;
       text-shadow:
-        0 0 6px rgba(25,247,255,.85),
-        0 0 18px rgba(138,91,255,.6),
-        0 0 30px rgba(255,59,122,.4);
+        0 0 4px #fff,
+        0 0 12px rgba(25,247,255,1),
+        0 0 30px rgba(25,247,255,.9),
+        0 0 50px rgba(138,91,255,.7),
+        0 0 70px rgba(255,59,122,.4);
     }
   }
   .btn{
-    margin-top:16px; display:inline-block; padding:10px 18px;
-    border:1px solid rgba(25,247,255,.5);
-    background: rgba(25,247,255,.1);
+    margin-top:16px; display:inline-block; padding:10px 20px;
+    border:1px solid rgba(25,247,255,.55);
+    background: linear-gradient(135deg, rgba(25,247,255,.14), rgba(138,91,255,.08));
     color:var(--text); border-radius:10px; cursor:pointer;
-    box-shadow: 0 0 10px rgba(25,247,255,.12);
-    transition: transform .12s ease, box-shadow .12s ease;
+    box-shadow: 0 0 12px rgba(25,247,255,.15), inset 0 1px 0 rgba(25,247,255,.2);
+    transition: transform .12s ease, box-shadow .15s ease, background .15s ease;
+    position:relative; overflow:hidden;
   }
-  .btn:hover{ transform: translateY(-1px); box-shadow: 0 0 16px rgba(25,247,255,.25); }
+  .btn::before{
+    content:""; position:absolute; inset:0;
+    background: linear-gradient(135deg, rgba(25,247,255,.08) 0%, transparent 60%);
+    opacity:0; transition: opacity .15s ease;
+  }
+  .btn:hover{ transform: translateY(-2px); box-shadow: 0 0 22px rgba(25,247,255,.35), 0 4px 16px rgba(25,247,255,.15), inset 0 1px 0 rgba(25,247,255,.3); }
+  .btn:hover::before{ opacity:1; }
+  .btn:active{ transform: translateY(0px) scale(0.97); }
   .hint{ font-size:12px; opacity:.8; margin-top:8px; }
   .hidden{ opacity:0; transform: translateY(14px) scale(0.98); pointer-events:none; position:absolute; }
   .hud{
@@ -153,24 +198,24 @@
     font-size:10px; opacity:.7;
   }
   .hud-value{
-    font-size:16px; letter-spacing:1.5px;
-    text-shadow: 0 0 12px rgba(25,247,255,.5);
+    font-size:17px; letter-spacing:2px;
+    text-shadow: 0 0 14px rgba(25,247,255,.7), 0 0 4px rgba(25,247,255,.4);
   }
   .meter{
-    width:140px; height:7px; border-radius:8px;
-    border:1px solid rgba(25,247,255,.35);
-    background: rgba(6,12,20,.6);
+    width:140px; height:8px; border-radius:8px;
+    border:1px solid rgba(25,247,255,.4);
+    background: rgba(6,12,20,.7);
     overflow:hidden;
-    box-shadow: inset 0 0 12px rgba(25,247,255,.1);
+    box-shadow: inset 0 0 14px rgba(25,247,255,.12), 0 0 6px rgba(25,247,255,.1);
   }
   .meter-fill{
     height:100%; transform-origin:left;
-    background: linear-gradient(90deg, rgba(25,247,255,.8), rgba(138,91,255,.95), rgba(255,59,122,.9));
-    box-shadow: 0 0 10px rgba(25,247,255,.6);
+    background: linear-gradient(90deg, rgba(25,247,255,.9), rgba(138,91,255,1), rgba(255,80,120,.95), rgba(255,157,0,.9));
+    box-shadow: 0 0 14px rgba(25,247,255,.8), 0 0 4px #fff;
     transform: scaleX(0);
     transition: transform .12s ease, filter .12s ease;
-    background-size: 200% 100%;
-    animation: meterShimmer 3.5s linear infinite;
+    background-size: 300% 100%;
+    animation: meterShimmer 2.8s linear infinite;
   }
   .hud-sub{
     font-size:11px; opacity:.85;
@@ -227,10 +272,10 @@
     pointer-events:auto; opacity:1;
   }
   .settings-box, .pause-box{
-    background: linear-gradient(180deg, rgba(10,16,30,.95), rgba(6,10,20,.95));
-    border:1px solid rgba(25,247,255,.35);
-    box-shadow: 0 0 28px rgba(25,247,255,.25);
-    padding:20px 22px; border-radius:14px; min-width:260px;
+    background: linear-gradient(160deg, rgba(12,20,38,.97), rgba(6,10,20,.97));
+    border:1px solid rgba(25,247,255,.4);
+    box-shadow: 0 0 36px rgba(25,247,255,.2), 0 0 60px rgba(138,91,255,.12), inset 0 1px 0 rgba(25,247,255,.2);
+    padding:20px 22px; border-radius:16px; min-width:260px;
   }
   .settings-row{
     display:flex; align-items:center; justify-content:space-between;
@@ -477,15 +522,31 @@
     background: linear-gradient(180deg, rgba(10,16,30,.95), rgba(6,10,20,.95));
     border:1px solid rgba(25,247,255,.35);
     box-shadow: 0 0 28px rgba(25,247,255,.25);
-    padding:18px 20px; border-radius:14px; width:min(520px, 90vw);
+    padding:18px 20px 14px; border-radius:14px; width:min(520px, 90vw);
+    max-height:min(92dvh, 90vh);
+    display:flex; flex-direction:column;
   }
+  .upgrades-scroll{
+    flex:1 1 0; overflow-y:auto; min-height:0;
+    padding-right:4px;
+    scrollbar-width:thin;
+    scrollbar-color:rgba(25,247,255,.4) transparent;
+  }
+  .upgrades-scroll::-webkit-scrollbar{ width:4px; }
+  .upgrades-scroll::-webkit-scrollbar-track{ background:transparent; }
+  .upgrades-scroll::-webkit-scrollbar-thumb{ background:rgba(25,247,255,.4); border-radius:4px; }
   .upgrade-grid{
     display:grid; grid-template-columns:1fr 1fr; gap:10px;
   }
   .upgrade-card{
-    border:1px solid rgba(25,247,255,.35);
-    border-radius:12px; padding:10px; background: rgba(25,247,255,.06);
+    border:1px solid rgba(25,247,255,.38);
+    border-radius:12px; padding:10px; background: linear-gradient(160deg, rgba(25,247,255,.08), rgba(138,91,255,.05));
     font-size:11px; text-transform:uppercase; letter-spacing:1px;
+    box-shadow: inset 0 1px 0 rgba(25,247,255,.15);
+    transition: box-shadow .15s ease;
+  }
+  .upgrade-card:hover{
+    box-shadow: 0 0 16px rgba(25,247,255,.15), inset 0 1px 0 rgba(25,247,255,.2);
   }
   .upgrade-card .btn{ margin-top:8px; width:100%; }
   .currency{
@@ -725,22 +786,24 @@
   <div class="upgrades-box">
     <div class="title">Upgrades / Mods</div>
     <div id="currency" class="currency">Neon Shards: 0</div>
-    <div class="upgrade-grid" id="upgradeGrid"></div>
-    <div class="rebind">
-      <span>Left Key</span><span id="rebindLeft" class="rebind-key">A</span>
+    <div class="upgrades-scroll">
+      <div class="upgrade-grid" id="upgradeGrid"></div>
+      <div class="rebind">
+        <span>Left Key</span><span id="rebindLeft" class="rebind-key">A</span>
+      </div>
+      <div class="rebind">
+        <span>Right Key</span><span id="rebindRight" class="rebind-key">D</span>
+      </div>
+      <div class="feature-toggle"><span>Motion Intensity</span>
+        <select id="motionLevel" class="toggle">
+          <option value="low">Low</option>
+          <option value="med">Med</option>
+          <option value="high">High</option>
+        </select>
+      </div>
+      <div class="feature-toggle"><span>Color-Blind</span><button id="colorBlindToggle" class="toggle">Off</button></div>
+      <div class="feature-toggle"><span>Streamer Mode</span><button id="streamerToggle" class="toggle">Off</button></div>
     </div>
-    <div class="rebind">
-      <span>Right Key</span><span id="rebindRight" class="rebind-key">D</span>
-    </div>
-    <div class="feature-toggle"><span>Motion Intensity</span>
-      <select id="motionLevel" class="toggle">
-        <option value="low">Low</option>
-        <option value="med">Med</option>
-        <option value="high">High</option>
-      </select>
-    </div>
-    <div class="feature-toggle"><span>Color-Blind</span><button id="colorBlindToggle" class="toggle">Off</button></div>
-    <div class="feature-toggle"><span>Streamer Mode</span><button id="streamerToggle" class="toggle">Off</button></div>
     <div class="settings-actions">
       <div id="closeUpgrades" class="btn">Close</div>
     </div>
@@ -907,6 +970,7 @@
     canvas.width = Math.floor(w * dpr);
     canvas.height = Math.floor(h * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    player.x = w * 0.5;  // ensure valid position before the first draw frame
     initVisualCaches();
   }
   window.addEventListener("resize", resize);
@@ -1088,24 +1152,24 @@
     pulseTime: 0.18,
     pulseScale: 0.12,
     bgDriftSpeed: 0.035,
-    scanlineAlpha: 0.08,
-    noiseAlpha: 0.035,
-    trailLength: 12,
-    trailFade: 0.5,
+    scanlineAlpha: 0.055,
+    noiseAlpha: 0.028,
+    trailLength: 20,
+    trailFade: 0.45,
     nearMissShake: 0.06,
     deathShake: 0.45,
     deathFreeze: 0.12,
     deathUiDelay: 0.35,
     deathZoom: 0.035,
     visualSpeedBoost: 0.55,
-    speedLineCount: 26,
-    speedLineAlpha: 0.12,
-    maxParticles: 180,
-    starAlpha: 0.22,
-    starSpeed: 12,
-    vignetteAlpha: 0.35,
-    gateStreakAlpha: 0.12,
-    gateStreakLen: 30,
+    speedLineCount: 40,
+    speedLineAlpha: 0.18,
+    maxParticles: 280,
+    starAlpha: 0.32,
+    starSpeed: 14,
+    vignetteAlpha: 0.42,
+    gateStreakAlpha: 0.22,
+    gateStreakLen: 50,
     uiGlowPulse: 0.12
   };
 
@@ -1138,25 +1202,25 @@
     {
       name: "Aurora",
       palette: { neonA: [25, 247, 255], neonB: [138, 91, 255], neonC: [70, 255, 180] },
-      bg: { a: "#05090f", b: "#0d1430" },
+      bg: { a: "#04080e", b: "#0b1230" },
       pacingBias: 0.92,
-      glowBoost: 1.1,
+      glowBoost: 1.25,
       meterHue: 190
     },
     {
       name: "Pulse",
       palette: { neonA: [255, 80, 120], neonB: [255, 200, 80], neonC: [25, 247, 255] },
-      bg: { a: "#0b0407", b: "#1c0c14" },
+      bg: { a: "#090306", b: "#180a12" },
       pacingBias: 1.08,
-      glowBoost: 1.2,
+      glowBoost: 1.4,
       meterHue: 340
     },
     {
       name: "Glitch",
       palette: { neonA: [130, 255, 220], neonB: [255, 80, 200], neonC: [80, 140, 255] },
-      bg: { a: "#05060c", b: "#0b0f1e" },
+      bg: { a: "#040509", b: "#090c1a" },
       pacingBias: 1.0,
-      glowBoost: 1.3,
+      glowBoost: 1.5,
       meterHue: 280
     }
   ];
@@ -1296,23 +1360,74 @@
       state.speedLines.push({
         x: Math.random() * w,
         y: Math.random() * h,
-        len: 12 + Math.random() * 24
+        len: 14 + Math.random() * 32,
+        bright: 0.4 + Math.random() * 0.6
       });
     }
+
+    // Enhanced starfield: multiple sizes, halos, tinted stars
     const stars = document.createElement("canvas");
-    stars.width = 256;
-    stars.height = 256;
+    stars.width = 512;
+    stars.height = 512;
     const sctx = stars.getContext("2d");
-    sctx.fillStyle = "rgba(255,255,255,0.8)";
-    for (let i = 0; i < 120; i++){
-      const x = Math.random() * stars.width;
-      const y = Math.random() * stars.height;
-      const r = Math.random() < 0.1 ? 1.6 : 1;
-      sctx.globalAlpha = Math.random() * 0.8;
-      sctx.fillRect(x, y, r, r);
+    // Background subtle color wash
+    const grad = sctx.createLinearGradient(0, 0, 512, 512);
+    grad.addColorStop(0, "rgba(10,15,35,0.4)");
+    grad.addColorStop(1, "rgba(5,8,18,0.4)");
+    sctx.fillStyle = grad;
+    sctx.fillRect(0, 0, 512, 512);
+
+    // Tiny dim stars
+    for (let i = 0; i < 200; i++){
+      const x = Math.random() * 512;
+      const y = Math.random() * 512;
+      sctx.globalAlpha = 0.2 + Math.random() * 0.4;
+      sctx.fillStyle = "#ffffff";
+      sctx.fillRect(x, y, 1, 1);
+    }
+    // Medium stars
+    for (let i = 0; i < 80; i++){
+      const x = Math.random() * 512;
+      const y = Math.random() * 512;
+      const r = 0.8 + Math.random() * 0.8;
+      sctx.globalAlpha = 0.4 + Math.random() * 0.5;
+      // Some are tinted cyan or purple
+      const tint = Math.random();
+      if (tint < 0.25) sctx.fillStyle = "#8af6ff";
+      else if (tint < 0.45) sctx.fillStyle = "#b07aff";
+      else sctx.fillStyle = "#ffffff";
+      sctx.beginPath();
+      sctx.arc(x, y, r, 0, Math.PI * 2);
+      sctx.fill();
+    }
+    // Bright stars with halos
+    for (let i = 0; i < 25; i++){
+      const x = Math.random() * 512;
+      const y = Math.random() * 512;
+      const r = 1.2 + Math.random() * 1.2;
+      // Outer halo
+      const halo = sctx.createRadialGradient(x, y, 0, x, y, r * 5);
+      const tint = Math.random();
+      const col = tint < 0.35 ? "25,247,255" : (tint < 0.65 ? "138,91,255" : "255,255,255");
+      halo.addColorStop(0, `rgba(${col},0.7)`);
+      halo.addColorStop(0.3, `rgba(${col},0.2)`);
+      halo.addColorStop(1, `rgba(${col},0)`);
+      sctx.globalAlpha = 0.6 + Math.random() * 0.4;
+      sctx.fillStyle = halo;
+      sctx.beginPath();
+      sctx.arc(x, y, r * 5, 0, Math.PI * 2);
+      sctx.fill();
+      // Bright core
+      sctx.globalAlpha = 1;
+      sctx.fillStyle = "#ffffff";
+      sctx.beginPath();
+      sctx.arc(x, y, r, 0, Math.PI * 2);
+      sctx.fill();
     }
     sctx.globalAlpha = 1;
     state.starCanvas = stars;
+
+    // Noise texture
     const noise = document.createElement("canvas");
     noise.width = 128;
     noise.height = 128;
@@ -1323,7 +1438,7 @@
       img.data[i] = v;
       img.data[i + 1] = v;
       img.data[i + 2] = v;
-      img.data[i + 3] = 80;
+      img.data[i + 3] = 70;
     }
     nctx.putImageData(img, 0, 0);
     state.noiseCanvas = noise;
@@ -2515,14 +2630,18 @@
   }
 
   function spawnParticles(x, y){
-    const count = Math.max(4, Math.floor(10 * motionScale()));
+    const count = Math.max(6, Math.floor(14 * motionScale()));
     for (let i = 0; i < count; i++){
       if (particles.length >= POLISH.maxParticles) break;
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 60 + Math.random() * 180;
       particles.push({
         x, y,
-        vx: (Math.random() - 0.5) * 160,
-        vy: -Math.random() * 120,
-        life: 0.5 + Math.random() * 0.3
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed - 40,
+        life: 0.5 + Math.random() * 0.45,
+        r: 1.5 + Math.random() * 2.5,
+        colorMix: Math.random()
       });
     }
   }
@@ -2533,7 +2652,8 @@
       p.life -= dt;
       p.x += p.vx * dt;
       p.y += p.vy * dt;
-      p.vy += 220 * dt;
+      p.vy += 180 * dt;
+      p.vx *= 0.98;
       if (p.life <= 0) particles.splice(i, 1);
     }
   }
@@ -2678,39 +2798,7 @@
     const anchorY = player.y();
     const renderY = (y) => anchorY + (y - anchorY) * speedFactor;
 
-    // Starfield (cached)
-    if (state.starCanvas){
-      ctx.globalAlpha = POLISH.starAlpha * motion;
-      const sx = (state.visualTime * POLISH.starSpeed) % state.starCanvas.width;
-      const sy = (state.visualTime * POLISH.starSpeed * 0.6) % state.starCanvas.height;
-      ctx.drawImage(state.starCanvas, -sx, -sy, w + state.starCanvas.width, h + state.starCanvas.height);
-      ctx.globalAlpha = 1;
-    }
-
-    // Animated background glow
-    const drift = state.visualTime * POLISH.bgDriftSpeed * speedFactor;
-    const gx = w * 0.6 + Math.sin(drift * 1.3) * 120;
-    const gy = h * 0.2 + Math.cos(drift * 0.9) * 90;
-    const radial = ctx.createRadialGradient(gx, gy, 60, gx, gy, Math.max(w, h));
-    radial.addColorStop(0, "rgba(25,247,255,0.08)");
-    radial.addColorStop(0.35, "rgba(138,91,255,0.06)");
-    radial.addColorStop(1, "rgba(0,0,0,0)");
-    ctx.fillStyle = radial;
-    ctx.fillRect(0, 0, w, h);
-
-    // Background grid glow
-    ctx.globalAlpha = 0.14;
-    ctx.strokeStyle = "#1a2a44";
-    const gridOffset = (state.visualTime * 12 * speedFactor) % (h / 12);
-    for (let i = 0; i < 12; i++){
-      const y = (i / 12) * h + gridOffset;
-      ctx.beginPath();
-      ctx.moveTo(0, y);
-      ctx.lineTo(w, y);
-      ctx.stroke();
-    }
-    ctx.globalAlpha = 1;
-
+    // Color variables derived from current intensity and theme
     const tint = intensityNorm();
     const theme = state.theme || THEMES[0];
     const a = theme.palette.neonA;
@@ -2727,33 +2815,157 @@
     const glowBoost = (theme.glowBoost || 1) * (state.upgradeEffects.glowBoost || 1);
     const pulseBoost = state.upgradeEffects.gatePulse || 0;
 
-    // Gates
+    // Starfield (cached)
+    if (state.starCanvas){
+      ctx.globalAlpha = POLISH.starAlpha * motion;
+      const sx = (state.visualTime * POLISH.starSpeed) % state.starCanvas.width;
+      const sy = (state.visualTime * POLISH.starSpeed * 0.6) % state.starCanvas.height;
+      ctx.drawImage(state.starCanvas, -sx, -sy, w + state.starCanvas.width, h + state.starCanvas.height);
+      ctx.globalAlpha = 1;
+    }
+
+    // Animated background glow - enhanced with multiple radial layers
+    const drift = state.visualTime * POLISH.bgDriftSpeed * speedFactor;
+    const gx = w * 0.6 + Math.sin(drift * 1.3) * 130;
+    const gy = h * 0.2 + Math.cos(drift * 0.9) * 100;
+    const maxDim = Math.max(w, h, 1);
+    const radial = ctx.createRadialGradient(gx, gy, 0, gx, gy, maxDim);
+    radial.addColorStop(0, `rgba(${neonR},${neonG},${neonB},0.10)`);
+    radial.addColorStop(0.3, `rgba(${Math.round(neonR*0.4+neonB*0.6)},${Math.round(neonG*0.3+neonR*0.7)},${Math.round(neonB*0.8)},0.07)`);
+    radial.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = radial;
+    ctx.fillRect(0, 0, w, h);
+
+    // Second drifting glow on opposite side
+    const gx2 = w * 0.2 + Math.cos(drift * 1.1) * 100;
+    const gy2 = h * 0.75 + Math.sin(drift * 0.7) * 80;
+    const radial2 = ctx.createRadialGradient(gx2, gy2, 0, gx2, gy2, maxDim * 0.7);
+    radial2.addColorStop(0, `rgba(${neonB},${neonR},${neonG},0.07)`);
+    radial2.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = radial2;
+    ctx.fillRect(0, 0, w, h);
+
+    // Nebula blobs - soft drifting color clouds
+    const blobCount = 3;
+    const minDim = Math.min(w, h, 1);
+    for (let b = 0; b < blobCount; b++){
+      const phase = (b / blobCount) * Math.PI * 2;
+      const bx = w * (0.15 + 0.7 * (0.5 + 0.5 * Math.sin(state.visualTime * 0.028 + phase)));
+      const by = h * (0.08 + 0.55 * (0.5 + 0.5 * Math.cos(state.visualTime * 0.022 + phase * 1.4)));
+      const br = Math.max(1, minDim * (0.28 + 0.08 * Math.sin(state.visualTime * 0.04 + phase)));
+      const bAlpha = (0.025 + intensityNorm() * 0.025) * motion;
+      const blobColors = [
+        [neonR, neonG, neonB],
+        [neonB, neonR, neonG],
+        [Math.round(neonR*0.5+neonG*0.5), Math.round(neonG*0.5+neonB*0.5), Math.round(neonB*0.5+neonR*0.5)]
+      ];
+      const bc = blobColors[b % blobColors.length];
+      const blob = ctx.createRadialGradient(bx, by, 0, bx, by, br);
+      blob.addColorStop(0, `rgba(${bc[0]},${bc[1]},${bc[2]},${bAlpha})`);
+      blob.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = blob;
+      ctx.fillRect(0, 0, w, h);
+    }
+
+    // Perspective grid (vanishing point) - replaces flat horizontal grid
+    const vpX = w * 0.5 + Math.sin(drift * 0.5) * 30;
+    const vpY = h * 0.25;
+    const gridScroll = (state.visualTime * 55 * speedFactor) % 1;
+    const gridBaseAlpha = (0.09 + intensityNorm() * 0.07) * motion;
+    ctx.strokeStyle = `rgba(${neonR},${neonG},${neonB},0.5)`;
+    ctx.lineWidth = 0.7;
+
+    // Vertical converging lines
+    const vLineCount = 14;
+    for (let i = 0; i <= vLineCount; i++){
+      const t = i / vLineCount;
+      const xBottom = t * w;
+      const xVP = vpX + (xBottom - vpX) * 0.0;
+      ctx.globalAlpha = gridBaseAlpha * (0.5 + 0.5 * Math.abs(t - 0.5) * 2);
+      ctx.beginPath();
+      ctx.moveTo(vpX, vpY);
+      ctx.lineTo(xBottom, h + 20);
+      ctx.stroke();
+    }
+
+    // Horizontal perspective-spaced lines
+    const hLineCount = 10;
+    for (let i = 0; i < hLineCount; i++){
+      const rawT = ((i + gridScroll) / hLineCount) % 1;
+      const tPow = Math.pow(rawT, 1.8);
+      const lineY = vpY + tPow * (h + 40 - vpY);
+      if (lineY < vpY) continue;
+      const spreadFactor = tPow;
+      const xL = vpX + (0 - vpX) * spreadFactor;
+      const xR = vpX + (w - vpX) * spreadFactor;
+      const lineAlpha = gridBaseAlpha * (0.3 + tPow * 0.9);
+      ctx.globalAlpha = lineAlpha;
+      ctx.beginPath();
+      ctx.moveTo(xL, lineY);
+      ctx.lineTo(xR, lineY);
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+
+    // Gates - enhanced multi-layer glow
     for (const g of gates){
       const gy = renderY(g.y);
-      ctx.shadowColor = `rgba(${neonR},${neonG},${neonB},0.6)`;
-      ctx.shadowBlur = 10 * glowBoost;
-      const pulse = pulseBoost ? (0.16 + 0.04 * Math.sin(state.visualTime * 6)) : 0.18;
-      ctx.fillStyle = `rgba(${neonR},${neonG},${neonB},${pulse})`;
+      const animPulse = pulseBoost ? (0.82 + 0.18 * Math.sin(state.visualTime * 6)) : 1;
+      const pulse = (pulseBoost ? (0.16 + 0.04 * Math.sin(state.visualTime * 6)) : 0.18) * animPulse;
+
+      // Outer soft glow layer
+      ctx.shadowColor = `rgba(${neonR},${neonG},${neonB},0.8)`;
+      ctx.shadowBlur = 18 * glowBoost;
+      ctx.fillStyle = `rgba(${neonR},${neonG},${neonB},${pulse * 0.55})`;
       ctx.fillRect(0, gy, g.gapX, 16);
       ctx.fillRect(g.gapX + g.gapW, gy, w, 16);
 
-      ctx.globalAlpha = 0.15;
-      ctx.fillRect(0, gy - 18, g.gapX, 18);
-      ctx.fillRect(g.gapX + g.gapW, gy - 18, w, 18);
+      // Mid glow layer
+      ctx.shadowBlur = 10 * glowBoost;
+      ctx.fillStyle = `rgba(${neonR},${neonG},${neonB},${pulse * 0.85})`;
+      ctx.fillRect(0, gy + 3, g.gapX, 10);
+      ctx.fillRect(g.gapX + g.gapW, gy + 3, w, 10);
+
+      // Bright inner core
+      const coreR = Math.min(255, neonR + 80);
+      const coreG = Math.min(255, neonG + 50);
+      const coreB = Math.min(255, neonB + 50);
+      ctx.shadowBlur = 5 * glowBoost;
+      ctx.fillStyle = `rgba(${coreR},${coreG},${coreB},${pulse * 1.1})`;
+      ctx.fillRect(0, gy + 6, g.gapX, 4);
+      ctx.fillRect(g.gapX + g.gapW, gy + 6, w, 4);
+
+      ctx.globalAlpha = 0.12;
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = `rgba(${neonR},${neonG},${neonB},0.08)`;
+      ctx.fillRect(0, gy - 20, g.gapX, 20);
+      ctx.fillRect(g.gapX + g.gapW, gy - 20, w, 20);
       ctx.globalAlpha = 1;
 
       if (g.echo){
-        ctx.globalAlpha = 0.22;
-        ctx.fillStyle = `rgba(${neonR},${neonG},${neonB},0.12)`;
-        ctx.fillRect(0, gy - 36, g.gapX, 10);
-        ctx.fillRect(g.gapX + g.gapW, gy - 36, w, 10);
+        ctx.globalAlpha = 0.25;
+        ctx.fillStyle = `rgba(${neonR},${neonG},${neonB},0.14)`;
+        ctx.fillRect(0, gy - 40, g.gapX, 10);
+        ctx.fillRect(g.gapX + g.gapW, gy - 40, w, 10);
         ctx.globalAlpha = 1;
       }
 
-      ctx.fillStyle = neonGlow;
-      ctx.fillRect(g.gapX - 2, gy - 2, 4, 20);
-      ctx.fillRect(g.gapX + g.gapW - 2, gy - 2, 4, 20);
-      ctx.globalAlpha = POLISH.gateStreakAlpha * motion;
+      // Edge pillars - bright neon bars with strong glow
+      ctx.shadowColor = `rgba(${coreR},${coreG},${coreB},1)`;
+      ctx.shadowBlur = 14 * glowBoost;
+      ctx.fillStyle = `rgba(${coreR},${coreG},${coreB},0.95)`;
+      ctx.fillRect(g.gapX - 2, gy - 4, 4, 24);
+      ctx.fillRect(g.gapX + g.gapW - 2, gy - 4, 4, 24);
+
+      // Edge pillar inner white core
+      ctx.shadowBlur = 6 * glowBoost;
+      ctx.fillStyle = `rgba(255,255,255,0.7)`;
+      ctx.fillRect(g.gapX - 1, gy, 2, 16);
+      ctx.fillRect(g.gapX + g.gapW - 1, gy, 2, 16);
+
+      // Streak above edges
+      ctx.globalAlpha = POLISH.gateStreakAlpha * motion * animPulse;
+      ctx.fillStyle = `rgba(${neonR},${neonG},${neonB},0.8)`;
       ctx.fillRect(g.gapX - 1, gy - POLISH.gateStreakLen, 2, POLISH.gateStreakLen);
       ctx.fillRect(g.gapX + g.gapW - 1, gy - POLISH.gateStreakLen, 2, POLISH.gateStreakLen);
       ctx.globalAlpha = 1;
@@ -2822,28 +3034,55 @@
       ctx.globalAlpha = 1;
     }
 
-    // Player trail
+    // Player trail - enhanced with gradient and width variation
     const trailShift = state.upgradeEffects.trailShift || 0;
     const trailR = Math.round(neonR + (255 - neonR) * trailShift);
     const trailG = Math.round(neonG + (neonB - neonG) * trailShift);
     const trailB = Math.round(neonB + (neonG - neonB) * trailShift);
     for (let i = 0; i < trail.length; i++){
       const t = trail[i];
-      const alpha = (i / trail.length) * 0.35 * t.life;
+      const frac = i / trail.length;
+      const alpha = frac * 0.5 * t.life;
       ctx.globalAlpha = alpha;
-      const size = 7;
+      const size = 4 + frac * 5;
       ctx.beginPath();
       ctx.moveTo(t.x, t.y - size);
       ctx.lineTo(t.x - size + 1, t.y + size - 1);
       ctx.lineTo(t.x + size - 1, t.y + size - 1);
       ctx.closePath();
-      ctx.fillStyle = `rgba(${trailR},${trailG},${trailB},0.6)`;
+      ctx.fillStyle = `rgba(${trailR},${trailG},${trailB},0.7)`;
+      ctx.shadowColor = `rgba(${trailR},${trailG},${trailB},0.6)`;
+      ctx.shadowBlur = 6 * frac;
       ctx.fill();
     }
     ctx.globalAlpha = 1;
+    ctx.shadowBlur = 0;
 
-    // Player
+    // Engine exhaust glow below player
     const py = player.y();
+    const exhaustAlpha = (0.3 + Math.abs(player.vx) / 800 * 0.4) * motion;
+    if (exhaustAlpha > 0.05){
+      const exhaustGrad = ctx.createRadialGradient(player.x, py + 10, 0, player.x, py + 10, 28);
+      exhaustGrad.addColorStop(0, `rgba(${neonR},${neonG},${neonB},${exhaustAlpha})`);
+      exhaustGrad.addColorStop(0.5, `rgba(${neonR},${neonG},${neonB},${exhaustAlpha * 0.3})`);
+      exhaustGrad.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = exhaustGrad;
+      ctx.fillRect(player.x - 28, py - 5, 56, 40);
+    }
+
+    // Player outer halo ring
+    const haloRadius = 22 + Math.sin(state.visualTime * 5) * 2;
+    const haloGrad = ctx.createRadialGradient(player.x, py, 0, player.x, py, haloRadius + 8);
+    const haloAlpha = 0.18 + intensityNorm() * 0.14;
+    haloGrad.addColorStop(0, `rgba(${neonR},${neonG},${neonB},0)`);
+    haloGrad.addColorStop(0.4, `rgba(${neonR},${neonG},${neonB},${haloAlpha})`);
+    haloGrad.addColorStop(1, `rgba(${neonR},${neonG},${neonB},0)`);
+    ctx.fillStyle = haloGrad;
+    ctx.beginPath();
+    ctx.arc(player.x, py, haloRadius + 8, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Player triangle
     ctx.beginPath();
     ctx.moveTo(player.x, py - 14);
     ctx.lineTo(player.x - 12, py + 12);
@@ -2851,28 +3090,52 @@
     ctx.closePath();
     ctx.fillStyle = neonColor;
     ctx.shadowColor = neonColor;
-    ctx.shadowBlur = (16 + Math.sin(state.visualTime * 6) * 2) * glowBoost;
+    ctx.shadowBlur = (20 + Math.sin(state.visualTime * 6) * 3) * glowBoost;
     ctx.fill();
+
+    // Player inner highlight stripe
+    ctx.globalAlpha = 0.5;
+    ctx.fillStyle = `rgba(255,255,255,0.6)`;
+    ctx.shadowBlur = 0;
+    ctx.beginPath();
+    ctx.moveTo(player.x, py - 10);
+    ctx.lineTo(player.x - 3, py);
+    ctx.lineTo(player.x + 3, py);
+    ctx.closePath();
+    ctx.fill();
+    ctx.globalAlpha = 1;
     ctx.shadowBlur = 0;
 
-    // Particles
-    ctx.fillStyle = "rgba(138,91,255,0.8)";
+    // Particles - enhanced circular with glow, theme-colored
     for (const p of particles){
-      ctx.globalAlpha = Math.max(0, p.life);
-      ctx.fillRect(p.x, renderY(p.y), 3, 3);
+      const lifeAlpha = Math.max(0, p.life);
+      ctx.globalAlpha = lifeAlpha * 0.9;
+      // Mix neon colors for particle color variety
+      const pColor = p.colorMix != null ? p.colorMix : 0;
+      const pR = Math.round(neonR + (neonB - neonR) * pColor);
+      const pG = Math.round(neonG + (neonR - neonG) * pColor);
+      const pB = Math.round(neonB + (neonG - neonB) * pColor);
+      ctx.fillStyle = `rgba(${pR},${pG},${pB},0.9)`;
+      ctx.shadowColor = `rgba(${pR},${pG},${pB},0.8)`;
+      ctx.shadowBlur = 5;
+      const pr = p.r || 2.5;
+      ctx.beginPath();
+      ctx.arc(p.x, renderY(p.y), pr, 0, Math.PI * 2);
+      ctx.fill();
     }
     ctx.globalAlpha = 1;
+    ctx.shadowBlur = 0;
 
     if (state.flash > 0 && !SETTINGS.streamer){
       ctx.globalAlpha = state.flash;
-      ctx.fillStyle = "rgba(25,247,255,0.25)";
+      ctx.fillStyle = `rgba(${neonR},${neonG},${neonB},0.3)`;
       ctx.fillRect(0, 0, w, h);
       ctx.globalAlpha = 1;
     }
 
     // Scanlines
     ctx.globalAlpha = POLISH.scanlineAlpha * motion;
-    ctx.fillStyle = "rgba(6,10,20,0.45)";
+    ctx.fillStyle = "rgba(4,7,16,0.5)";
     for (let y = 0; y < h; y += 4){
       ctx.fillRect(0, y + (state.visualTime * 20 * speedFactor) % 4, w, 1);
     }
@@ -2887,16 +3150,16 @@
       ctx.globalAlpha = 1;
     }
 
-    // Speed lines (cached)
+    // Speed lines - neon colored, brightness varied
     const speedAlpha = POLISH.speedLineAlpha * intensityNorm() * motion;
     if (speedAlpha > 0 && state.speedLines.length){
-      ctx.globalAlpha = speedAlpha;
-      ctx.strokeStyle = "rgba(25,247,255,0.5)";
-      ctx.lineWidth = 1;
       const offset = (state.visualTime * 220 * speedFactor) % h;
       for (const line of state.speedLines){
         const y = (line.y + offset) % h;
         const len = line.len * speedFactor;
+        ctx.globalAlpha = speedAlpha * (line.bright || 0.7);
+        ctx.strokeStyle = `rgba(${neonR},${neonG},${neonB},0.7)`;
+        ctx.lineWidth = 1;
         ctx.beginPath();
         ctx.moveTo(line.x, y);
         ctx.lineTo(line.x, y + len);
@@ -2905,6 +3168,7 @@
       ctx.globalAlpha = 1;
     }
 
+    // Glitch + chromatic aberration at high intensity
     if (state.glitch > 0){
       const g = state.glitch;
       const ox = (Math.random() - 0.5) * 6 * g;
@@ -2920,18 +3184,43 @@
       ctx.globalCompositeOperation = "source-over";
     }
 
-    // Intensity wash
-    const wash = intensityNorm() * 0.08 * motion;
+    // Chromatic aberration at high intensity (subtle RGB offset)
+    const chromaIntensity = Math.max(0, intensityNorm() - 0.65) * 2.2;
+    if (chromaIntensity > 0 && motion > 0.5){
+      const chromaShift = chromaIntensity * 3.5;
+      ctx.globalCompositeOperation = "screen";
+      ctx.globalAlpha = chromaIntensity * 0.07;
+      ctx.drawImage(canvas, -chromaShift, 0);  // Red shift left
+      ctx.drawImage(canvas, chromaShift, 0);   // Blue shift right
+      ctx.globalAlpha = 1;
+      ctx.globalCompositeOperation = "source-over";
+    }
+
+    // Intensity wash - enhanced with neon color
+    const wash = intensityNorm() * 0.09 * motion;
     if (wash > 0){
       ctx.globalAlpha = wash;
-      ctx.fillStyle = `rgba(${neonR},${neonG},${neonB},0.35)`;
+      ctx.fillStyle = `rgba(${neonR},${neonG},${neonB},0.28)`;
       ctx.fillRect(0, 0, w, h);
       ctx.globalAlpha = 1;
     }
 
-    // Vignette
-    const vg = ctx.createRadialGradient(w * 0.5, h * 0.55, Math.min(w, h) * 0.2, w * 0.5, h * 0.55, Math.max(w, h) * 0.7);
+    // Screen edge bloom at high intensity
+    const edgeBloom = Math.max(0, intensityNorm() - 0.5) * 1.4 * motion;
+    if (edgeBloom > 0){
+      const edgeAlpha = edgeBloom * 0.12 * (0.8 + 0.2 * Math.sin(state.visualTime * 7));
+      const edgeGrad = ctx.createRadialGradient(w * 0.5, h * 0.5, 0, w * 0.5, h * 0.5, Math.max(w, h, 1) * 0.72);
+      edgeGrad.addColorStop(0, "rgba(0,0,0,0)");
+      edgeGrad.addColorStop(0.55, "rgba(0,0,0,0)");
+      edgeGrad.addColorStop(1, `rgba(${neonR},${neonG},${neonB},${edgeAlpha})`);
+      ctx.fillStyle = edgeGrad;
+      ctx.fillRect(0, 0, w, h);
+    }
+
+    // Vignette - deeper, tinted with neon at edges
+    const vg = ctx.createRadialGradient(w * 0.5, h * 0.52, 0, w * 0.5, h * 0.52, Math.max(w, h, 1) * 0.72);
     vg.addColorStop(0, "rgba(0,0,0,0)");
+    vg.addColorStop(0.6, "rgba(0,0,0,0)");
     vg.addColorStop(1, `rgba(0,0,0,${POLISH.vignetteAlpha})`);
     ctx.fillStyle = vg;
     ctx.fillRect(0, 0, w, h);
