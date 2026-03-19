@@ -403,11 +403,23 @@
   .modifier-slideshow.active{ pointer-events:auto; opacity:1; }
   .slideshow-box{
     background: linear-gradient(180deg, rgba(10,16,30,.98), rgba(6,10,20,.98));
-    border:1px solid rgba(25,247,255,.35);
-    box-shadow: 0 0 32px rgba(25,247,255,.3);
+    border:1px solid rgba(25,247,255,.45);
+    box-shadow:
+      0 0 40px rgba(25,247,255,.3),
+      0 0 80px rgba(138,91,255,.18),
+      inset 0 0 30px rgba(138,91,255,.1),
+      inset 0 1px 0 rgba(25,247,255,.28);
     padding:24px 28px; border-radius:14px; width:min(480px, 92vw);
     text-align:center;
+    position:relative; overflow:hidden;
   }
+  .slideshow-box::before{
+    content:""; position:absolute; inset:-50%;
+    background: conic-gradient(from 0deg, rgba(25,247,255,.14), rgba(138,91,255,.04), rgba(255,59,122,.1), rgba(255,157,0,.07), rgba(25,247,255,.14));
+    animation: panelGlow 8s linear infinite;
+    pointer-events:none;
+  }
+  .slideshow-box > *{ position:relative; z-index:1; }
   .slideshow-content{
     min-height:280px; display:flex; flex-direction:column; justify-content:center;
     animation: slideIn .4s ease;
@@ -544,7 +556,7 @@
     border:1px solid rgba(25,247,255,.35);
     box-shadow: 0 0 28px rgba(25,247,255,.25);
     padding:18px 20px 14px; border-radius:14px;
-    width:min(96vw, 700px);
+    width:min(96vw, 860px);
     height:88vh;
     max-height:88vh;
     display:flex; flex-direction:column;
@@ -826,15 +838,44 @@
   body[data-danger="1"] .meter-fill{ filter: brightness(1.4); }
   body[data-state="play"] .ui{ pointer-events:none; }
   body[data-state="dying"] .ui{ pointer-events:none; }
-  .itch-embed{
-    position:fixed; right:12px; bottom:12px;
-    z-index:8; opacity:.9; transition: opacity .2s ease;
+  /* Side leaderboard (visible on start menu, wide screens only) */
+  .side-leaderboard{
+    position:fixed; right:18px; top:50%; transform:translateY(-50%);
+    background: linear-gradient(180deg, rgba(10,16,30,.93), rgba(6,10,20,.93));
+    border:1px solid rgba(25,247,255,.28);
+    box-shadow: 0 0 24px rgba(25,247,255,.12), inset 0 1px 0 rgba(25,247,255,.18);
+    border-radius:12px; padding:14px 15px 12px;
+    width:210px; z-index:6;
+    pointer-events:none; opacity:0; transition: opacity .4s ease;
   }
-  .itch-embed iframe{ display:block; border:0; }
-  body[data-state="play"] .itch-embed,
-  body[data-state="dying"] .itch-embed{
-    opacity:0; pointer-events:none;
+  body[data-state="start"] .side-leaderboard{ opacity:1; pointer-events:auto; }
+  .side-lb-title{
+    font-size:11px; color:var(--neon); letter-spacing:2px; text-transform:uppercase;
+    margin-bottom:10px; text-align:center; text-shadow:0 0 8px rgba(25,247,255,.5);
   }
+  .side-lb-entry{
+    display:flex; align-items:center; gap:7px;
+    padding:5px 2px; border-bottom:1px solid rgba(25,247,255,.07);
+    font-size:10px; letter-spacing:.5px;
+  }
+  .side-lb-entry:last-child{ border-bottom:none; }
+  .side-lb-rank{ width:20px; text-align:center; flex-shrink:0; font-size:11px; }
+  .side-lb-name{ flex:1 1 0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; opacity:.82; }
+  .side-lb-score{ color:var(--neon); flex-shrink:0; font-weight:bold; text-shadow:0 0 6px rgba(25,247,255,.4); }
+  .side-lb-empty{ font-size:10px; letter-spacing:.5px; text-align:center; opacity:.45; padding:8px 0; }
+  /* Leaderboard time-period tabs */
+  .lb-tabs{
+    display:flex; gap:5px; margin-bottom:8px; flex-shrink:0;
+  }
+  .lb-tab{
+    flex:1; padding:4px 0; border-radius:20px; font-size:9px; text-transform:uppercase;
+    letter-spacing:1px; cursor:pointer; text-align:center;
+    border:1px solid rgba(25,247,255,.3); background:rgba(25,247,255,.06);
+    color:var(--text); transition: all .15s ease; user-select:none;
+  }
+  .lb-tab.active{ background:rgba(25,247,255,.2); border-color:var(--neon); color:var(--neon); box-shadow:0 0 8px rgba(25,247,255,.2); }
+  .lb-tab:hover:not(.active){ background:rgba(25,247,255,.12); }
+  @media(max-width:720px){ .side-leaderboard{ display:none; } }
 </style>
 </head>
 <body>
@@ -1018,6 +1059,11 @@
     <div id="leaderboardCloseX" class="leaderboard-close-x" title="Close">✕</div>
     <div class="title">🏆 Leaderboard</div>
     <div class="lb-your-score" id="lbYourScore"></div>
+    <div class="lb-tabs" id="lbTabs">
+      <div class="lb-tab active" data-period="all">All Time</div>
+      <div class="lb-tab" data-period="week">This Week</div>
+      <div class="lb-tab" data-period="today">Today</div>
+    </div>
     <div class="leaderboard-list" id="leaderboardList"></div>
     <div class="settings-actions">
       <div id="closeLeaderboard" class="btn">Close</div>
@@ -1104,6 +1150,12 @@
 
 <div class="itch-embed">
   <iframe frameborder="0" src="https://itch.io/embed/4157033" width="552" height="167"><a href="https://247-gamer.itch.io/neon-slip">NEON Slip by 24.7-GAMER</a></iframe>
+</div>
+
+
+<div id="sideLeaderboard" class="side-leaderboard">
+  <div class="side-lb-title">🏆 Top Scores</div>
+  <div id="sideLeaderboardList"></div>
 </div>
 
 <!-- Firebase SDK (Realtime Database compat) -->
