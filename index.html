@@ -989,7 +989,6 @@
   <div class="breakdown-box">
     <div class="title">Run Breakdown</div>
     <div id="breakdownStats" class="hint">---</div>
-    <div class="btn" id="closeBreakdown">Close</div>
   </div>
 </div>
 
@@ -4093,17 +4092,7 @@
     startPanel.classList.add("enter");
     setTimeout(() => startPanel.classList.remove("enter"), 600);
   });
-  closeBreakdownEl.addEventListener("click", () => {
-    sfxClick();
-    clearTimeout(state.lbSubmitTimer);
-    breakdownPanelEl.classList.remove("active");
-    overPanel.classList.add("hidden");
-    setMode("start");
-    modsPanelEl.classList.remove("active");
-    startPanel.classList.remove("hidden");
-    startPanel.classList.add("enter");
-    setTimeout(() => startPanel.classList.remove("enter"), 600);
-  });
+
   document.addEventListener("visibilitychange", handleVisibilityChange);
   musicVolEl.addEventListener("input", () => {
     SETTINGS.musicVolume = parseFloat(musicVolEl.value);
