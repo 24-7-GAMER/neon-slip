@@ -777,7 +777,9 @@
   .slides{
     display:flex; gap:16px; overflow-x:auto; scroll-snap-type:x mandatory;
     padding:12px 6px; scroll-behavior:smooth;
+    scrollbar-width:none;
   }
+  .slides::-webkit-scrollbar{ display:none; }
   .slide{
     min-width:80vw; max-width:80vw; scroll-snap-align:center;
     background: rgba(25,247,255,.06);
@@ -1092,7 +1094,7 @@
     <div class="slide-controls">
       <div class="btn" id="prevSlide">Prev</div>
       <div class="dots" id="slideDots"></div>
-      <div class="btn" id="nextSlide">Next</div>
+      <div class="btn" id="nextIntroSlide">Next</div>
     </div>
     <div class="settings-actions">
       <div id="closeIntro" class="btn">Start Run</div>
@@ -1210,7 +1212,7 @@
   const introPanelEl = document.getElementById("introPanel");
   const slidesEl = document.getElementById("slides");
   const prevSlideEl = document.getElementById("prevSlide");
-  const nextSlideEl = document.getElementById("nextSlide");
+  const nextIntroSlideEl = document.getElementById("nextIntroSlide");
   const slideDotsEl = document.getElementById("slideDots");
   const closeIntroEl = document.getElementById("closeIntro");
   const modifierSlideshowEl = document.getElementById("modifierSlideshow");
@@ -3814,6 +3816,7 @@
   }
 
   function navigateToMainMenu(){
+    breakdownPanelEl.classList.remove("active");
     setMode("start");
     overPanel.classList.add("hidden");
     startPanel.classList.remove("hidden");
@@ -3905,16 +3908,13 @@
         sfxClick();
       }
     }
-    // Space bar advances slideshow or starts game
+    // Space bar advances slideshow
     if (e.code === "Space"){
       if (state.slideshowActive){
         e.preventDefault();
         advanceSlideshow();
-      } else if (state.mode !== "play"){
-        startGame();
       }
     }
-    if (state.mode !== "play" && e.code === "Enter") startGame();
   });
   window.addEventListener("keyup", (e) => {
     if (e.code === state.rebind.left) input.left = false;
@@ -3946,19 +3946,12 @@
   canvas.addEventListener("touchmove", preventTouchScroll, { passive: false });
   canvas.addEventListener("touchend", preventTouchScroll, { passive: false });
 
-  startPanel.addEventListener("click", () => {
-    if (state.mode !== "start") return;
-    initAudio();
-    unlockAudio();
-    sfxClick();
-    modsPanelEl.classList.add("active");
-  });
   document.getElementById("startRunBtn").addEventListener("click", (e) => {
     e.stopPropagation();
     initAudio();
     unlockAudio();
     sfxClick();
-    startGame();
+    modsPanelEl.classList.add("active");
   });
   overPanel.addEventListener("click", () => {
     // Return to main menu after game over
@@ -4180,7 +4173,7 @@
   prevSlideEl.addEventListener("click", () => {
     scrollToSlide(-1);
   });
-  nextSlideEl.addEventListener("click", () => {
+  nextIntroSlideEl.addEventListener("click", () => {
     scrollToSlide(1);
   });
   closeIntroEl.addEventListener("click", () => {
