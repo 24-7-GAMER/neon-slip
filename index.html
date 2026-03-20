@@ -1533,6 +1533,9 @@
     nearMissThreshold: 13,
     slowMoTime: 0.09,
     slowMoScale: 0.7,
+    slowMoEaseRate: 1.5,
+    tremorShake: 0.18,
+    tremorShakePower: 7,
     deathGlitchTime: 0.35
   };
 
@@ -3799,7 +3802,7 @@
     if (state.slowMo > 0){
       state.slowMoEase = TUNING.slowMoScale;
     } else if (state.slowMoEase < 1){
-      state.slowMoEase = Math.min(1, state.slowMoEase + dt * 1.5);
+      state.slowMoEase = Math.min(1, state.slowMoEase + dt * TUNING.slowMoEaseRate);
     }
     const timeScale = state.slowMoEase;
     state.lastTime = ts;
@@ -3834,8 +3837,8 @@
       if (state.shake > 0) state.shake -= dt;
       // tremorMode: constant screen tremor
       if (state.runMods.tremorMode){
-        state.shake = 0.18;
-        state.shakePower = Math.max(state.shakePower, 7);
+        state.shake = TUNING.tremorShake;
+        state.shakePower = Math.max(state.shakePower, TUNING.tremorShakePower);
       }
       if (state.slowMo > 0) state.slowMo -= dt;
       if (state.flash > 0) state.flash -= dt;
