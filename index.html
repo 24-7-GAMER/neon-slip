@@ -245,14 +245,14 @@
   }
   /* Leaderboard target bar in HUD */
   .lb-target-bar{
-    display:none; width:120px; margin-top:2px;
+    display:none; width:160px; margin-top:4px;
   }
   .lb-target-label{
-    font-size:9px; letter-spacing:1px; opacity:.65; margin-bottom:3px;
+    font-size:13px; letter-spacing:1px; opacity:.85; margin-bottom:4px;
     color:var(--neon); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
   }
   .lb-target-meter{
-    width:100%; height:4px; border-radius:4px;
+    width:100%; height:8px; border-radius:4px;
     border:1px solid rgba(25,247,255,.3);
     background: rgba(6,12,20,.7);
     overflow:hidden;
@@ -693,19 +693,19 @@
     background: linear-gradient(180deg, rgba(10,16,30,.97), rgba(6,10,20,.97));
     border:1px solid rgba(25,247,255,.35);
     box-shadow: 0 0 32px rgba(25,247,255,.2);
-    padding:20px 22px 16px; border-radius:14px;
-    width:min(96vw, 500px);
+    padding:26px 30px 20px; border-radius:14px;
+    width:min(96vw, 700px);
     height:90vh;
     max-height:90vh;
     display:flex; flex-direction:column;
     overflow:hidden; position:relative;
   }
   .leaderboard-close-x{
-    position:absolute; top:10px; right:12px;
-    width:28px; height:28px; border-radius:50%;
+    position:absolute; top:12px; right:14px;
+    width:34px; height:34px; border-radius:50%;
     background: rgba(25,247,255,.15); border:1px solid rgba(25,247,255,.4);
     display:flex; align-items:center; justify-content:center;
-    cursor:pointer; font-size:14px; color:var(--neon);
+    cursor:pointer; font-size:17px; color:var(--neon);
     transition: background .15s ease; z-index:2;
   }
   .leaderboard-close-x:hover{ background: rgba(25,247,255,.3); }
@@ -719,47 +719,47 @@
   .leaderboard-list::-webkit-scrollbar-track{ background:transparent; }
   .leaderboard-list::-webkit-scrollbar-thumb{ background:rgba(25,247,255,.4); border-radius:4px; }
   .lb-entry{
-    display:flex; align-items:center; gap:10px;
-    padding:8px 10px; border-radius:10px;
+    display:flex; align-items:center; gap:12px;
+    padding:12px 14px; border-radius:10px;
     border:1px solid rgba(25,247,255,.12);
     background: rgba(25,247,255,.03);
-    margin-bottom:6px;
+    margin-bottom:8px;
     transition: background .15s ease;
   }
   .lb-entry:hover{ background: rgba(25,247,255,.08); }
   .lb-rank{
-    font-size:14px; font-weight:bold; color:var(--neon);
-    min-width:22px; text-align:center; flex-shrink:0;
+    font-size:18px; font-weight:bold; color:var(--neon);
+    min-width:28px; text-align:center; flex-shrink:0;
   }
   .lb-rank.gold{ color:#ffd700; text-shadow:0 0 8px rgba(255,215,0,.6); }
   .lb-rank.silver{ color:#c0c0c0; text-shadow:0 0 6px rgba(192,192,192,.4); }
   .lb-rank.bronze{ color:#cd7f32; text-shadow:0 0 6px rgba(205,127,50,.4); }
   .lb-avatar{
-    width:36px; height:36px; border-radius:50%;
+    width:46px; height:46px; border-radius:50%;
     border:1px solid rgba(25,247,255,.35);
     object-fit:cover; flex-shrink:0; display:block;
   }
   .lb-avatar-ph{
-    width:36px; height:36px; border-radius:50%;
+    width:46px; height:46px; border-radius:50%;
     border:1px solid rgba(25,247,255,.25);
     background: rgba(25,247,255,.08);
     display:flex; align-items:center; justify-content:center;
-    font-size:16px; flex-shrink:0;
+    font-size:20px; flex-shrink:0;
   }
   .lb-info{ flex:1 1 0; min-width:0; }
-  .lb-name{ font-size:11px; letter-spacing:1px; text-transform:uppercase; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .lb-score{ font-size:17px; color:var(--neon); font-weight:bold; letter-spacing:1px; text-shadow:0 0 8px rgba(25,247,255,.4); }
-  .lb-date{ font-size:9px; color:rgba(215,249,255,.35); letter-spacing:.5px; text-transform:uppercase; white-space:nowrap; flex-shrink:0; }
-  .lb-empty{ text-align:center; padding:32px 0; opacity:.45; font-size:12px; letter-spacing:1px; text-transform:uppercase; }
-  .lb-your-score{ font-size:12px; letter-spacing:1px; text-transform:uppercase; color:rgba(215,249,255,.55); margin-bottom:6px; flex-shrink:0; }
+  .lb-name{ font-size:14px; letter-spacing:1px; text-transform:uppercase; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .lb-score{ font-size:22px; color:var(--neon); font-weight:bold; letter-spacing:1px; text-shadow:0 0 8px rgba(25,247,255,.4); }
+  .lb-date{ font-size:12px; color:rgba(215,249,255,.35); letter-spacing:.5px; text-transform:uppercase; white-space:nowrap; flex-shrink:0; }
+  .lb-empty{ text-align:center; padding:32px 0; opacity:.45; font-size:15px; letter-spacing:1px; text-transform:uppercase; }
+  .lb-your-score{ font-size:14px; letter-spacing:1px; text-transform:uppercase; color:rgba(215,249,255,.55); margin-bottom:8px; flex-shrink:0; }
   @keyframes lb-spin{ to{ transform:rotate(360deg); } }
   .lb-loading{ display:inline-block; animation: lb-spin 0.8s linear infinite; }
   /* Leaderboard category tabs */
   .lb-category-tabs{
-    display:flex; gap:6px; margin-bottom:10px; flex-shrink:0; flex-wrap:wrap;
+    display:flex; gap:8px; margin-bottom:12px; flex-shrink:0; flex-wrap:wrap;
   }
   .lb-category-tab{
-    padding:4px 10px; border-radius:20px; font-size:10px; text-transform:uppercase;
+    padding:6px 16px; border-radius:20px; font-size:13px; text-transform:uppercase;
     letter-spacing:1px; cursor:pointer;
     border:1px solid rgba(25,247,255,.3); background:rgba(25,247,255,.06);
     color:var(--text); transition: all .15s ease;
@@ -1382,6 +1382,7 @@
     lastGapCenter: null,
     loggedParams: false,
     slowMo: 0,
+    slowMoEase: 1,
     flash: 0,
     glitch: 0,
     orbTimer: 0,
@@ -2399,6 +2400,7 @@
     state.lastPassETA = null;
     state.lastGapCenter = null;
     state.slowMo = 0;
+    state.slowMoEase = 1;
     state.flash = 0;
     state.glitch = 0;
     state.orbTimer = 0.7;
@@ -3794,7 +3796,12 @@
 
   function loop(ts){
     const dt = Math.min(0.033, (ts - state.lastTime) / 1000 || 0);
-    const timeScale = state.slowMo > 0 ? TUNING.slowMoScale : 1;
+    if (state.slowMo > 0){
+      state.slowMoEase = TUNING.slowMoScale;
+    } else if (state.slowMoEase < 1){
+      state.slowMoEase = Math.min(1, state.slowMoEase + dt * 1.5);
+    }
+    const timeScale = state.slowMoEase;
     state.lastTime = ts;
     state.visualTime += dt;
 
@@ -3825,10 +3832,10 @@
       checkMissions();
 
       if (state.shake > 0) state.shake -= dt;
-      // tremorMode: constant mild screen tremor
+      // tremorMode: constant screen tremor
       if (state.runMods.tremorMode){
-        state.shake = 0.06;
-        state.shakePower = Math.max(state.shakePower, 2.5);
+        state.shake = 0.18;
+        state.shakePower = Math.max(state.shakePower, 7);
       }
       if (state.slowMo > 0) state.slowMo -= dt;
       if (state.flash > 0) state.flash -= dt;
