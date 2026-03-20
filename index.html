@@ -2428,6 +2428,7 @@
     state.intensityPeak = 1;
     state.announceCooldown = 0;
     state.hasShield = false;
+    state.revivalUsed = false;
     state.magnetActive = false;
     state.magnetTimer = 0;
     state.dashActive = false;
@@ -2630,8 +2631,9 @@
       return;
     }
     
-    // Check for revival upgrade
-    if (state.upgrades.revival && Math.random() < (state.upgrades.revival * GAMEPLAY_CONSTANTS.revivalChance)){
+    // Check for revival upgrade (once per run)
+    if (!state.revivalUsed && state.upgrades.revival && Math.random() < (state.upgrades.revival * GAMEPLAY_CONSTANTS.revivalChance)){
+      state.revivalUsed = true;
       state.flash = 0.15;
       state.shake = 0.2;
       announce("SECOND CHANCE!");
