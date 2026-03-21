@@ -1632,8 +1632,9 @@
     orbRadius: 7,
     nearMissThreshold: 13,
     slowMoTime: 0.45,
-    slowMoScale: 0.38,
-    slowMoEaseRate: 6.0,
+    slowMoScale: 0.38,      // 62% slower gameplay; lower = more dramatic
+    slowMoEaseRate: 6.0,    // ease-out rate (back to normal speed)
+    slowMoEaseInRate: 12,   // ease-in rate (into slow-mo)
     tremorShake: 0.18,
     tremorShakePower: 7,
     deathGlitchTime: 0.35
@@ -2813,9 +2814,9 @@
       const target = lerp(patternCenter + directorPush, player.x, 0.2);
       const blended = state.lastGapCenter * bias + target * (1 - bias);
       // Flow reduces jitter for smoother, more readable patterns
-      const flowJitterReduce = state.runMods.patternBias > 0 ? Math.max(0.25, 1 - state.runMods.patternBias * 0.7) : 1;
+      const flowJitterMul = state.runMods.patternBias > 0 ? Math.max(0.25, 1 - state.runMods.patternBias * 0.7) : 1;
       const jitterScale = lerp(TUNING.jitterHigh, TUNING.jitterLow, intensityN);
-      const jitter = (randRange(-1, 1)) * maxShift * jitterScale * (state.runMods.chaosMode ? 3.0 : 1) * flowJitterReduce;
+      const jitter = (randRange(-1, 1)) * maxShift * jitterScale * (state.runMods.chaosMode ? 3.0 : 1) * flowJitterMul;
       if (state.runMods.chaosMode){
         // Chaos: bypass reach constraint, teleport anywhere on screen
         center = clamp(w * 0.5 + patternOffset() + jitter * 2.5, minCenter, maxCenter);
@@ -3057,6 +3058,7 @@
       const pulseFactor = 0.65 + 0.45 * Math.sin(state.time * 2.8);
       interval *= pulseFactor;
       // During burst phase, bypass minimum clamp for intense gate floods
+      // Pulse burst: allow 30% of minimum interval for rapid-fire bursts
       const pulseMin = pulseFactor < 0.70 ? minInterval * 0.30 : minInterval;
       interval = clamp(interval, pulseMin, Math.max(minInterval, maxInterval));
     } else {
@@ -3663,6 +3665,7 @@
       const gy = renderY(g.y);
 
       // Echo decoy: ghostly blue, fades out as it approaches the player
+      // Fade over the last 200px before the player line (ECHO_FADE_DISTANCE)
       if (g.echo){
         const distToPlayer = player.y() - g.y;
         const echoAlpha = clamp(distToPlayer / 200, 0, 0.45);
@@ -4171,7 +4174,7 @@
     const dt = Math.min(0.033, (ts - state.lastTime) / 1000 || 0);
     if (state.slowMo > 0){
       // Smooth ease-in: approach slowMoScale quickly
-      state.slowMoEase = Math.max(TUNING.slowMoScale, state.slowMoEase - dt * 12);
+      state.slowMoEase = Math.max(TUNING.slowMoScale, state.slowMoEase - dt * TUNING.slowMoEaseInRate);
     } else if (state.slowMoEase < 1){
       state.slowMoEase = Math.min(1, state.slowMoEase + dt * TUNING.slowMoEaseRate);
     }
