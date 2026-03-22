@@ -1601,25 +1601,25 @@
     intensityResponseMax: 0.6,
     baseGapMin: 150,
     baseGapMax: 175,
-    gapShrinkPerIntensityMin: 24,
-    gapShrinkPerIntensityMax: 32,
-    minGapMin: 62,
-    minGapMax: 74,
+    gapShrinkPerIntensityMin: 20,
+    gapShrinkPerIntensityMax: 26,
+    minGapMin: 78,
+    minGapMax: 92,
     minPassIntervalMin: 0.42,
     minPassIntervalMax: 0.54,
     maxPassIntervalMin: 0.7,
     maxPassIntervalMax: 0.9,
     intervalDecay: 0.12,
     intervalMaxDecay: 0.06,
-    reachFactor: 0.98,
+    reachFactor: 0.62,
     patternBiasStrengthMin: 60,
     patternBiasStrengthMax: 140,
     patternPeriodMin: 2.2,
     patternPeriodMax: 4.2,
     directorWindowSec: 2.6,
     directorStrength: 0.22,
-    jitterHigh: 0.6,
-    jitterLow: 0.22,
+    jitterHigh: 0.38,
+    jitterLow: 0.15,
     orbTelegraphMin: 0.16,
     orbTelegraphMax: 0.24,
     orbSpeedMin: 880,
@@ -3058,8 +3058,8 @@
       const pulseFactor = 0.65 + 0.45 * Math.sin(state.time * 2.8);
       interval *= pulseFactor;
       // During burst phase, bypass minimum clamp for intense gate floods
-      // Pulse burst: allow 30% of minimum interval for rapid-fire bursts
-      const pulseMin = pulseFactor < 0.70 ? minInterval * 0.30 : minInterval;
+      // Pulse burst: allow 50% of minimum interval for rapid-fire bursts
+      const pulseMin = pulseFactor < 0.70 ? minInterval * 0.50 : minInterval;
       interval = clamp(interval, pulseMin, Math.max(minInterval, maxInterval));
     } else {
       interval = clamp(interval, minInterval, Math.max(minInterval, maxInterval));
@@ -4190,8 +4190,11 @@
     }
 
     if (state.mode === "play"){
-      state.time += dt;
       const dtScaled = dt * timeScale;
+      // Advance game time in scaled units so passETA/speed calculations stay
+      // in sync with gate movement (which also uses dtScaled).  Real-world
+      // timers such as state.slowMo and powerup durations still use raw dt.
+      state.time += dtScaled;
       state.score += Math.floor(dtScaled * 8);
       state.intensityPeak = Math.max(state.intensityPeak, intensity());
       if (state.announceCooldown > 0) state.announceCooldown -= dt;
