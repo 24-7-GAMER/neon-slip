@@ -4796,7 +4796,9 @@ const FIREBASE_CONFIG = firebaseConfig;
         const fbKey = lbEntries[entryIdx].fbKey;
         // Delete from Firebase
         if (fbKey && lbDB){
-          lbDB.ref("leaderboard/" + fbKey).remove().catch(() => {});
+          lbDB.ref("leaderboard/" + fbKey).remove().catch(err => {
+            console.error("[Admin] Failed to delete entry:", err.message);
+          });
         }
         lbEntries.splice(entryIdx, 1);
         renderLeaderboard(false);
@@ -5676,7 +5678,9 @@ const FIREBASE_CONFIG = firebaseConfig;
         const fbKey = lbEntries[idx].fbKey;
         // Delete from Firebase
         if (fbKey && lbDB){
-          lbDB.ref("leaderboard/" + fbKey).remove().catch(() => {});
+          lbDB.ref("leaderboard/" + fbKey).remove().catch(err => {
+            console.error("[Admin] Failed to delete entry:", err.message);
+          });
         }
         lbEntries.splice(idx, 1);
         renderLeaderboard(false);
@@ -5696,7 +5700,9 @@ const FIREBASE_CONFIG = firebaseConfig;
         // Delete all entries from Firebase
         for (const entry of lbEntries){
           if (entry.fbKey){
-            lbDB.ref("leaderboard/" + entry.fbKey).remove().catch(() => {});
+            lbDB.ref("leaderboard/" + entry.fbKey).remove().catch(err => {
+              console.error("[Admin] Failed to delete entry:", err.message);
+            });
           }
         }
       }
@@ -6395,6 +6401,18 @@ const FIREBASE_CONFIG = firebaseConfig;
   const mainMenuShardsEl = document.getElementById("mainMenuShards");
   if (mainMenuShardsEl) mainMenuShardsEl.innerHTML = `<img src="shard.png" alt="Shard" class="shard-icon-sm"> ${state.shards} Neon Shards`;
   loadLeaderboardOnline();
+  
+  // Unlock audio on first user interaction (required by browser autoplay policy)
+  function unlockOnInteraction(){
+    unlockAudio();
+    document.removeEventListener("click", unlockOnInteraction);
+    document.removeEventListener("keydown", unlockOnInteraction);
+  }
+  document.addEventListener("click", unlockOnInteraction, { once: true });
+  document.addEventListener("keydown", unlockOnInteraction, { once: true });
+  // Try to unlock immediately in case music needs to play right away
+  setTimeout(unlockAudio, 50);
+  
   requestAnimationFrame(loop);
 })();
 </script>
