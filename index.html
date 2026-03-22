@@ -6220,6 +6220,50 @@
     renderAdminTab(tab.dataset.tab);
   });
 
+  // Auth System event listeners
+  document.getElementById("mainMenuUserBtn").addEventListener("click", () => {
+    openAuthModal();
+  });
+  document.getElementById("authLoginBtn").addEventListener("click", () => {
+    doAuthLogin();
+  });
+  document.getElementById("authRegisterBtn").addEventListener("click", () => {
+    doAuthRegister();
+  });
+  document.getElementById("authSignOutBtn").addEventListener("click", () => {
+    doAuthSignOut();
+  });
+  document.getElementById("authCancelBtn").addEventListener("click", () => {
+    closeAuthModal();
+  });
+  document.getElementById("authCloseProfileBtn").addEventListener("click", () => {
+    closeAuthModal();
+  });
+  document.getElementById("authForgotLink").addEventListener("click", () => {
+    doForgotPassword();
+  });
+  document.querySelectorAll(".auth-tab").forEach(tab => {
+    tab.addEventListener("click", () => {
+      sfxClick();
+      setAuthView(tab.dataset.view);
+    });
+  });
+  document.getElementById("authLoginEmail").addEventListener("keydown", (e) => {
+    if (e.code === "Enter") doAuthLogin();
+  });
+  document.getElementById("authLoginPw").addEventListener("keydown", (e) => {
+    if (e.code === "Enter") doAuthLogin();
+  });
+  document.getElementById("authRegName").addEventListener("keydown", (e) => {
+    if (e.code === "Enter") doAuthRegister();
+  });
+  document.getElementById("authRegEmail").addEventListener("keydown", (e) => {
+    if (e.code === "Enter") doAuthRegister();
+  });
+  document.getElementById("authRegPw").addEventListener("keydown", (e) => {
+    if (e.code === "Enter") doAuthRegister();
+  });
+
   resize();
   loadSettings();
   loadProgress();
@@ -6240,3 +6284,4 @@
 </script>
 </body>
 </html>
+  // Thank you for checking out the code! If you have any questions or want to know more about how it works, feel free to ask.
