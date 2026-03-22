@@ -1043,8 +1043,8 @@
     background: linear-gradient(160deg, rgba(14,8,30,.98), rgba(6,4,18,.98));
     border:1px solid rgba(138,91,255,.55);
     box-shadow: 0 0 50px rgba(138,91,255,.35), 0 0 100px rgba(138,91,255,.15), inset 0 1px 0 rgba(138,91,255,.3);
-    padding:22px 24px 18px; border-radius:16px;
-    width:min(96vw,680px); max-height:90vh;
+    padding:28px 40px 24px; border-radius:16px;
+    width:min(96vw, 850px); max-height:88vh; min-height:400px;
     display:flex; flex-direction:column;
     position:relative; overflow:hidden;
   }
@@ -4653,13 +4653,18 @@
 
   // Initialise Firebase once (safe to call multiple times)
   (function initFirebase(){
-    if (!FIREBASE_CONFIG.apiKey) return;
+    if (!FIREBASE_CONFIG.apiKey) { console.warn("[Firebase] No API key configured"); return; }
     try {
       if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
       if (FIREBASE_CONFIG.databaseURL) lbDB = firebase.database();
       fbAuth = firebase.auth();
       fbAuth.onAuthStateChanged(handleAuthStateChanged);
-    } catch(e){ lbDB = null; fbAuth = null; }
+      console.log("[Firebase] ✓ Initialized successfully. Auth enabled:", !!fbAuth);
+    } catch(e){ 
+      console.error("[Firebase] Initialization failed:", e);
+      lbDB = null; 
+      fbAuth = null; 
+    }
   })();
 
   // Resize a photo dataURL to a 48×48 JPEG thumbnail (~2 KB) for online storage
@@ -5256,13 +5261,14 @@
       })
       .catch(err => {
         btn.textContent = "Sign In"; btn.style.opacity = "";
+        console.error("[Auth] Login error:", err.code, err.message);
         const msg =
           (err.code === "auth/wrong-password" || err.code === "auth/user-not-found" || err.code === "auth/invalid-credential")
             ? "Incorrect email or password."
             : err.code === "auth/too-many-requests" ? "Too many attempts. Try again later."
             : err.code === "auth/invalid-email" ? "Invalid email address."
             : err.code === "auth/user-disabled" ? "This account has been disabled."
-            : "Sign-in failed. Please try again.";
+            : err.message ? err.message : "Sign-in failed. Please try again.";
         authSetError("authLoginErr", msg);
       });
   }
@@ -5289,11 +5295,14 @@
       })
       .catch(err => {
         btn.textContent = "Create Account"; btn.style.opacity = "";
+        console.error("[Auth] Registration error:", err.code, err.message);
         const msg =
           err.code === "auth/email-already-in-use" ? "An account with this email already exists."
             : err.code === "auth/invalid-email" ? "Invalid email address."
             : err.code === "auth/weak-password" ? "Password is too weak."
-            : "Registration failed. Please try again.";
+            : err.code === "auth/operation-not-allowed" ? "Account creation is not enabled. Contact admin."
+            : err.code === "auth/too-many-requests" ? "Too many attempts. Try again later."
+            : err.message ? err.message : "Registration failed. Please try again.";
         authSetError("authRegErr", msg);
       });
   }
