@@ -65,7 +65,7 @@
       0 0 60px rgba(138,91,255,.12),
       inset 0 0 40px rgba(138,91,255,.12),
       inset 0 1px 0 rgba(25,247,255,.25);
-    padding:24px 28px; border-radius:16px; text-align:center; max-width:320px;
+    padding:28px 40px; border-radius:16px; text-align:center; max-width:420px;
     position:relative; overflow:hidden;
     transition: opacity .35s ease, transform .35s ease;
   }
@@ -161,7 +161,7 @@
     }
   }
   .btn{
-    margin-top:16px; display:inline-block; padding:10px 20px;
+    margin-top:12px; display:inline-block; padding:10px 20px;
     border:1px solid rgba(25,247,255,.55);
     background: linear-gradient(135deg, rgba(25,247,255,.14), rgba(138,91,255,.08));
     color:var(--text); border-radius:10px; cursor:pointer;
@@ -180,7 +180,7 @@
   .btn-start{
     display:block; width:100%; text-align:center;
     font-size:1.5rem; font-weight:700; letter-spacing:.14em;
-    padding:22px 48px; margin-top:24px;
+    padding:22px 48px; margin-top:16px;
     border:2px solid rgba(25,247,255,.9);
     background: linear-gradient(135deg, rgba(25,247,255,.22) 0%, rgba(138,91,255,.18) 100%);
     box-shadow: 0 0 30px rgba(25,247,255,.55), 0 0 70px rgba(25,247,255,.25), inset 0 1px 0 rgba(25,247,255,.4);
@@ -5141,8 +5141,11 @@
   }
 
   function openAuthModal(view){
+    console.log("[Auth] User clicked auth button");
     sfxClick();
-    document.getElementById("authModal").classList.add("active");
+    const modal = document.getElementById("authModal");
+    if (!modal) { console.error("[Auth] authModal element not found!"); return; }
+    modal.classList.add("active");
     setAuthView(authUser ? "profile" : (view || "login"));
   }
 
@@ -5365,8 +5368,11 @@
   }
 
   function openAdminPanel(){
+    console.log("[Admin] Opening admin panel");
     sfxClick();
-    document.getElementById("adminPanel").classList.add("active");
+    const panel = document.getElementById("adminPanel");
+    if (!panel) { console.error("[Admin] adminPanel element not found!"); return; }
+    panel.classList.add("active");
     renderAdminTab(adminCurrentTab);
   }
 
@@ -5380,10 +5386,13 @@
       t.classList.toggle("active", t.dataset.tab === tab);
     });
     const content = document.getElementById("adminContent");
-    if (tab === "player") renderAdminPlayer(content);
-    else if (tab === "leaderboard") renderAdminLeaderboard(content);
-    else if (tab === "tuning") renderAdminTuning(content);
-    else if (tab === "progression") renderAdminProgression(content);
+    if (!content) { console.error("adminContent element not found"); return; }
+    try {
+      if (tab === "player") renderAdminPlayer(content);
+      else if (tab === "leaderboard") renderAdminLeaderboard(content);
+      else if (tab === "tuning") renderAdminTuning(content);
+      else if (tab === "progression") renderAdminProgression(content);
+    } catch(e) { console.error("Error rendering admin tab:", e); }
   }
 
   // ── Player tab ──
@@ -6221,48 +6230,84 @@
   });
 
   // Auth System event listeners
-  document.getElementById("mainMenuUserBtn").addEventListener("click", () => {
-    openAuthModal();
-  });
-  document.getElementById("authLoginBtn").addEventListener("click", () => {
-    doAuthLogin();
-  });
-  document.getElementById("authRegisterBtn").addEventListener("click", () => {
-    doAuthRegister();
-  });
-  document.getElementById("authSignOutBtn").addEventListener("click", () => {
-    doAuthSignOut();
-  });
-  document.getElementById("authCancelBtn").addEventListener("click", () => {
-    closeAuthModal();
-  });
-  document.getElementById("authCloseProfileBtn").addEventListener("click", () => {
-    closeAuthModal();
-  });
-  document.getElementById("authForgotLink").addEventListener("click", () => {
-    doForgotPassword();
-  });
+  const mainMenuUserBtn = document.getElementById("mainMenuUserBtn");
+  if (mainMenuUserBtn) {
+    mainMenuUserBtn.addEventListener("click", () => {
+      openAuthModal();
+    });
+  }
+  const authLoginBtn = document.getElementById("authLoginBtn");
+  if (authLoginBtn) {
+    authLoginBtn.addEventListener("click", () => {
+      doAuthLogin();
+    });
+  }
+  const authRegisterBtn = document.getElementById("authRegisterBtn");
+  if (authRegisterBtn) {
+    authRegisterBtn.addEventListener("click", () => {
+      doAuthRegister();
+    });
+  }
+  const authSignOutBtn = document.getElementById("authSignOutBtn");
+  if (authSignOutBtn) {
+    authSignOutBtn.addEventListener("click", () => {
+      doAuthSignOut();
+    });
+  }
+  const authCancelBtn = document.getElementById("authCancelBtn");
+  if (authCancelBtn) {
+    authCancelBtn.addEventListener("click", () => {
+      closeAuthModal();
+    });
+  }
+  const authCloseProfileBtn = document.getElementById("authCloseProfileBtn");
+  if (authCloseProfileBtn) {
+    authCloseProfileBtn.addEventListener("click", () => {
+      closeAuthModal();
+    });
+  }
+  const authForgotLink = document.getElementById("authForgotLink");
+  if (authForgotLink) {
+    authForgotLink.addEventListener("click", () => {
+      doForgotPassword();
+    });
+  }
   document.querySelectorAll(".auth-tab").forEach(tab => {
     tab.addEventListener("click", () => {
       sfxClick();
       setAuthView(tab.dataset.view);
     });
   });
-  document.getElementById("authLoginEmail").addEventListener("keydown", (e) => {
-    if (e.code === "Enter") doAuthLogin();
-  });
-  document.getElementById("authLoginPw").addEventListener("keydown", (e) => {
-    if (e.code === "Enter") doAuthLogin();
-  });
-  document.getElementById("authRegName").addEventListener("keydown", (e) => {
-    if (e.code === "Enter") doAuthRegister();
-  });
-  document.getElementById("authRegEmail").addEventListener("keydown", (e) => {
-    if (e.code === "Enter") doAuthRegister();
-  });
-  document.getElementById("authRegPw").addEventListener("keydown", (e) => {
-    if (e.code === "Enter") doAuthRegister();
-  });
+  const authLoginEmail = document.getElementById("authLoginEmail");
+  if (authLoginEmail) {
+    authLoginEmail.addEventListener("keydown", (e) => {
+      if (e.code === "Enter") doAuthLogin();
+    });
+  }
+  const authLoginPw = document.getElementById("authLoginPw");
+  if (authLoginPw) {
+    authLoginPw.addEventListener("keydown", (e) => {
+      if (e.code === "Enter") doAuthLogin();
+    });
+  }
+  const authRegName = document.getElementById("authRegName");
+  if (authRegName) {
+    authRegName.addEventListener("keydown", (e) => {
+      if (e.code === "Enter") doAuthRegister();
+    });
+  }
+  const authRegEmail = document.getElementById("authRegEmail");
+  if (authRegEmail) {
+    authRegEmail.addEventListener("keydown", (e) => {
+      if (e.code === "Enter") doAuthRegister();
+    });
+  }
+  const authRegPw = document.getElementById("authRegPw");
+  if (authRegPw) {
+    authRegPw.addEventListener("keydown", (e) => {
+      if (e.code === "Enter") doAuthRegister();
+    });
+  }
 
   resize();
   loadSettings();
