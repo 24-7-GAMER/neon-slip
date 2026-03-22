@@ -5282,12 +5282,20 @@
     if (pw.length < 6){ authSetError("authRegErr", "Password must be at least 6 characters."); return; }
     const btn = document.getElementById("authRegisterBtn");
     btn.textContent = "Creating…"; btn.style.opacity = ".6";
+    console.log("[Auth] Starting registration for:", email);
     fbAuth.createUserWithEmailAndPassword(email, pw)
-      .then(cred =>
-        cred.user.updateProfile({ displayName: name })
-          .then(() => cred.user.sendEmailVerification())
-          .then(() => cred.user)
-      )
+      .then(cred => {
+        console.log("[Auth] User created, updating profile...");
+        return cred.user.updateProfile({ displayName: name })
+          .then(() => {
+            console.log("[Auth] Profile updated, sending verification email...");
+            return cred.user.sendEmailVerification();
+          })
+          .then(() => {
+            console.log("[Auth] Verification email sent");
+            return cred.user;
+          });
+      })
       .then(() => {
         btn.textContent = "Create Account"; btn.style.opacity = "";
         authSetOk("authRegErr", "Account created! Check your email to verify.");
@@ -5295,7 +5303,7 @@
       })
       .catch(err => {
         btn.textContent = "Create Account"; btn.style.opacity = "";
-        console.error("[Auth] Registration error:", err.code, err.message);
+        console.error("[Auth] Registration error:", err.code, err.message, err);
         const msg =
           err.code === "auth/email-already-in-use" ? "An account with this email already exists."
             : err.code === "auth/invalid-email" ? "Invalid email address."
