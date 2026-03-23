@@ -5602,6 +5602,31 @@ const FIREBASE_CONFIG = firebaseConfig;
     }
   }
 
+  function writeProfilePhotoToDatabase(uid, value){
+    return new Promise((resolve, reject) => {
+      let settled = false;
+      const timeoutId = setTimeout(() => {
+        if (settled) return;
+        settled = true;
+        reject(new Error("db-write-timeout"));
+      }, AUTH_CLOUD_TIMEOUT_MS);
+
+      lbDB.ref("users/" + uid + "/progress/profilePhoto").set(value)
+        .then(() => {
+          if (settled) return;
+          settled = true;
+          clearTimeout(timeoutId);
+          resolve();
+        })
+        .catch(err => {
+          if (settled) return;
+          settled = true;
+          clearTimeout(timeoutId);
+          reject(err);
+        });
+    });
+  }
+
   function uploadProfilePhotoWithTimeout(storageRef, uid, photo){
     return new Promise((resolve, reject) => {
       const task = storageRef.putString(photo, "data_url", {
@@ -5615,7 +5640,7 @@ const FIREBASE_CONFIG = firebaseConfig;
 
       task
         .then(() => storageRef.getDownloadURL())
-        .then(url => lbDB.ref("users/" + uid + "/progress/profilePhoto").set(url).then(() => {
+        .then(url => writeProfilePhotoToDatabase(uid, url).then(() => {
           clearTimeout(timeoutId);
           setCachedProfilePhoto(uid, url);
           resolve({ saved: "cloud", url });
@@ -5629,9 +5654,21 @@ const FIREBASE_CONFIG = firebaseConfig;
 
   function saveProfilePhotoToCloud(uid, photo){
     if (!uid) return Promise.reject(new Error("No user id for profile photo upload."));
-    if (!lbStorage) return Promise.reject(new Error("Firebase Storage is not configured."));
     if (!lbDB) return Promise.reject(new Error("Realtime Database is not configured."));
-    if (!photo) return lbDB.ref("users/" + uid + "/progress/profilePhoto").set("").then(() => ({ saved: "cloud", url: "" }));
+    if (!photo) return writeProfilePhotoToDatabase(uid, "").then(() => ({ saved: "cloud", url: "" }));
+
+    const saveInlineInDatabase = () => {
+      // Final cloud fallback: store resized thumbnail directly in Realtime DB.
+      return writeProfilePhotoToDatabase(uid, photo).then(() => {
+        setCachedProfilePhoto(uid, photo);
+        return { saved: "cloud-db-inline", url: photo };
+      });
+    };
+
+    if (!lbStorage){
+      console.warn("[Auth] Firebase Storage not configured; saving profile photo directly to Realtime DB.");
+      return saveInlineInDatabase();
+    }
 
     const path = "profilePhotos/" + uid + ".jpg";
     const primaryRef = lbStorage.ref(path);
@@ -5644,6 +5681,10 @@ const FIREBASE_CONFIG = firebaseConfig;
         console.warn("[Auth] Primary storage upload failed; retrying appspot fallback bucket.", err && (err.code || err.message || err));
         const fallbackRef = lbStorageFallback.ref(path);
         return uploadProfilePhotoWithTimeout(fallbackRef, uid, photo);
+      })
+      .catch((err) => {
+        console.warn("[Auth] Storage upload failed after retries; saving thumbnail directly in Realtime DB.", err && (err.code || err.message || err));
+        return saveInlineInDatabase();
       });
   }
 
@@ -6383,6 +6424,7 @@ const FIREBASE_CONFIG = firebaseConfig;
       else if (err && err.code === "storage/bucket-not-found") msg = "Storage bucket not found. Check FIREBASE_CONFIG.storageBucket.";
       else if (err && err.code === "storage/unknown") msg = "Storage upload failed. Check bucket and CORS/rules settings.";
       else if ((err && err.message) === "storage-upload-timeout") msg = "Upload timed out. Check your connection and Firebase Storage rules.";
+      else if ((err && err.message) === "db-write-timeout") msg = "Cloud database write timed out. Check Firebase Realtime Database rules/connection.";
       authSetError("authProfilePhotoMsg", msg);
     }
   }
