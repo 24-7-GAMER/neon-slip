@@ -5467,6 +5467,8 @@ const FIREBASE_CONFIG = firebaseConfig;
   const AUTH_MAX_PHOTO_BYTES = 12 * 1024 * 1024;
   const AUTH_ACCEPTED_IMAGE_EXTS = [".jpg", ".jpeg", ".png", ".gif", ".webp", ".bmp", ".avif", ".svg", ".ico", ".heic", ".heif", ".tif", ".tiff"];
   const AUTH_ACCEPT_ATTR = "image/*,.heic,.heif,.avif,.webp,.bmp,.tif,.tiff,.svg,.ico";
+  const AUTH_IMG_PROCESS_TIMEOUT_MS = 12000;
+  const AUTH_CLOUD_TIMEOUT_MS = 25000;
   let lbPendingScore = 0;
   let lbPendingPhoto = null;
   let authPendingRegisterPhoto = null;
@@ -5498,17 +5500,29 @@ const FIREBASE_CONFIG = firebaseConfig;
   // Resize a photo dataURL to a 48×48 JPEG thumbnail (~2 KB) for online storage
   function resizePhotoForUpload(dataUrl, cb){
     const img = new Image();
-    img.onload = function(){
-      const canvas = document.createElement("canvas");
-      canvas.width = 48; canvas.height = 48;
-      const c = canvas.getContext("2d");
-      const side = Math.min(img.width, img.height);
-      const sx = (img.width  - side) / 2;
-      const sy = (img.height - side) / 2;
-      c.drawImage(img, sx, sy, side, side, 0, 0, 48, 48);
-      cb(canvas.toDataURL("image/jpeg", 0.6));
+    let settled = false;
+    const finish = (value) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      cb(value);
     };
-    img.onerror = function(){ cb(null); };
+    const timer = setTimeout(() => finish(null), AUTH_IMG_PROCESS_TIMEOUT_MS);
+    img.onload = function(){
+      try {
+        const canvas = document.createElement("canvas");
+        canvas.width = 48; canvas.height = 48;
+        const c = canvas.getContext("2d");
+        const side = Math.min(img.width, img.height);
+        const sx = (img.width  - side) / 2;
+        const sy = (img.height - side) / 2;
+        c.drawImage(img, sx, sy, side, side, 0, 0, 48, 48);
+        finish(canvas.toDataURL("image/jpeg", 0.6));
+      } catch (_e) {
+        finish(null);
+      }
+    };
+    img.onerror = function(){ finish(null); };
     img.src = dataUrl;
   }
 
@@ -5587,15 +5601,28 @@ const FIREBASE_CONFIG = firebaseConfig;
 
     const path = "profilePhotos/" + uid + ".jpg";
     const ref = lbStorage.ref(path);
-    return ref.putString(photo, "data_url", {
-      contentType: "image/jpeg",
-      cacheControl: "public,max-age=604800"
-    })
-      .then(() => ref.getDownloadURL())
-      .then(url => lbDB.ref("users/" + uid + "/progress/profilePhoto").set(url).then(() => {
-        setCachedProfilePhoto(uid, url);
-        return { saved: "cloud", url };
-      }));
+    return new Promise((resolve, reject) => {
+      const task = ref.putString(photo, "data_url", {
+        contentType: "image/jpeg",
+        cacheControl: "public,max-age=604800"
+      });
+      const timeoutId = setTimeout(() => {
+        try { task.cancel(); } catch (_e) {}
+        reject(new Error("storage-upload-timeout"));
+      }, AUTH_CLOUD_TIMEOUT_MS);
+
+      task
+        .then(() => ref.getDownloadURL())
+        .then(url => lbDB.ref("users/" + uid + "/progress/profilePhoto").set(url).then(() => {
+          clearTimeout(timeoutId);
+          setCachedProfilePhoto(uid, url);
+          resolve({ saved: "cloud", url });
+        }))
+        .catch(err => {
+          clearTimeout(timeoutId);
+          reject(err);
+        });
+    });
   }
 
   function syncLeaderboardPhotoForCurrentUser(photo){
@@ -6314,7 +6341,7 @@ const FIREBASE_CONFIG = firebaseConfig;
     authSetOk("authProfilePhotoMsg", "Saving picture...");
     const resized = await resizePhotoForUploadAsync(dataUrl);
     if (!resized){
-      authSetError("authProfilePhotoMsg", "Could not process that image.");
+      authSetError("authProfilePhotoMsg", "Could not process that image. Try JPG/PNG/WEBP.");
       return;
     }
     try {
@@ -6333,6 +6360,7 @@ const FIREBASE_CONFIG = firebaseConfig;
       if (err && err.code === "storage/unauthorized") msg = "Storage permission denied. Update Firebase Storage rules.";
       else if (err && err.code === "storage/bucket-not-found") msg = "Storage bucket not found. Check FIREBASE_CONFIG.storageBucket.";
       else if (err && err.code === "storage/unknown") msg = "Storage upload failed. Check bucket and CORS/rules settings.";
+      else if ((err && err.message) === "storage-upload-timeout") msg = "Upload timed out. Check your connection and Firebase Storage rules.";
       authSetError("authProfilePhotoMsg", msg);
     }
   }
