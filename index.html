@@ -1061,6 +1061,69 @@
   .achievement-name.locked{ opacity:.45; }
   .achievement-desc{ font-size:11px; opacity:.6; margin-top:3px; }
   .achievement-badge{ font-size:10px; letter-spacing:1px; text-transform:uppercase; color:#7dffb2; text-shadow:0 0 8px rgba(125,255,178,.6); }
+  /* Friends + Neon Speech */
+  .friends-panel{
+    position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
+    pointer-events:none; opacity:0; transition:opacity .25s ease;
+    background: rgba(4,6,12,.82); z-index:22;
+  }
+  .friends-panel.active{ pointer-events:auto; opacity:1; }
+  .friends-box{
+    background: linear-gradient(160deg, rgba(18,26,52,.97), rgba(6,10,20,.99));
+    border:1px solid rgba(25,247,255,.4);
+    box-shadow: 0 0 40px rgba(25,247,255,.2), inset 0 1px 0 rgba(25,247,255,.2);
+    padding:22px 24px 16px; border-radius:16px;
+    width:min(96vw, 760px); max-height:88vh;
+    display:flex; flex-direction:column;
+  }
+  .friends-tabs{ display:flex; gap:6px; margin-bottom:10px; flex-wrap:wrap; }
+  .friends-tab{
+    padding:6px 12px; border-radius:16px; font-size:11px; text-transform:uppercase;
+    letter-spacing:1px; cursor:pointer; border:1px solid rgba(25,247,255,.3);
+    background: rgba(25,247,255,.07); color:var(--text); transition:all .15s ease;
+  }
+  .friends-tab.active{ background:rgba(25,247,255,.2); border-color:var(--neon); color:var(--neon); box-shadow:0 0 8px rgba(25,247,255,.25); }
+  .friends-tab-content{ display:none; flex:1 1 0; min-height:0; }
+  .friends-tab-content.active{ display:flex; flex-direction:column; }
+  .friends-actions{ display:flex; gap:8px; margin-bottom:8px; }
+  .friends-input{
+    flex:1; background: rgba(25,247,255,.06); border:1px solid rgba(25,247,255,.3);
+    border-radius:8px; padding:10px 12px; color:var(--text); font-family:inherit;
+    font-size:12px; letter-spacing:.6px; outline:none;
+  }
+  .friends-input:focus{ border-color:var(--neon); }
+  .friends-msg{ font-size:11px; min-height:15px; opacity:.75; margin-bottom:6px; }
+  .friends-list{ flex:1 1 0; overflow:auto; min-height:0; }
+  .friends-row{
+    display:flex; align-items:center; gap:10px;
+    border:1px solid rgba(25,247,255,.14);
+    background: rgba(25,247,255,.04);
+    border-radius:10px; padding:9px 10px; margin-bottom:7px;
+  }
+  .friends-row-name{ flex:1; font-size:12px; letter-spacing:.6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .friends-row-sub{ font-size:10px; opacity:.55; }
+  .friends-mini-btn{
+    padding:4px 8px; border-radius:6px; cursor:pointer; font-size:10px;
+    letter-spacing:.5px; text-transform:uppercase; border:1px solid rgba(25,247,255,.35);
+    background: rgba(25,247,255,.12);
+  }
+  .friends-mini-btn.danger{ border-color:rgba(255,59,122,.45); color:var(--danger); background:rgba(255,59,122,.08); }
+  .friends-empty{ text-align:center; opacity:.5; padding:24px 0; font-size:12px; letter-spacing:1px; text-transform:uppercase; }
+  .speech-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px; }
+  .speech-title{ font-size:12px; letter-spacing:1px; text-transform:uppercase; color:var(--neon); }
+  .speech-messages{
+    flex:1 1 0; overflow:auto; min-height:180px;
+    border:1px solid rgba(25,247,255,.2); border-radius:10px;
+    background: rgba(8,12,20,.65); padding:10px;
+  }
+  .speech-bubble{
+    max-width:78%; padding:8px 10px; border-radius:10px; margin-bottom:8px;
+    font-size:12px; letter-spacing:.3px; line-height:1.35;
+  }
+  .speech-bubble.me{ margin-left:auto; background:rgba(25,247,255,.16); border:1px solid rgba(25,247,255,.35); }
+  .speech-bubble.them{ margin-right:auto; background:rgba(138,91,255,.14); border:1px solid rgba(138,91,255,.35); }
+  .speech-meta{ font-size:9px; opacity:.55; margin-top:4px; letter-spacing:.5px; text-transform:uppercase; }
+  .speech-compose{ display:flex; gap:8px; margin-top:8px; }
   /* Active modifier HUD bar during gameplay */
   .mod-hud{
     position:fixed; top:0; left:50%; transform:translateX(-50%);
@@ -1691,6 +1754,7 @@
     <div class="btn btn-start" id="startRunBtn">START RUN</div>
     <div class="btn" id="openUpgrades">Upgrades</div>
     <div class="btn" id="openLeaderboard">🏆 Leaderboard</div>
+    <div class="btn" id="openFriends">🤝 Friends</div>
     <div class="btn" id="openAchievements">🎖️ Achievements</div>
     <div class="btn" id="openStats">📊 Stats</div>
     <div class="btn" id="openSettings">Settings</div>
@@ -1893,6 +1957,58 @@
     <div class="leaderboard-list" id="leaderboardList"></div>
     <div class="settings-actions">
       <div id="closeLeaderboard" class="btn">Close</div>
+    </div>
+  </div>
+</div>
+
+<div id="friendsPanel" class="friends-panel">
+  <div class="friends-box">
+    <div class="title">🤝 Friends</div>
+    <div class="friends-tabs" id="friendsTabs">
+      <div class="friends-tab active" data-tab="requests">Requests</div>
+      <div class="friends-tab" data-tab="list">Friends List</div>
+      <div class="friends-tab" data-tab="board">Friend Leaderboard</div>
+      <div class="friends-tab" data-tab="speech">Neon Speech</div>
+    </div>
+
+    <div class="friends-tab-content active" data-content="requests">
+      <div class="friends-actions">
+        <input id="friendAddInput" class="friends-input" maxlength="64" placeholder="Friend UID or exact leaderboard name">
+        <div id="friendAddBtn" class="btn">Send Request</div>
+      </div>
+      <div class="friends-actions">
+        <input id="friendSearchInput" class="friends-input" maxlength="32" placeholder="Search registered players by display name">
+        <div id="friendSearchBtn" class="btn">Search🔎</div>
+      </div>
+      <div id="friendsReqMsg" class="friends-msg"></div>
+      <div id="friendsSearchResults" class="friends-list" style="max-height:200px;margin-bottom:8px;"></div>
+      <div id="friendsRequestsList" class="friends-list"></div>
+    </div>
+
+    <div class="friends-tab-content" data-content="list">
+      <div id="friendsListMsg" class="friends-msg"></div>
+      <div id="friendsList" class="friends-list"></div>
+    </div>
+
+    <div class="friends-tab-content" data-content="board">
+      <div id="friendsBoardMsg" class="friends-msg"></div>
+      <div id="friendsLeaderboardList" class="friends-list"></div>
+    </div>
+
+    <div class="friends-tab-content" data-content="speech">
+      <div class="speech-head">
+        <div class="speech-title" id="speechActiveTitle">Neon Speech: Pick a friend in Friends List</div>
+      </div>
+      <div id="speechMessages" class="speech-messages"></div>
+      <div class="speech-compose">
+        <input id="speechInput" class="friends-input" maxlength="280" placeholder="Type a Neon Speech message...">
+        <div id="speechSendBtn" class="btn">Send</div>
+      </div>
+      <div id="speechMsg" class="friends-msg"></div>
+    </div>
+
+    <div class="settings-actions">
+      <div id="closeFriends" class="btn">Close</div>
     </div>
   </div>
 </div>
@@ -2135,7 +2251,7 @@ const firebaseConfig = {
   authDomain: "neon-slip.firebaseapp.com",
   databaseURL: "https://neon-slip-default-rtdb.europe-west1.firebasedatabase.app",
   projectId: "neon-slip",
-  storageBucket: "neon-slip.firebasestorage.app",
+  storageBucket: "",
   messagingSenderId: "892329479553",
   appId: "1:892329479553:web:388d1e47da11b02d8fac80",
   measurementId: "G-HD7W635F9B"
@@ -2226,6 +2342,26 @@ const FIREBASE_CONFIG = firebaseConfig;
   const leaderboardListEl = document.getElementById("leaderboardList");
   const closeLeaderboardEl = document.getElementById("closeLeaderboard");
   const openLeaderboardEl = document.getElementById("openLeaderboard");
+  const openFriendsEl = document.getElementById("openFriends");
+  const friendsPanelEl = document.getElementById("friendsPanel");
+  const closeFriendsEl = document.getElementById("closeFriends");
+  const friendsTabsEl = document.getElementById("friendsTabs");
+  const friendAddInputEl = document.getElementById("friendAddInput");
+  const friendAddBtnEl = document.getElementById("friendAddBtn");
+  const friendSearchInputEl = document.getElementById("friendSearchInput");
+  const friendSearchBtnEl = document.getElementById("friendSearchBtn");
+  const friendsReqMsgEl = document.getElementById("friendsReqMsg");
+  const friendsSearchResultsEl = document.getElementById("friendsSearchResults");
+  const friendsRequestsListEl = document.getElementById("friendsRequestsList");
+  const friendsListMsgEl = document.getElementById("friendsListMsg");
+  const friendsListEl = document.getElementById("friendsList");
+  const friendsBoardMsgEl = document.getElementById("friendsBoardMsg");
+  const friendsLeaderboardListEl = document.getElementById("friendsLeaderboardList");
+  const speechActiveTitleEl = document.getElementById("speechActiveTitle");
+  const speechMessagesEl = document.getElementById("speechMessages");
+  const speechInputEl = document.getElementById("speechInput");
+  const speechSendBtnEl = document.getElementById("speechSendBtn");
+  const speechMsgEl = document.getElementById("speechMsg");
   const lbModalEl = document.getElementById("lbModal");
   const lbModalScoreEl = document.getElementById("lbModalScore");
   const lbNameInputEl = document.getElementById("lbNameInput");
@@ -5479,6 +5615,15 @@ const FIREBASE_CONFIG = firebaseConfig;
   let lbStorageFallback = null; // Optional fallback bucket reference (appspot)
   let fbAuth = null;    // Firebase auth instance
   let authUser = null;  // currently signed-in Firebase user (null if guest)
+  let friendsTab = "requests";
+  let friendsMap = {};
+  let friendRequestsIncoming = {};
+  let friendRequestsOutgoing = {};
+  let friendSearchResults = [];
+  let activeSpeechFriendUid = null;
+  let activeSpeechFriendName = "";
+  let speechRef = null;
+  let speechHandler = null;
 
   // Initialise Firebase once (safe to call multiple times)
   (function initFirebase(){
@@ -5909,6 +6054,453 @@ const FIREBASE_CONFIG = firebaseConfig;
     return `${Math.floor(sec/3600)}h ${Math.floor((sec%3600)/60)}m`;
   }
 
+  function escText(value){
+    return String(value || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
+  function formatShortDateTime(ts){
+    if (!ts) return "";
+    const d = new Date(ts);
+    return d.toLocaleString("en-US", { month:"short", day:"numeric", hour:"numeric", minute:"2-digit" });
+  }
+
+  function getCurrentDisplayName(){
+    if (!authUser) return "Player";
+    return authUser.displayName || (authUser.email ? authUser.email.split("@")[0] : "Player");
+  }
+
+  function setFriendsStatus(el, msg, isErr){
+    if (!el) return;
+    el.textContent = msg || "";
+    el.style.color = msg ? (isErr ? "var(--danger)" : "#7dffb2") : "";
+  }
+
+  function getChatId(uidA, uidB){
+    return [uidA, uidB].sort().join("__");
+  }
+
+  function clearSpeechSubscription(){
+    if (speechRef && speechHandler){
+      speechRef.off("value", speechHandler);
+    }
+    speechRef = null;
+    speechHandler = null;
+  }
+
+  function setFriendsTab(tab){
+    friendsTab = tab;
+    if (!friendsTabsEl) return;
+    friendsTabsEl.querySelectorAll(".friends-tab").forEach(el => {
+      el.classList.toggle("active", el.dataset.tab === tab);
+    });
+    document.querySelectorAll(".friends-tab-content").forEach(el => {
+      el.classList.toggle("active", el.dataset.content === tab);
+    });
+    if (tab === "board") renderFriendsLeaderboard();
+  }
+
+  function renderFriendRequests(){
+    if (!friendsRequestsListEl) return;
+    const incoming = Object.entries(friendRequestsIncoming || {});
+    const outgoing = Object.entries(friendRequestsOutgoing || {});
+    if (!incoming.length && !outgoing.length){
+      friendsRequestsListEl.innerHTML = '<div class="friends-empty">No pending friend requests</div>';
+      return;
+    }
+    const reqHtml = incoming.map(([uid, req]) => {
+      const name = escText(req.fromName || uid);
+      const when = formatShortDateTime(req.createdAt);
+      return `<div class="friends-row">
+        ${req.fromPhoto ? `<img class="lb-avatar" src="${escText(req.fromPhoto)}" alt="${name}">` : '<div class="lb-avatar-ph">👤</div>'}
+        <div class="friends-row-name">${name}<div class="friends-row-sub">Incoming ${escText(when)}</div></div>
+        <div class="friends-mini-btn" data-act="accept" data-uid="${escText(uid)}">Accept</div>
+        <div class="friends-mini-btn danger" data-act="decline" data-uid="${escText(uid)}">Decline</div>
+      </div>`;
+    }).join("");
+    const sentHtml = outgoing.map(([uid, req]) => {
+      const name = escText(req.toName || uid);
+      const when = formatShortDateTime(req.createdAt);
+      return `<div class="friends-row">
+        <div class="lb-avatar-ph">⏳</div>
+        <div class="friends-row-name">${name}<div class="friends-row-sub">Sent ${escText(when)}</div></div>
+        <div class="friends-mini-btn danger" data-act="cancel" data-uid="${escText(uid)}">Cancel</div>
+      </div>`;
+    }).join("");
+    friendsRequestsListEl.innerHTML = reqHtml + sentHtml;
+  }
+
+  function renderFriendSearchResults(){
+    if (!friendsSearchResultsEl) return;
+    if (!friendSearchResults.length){
+      friendsSearchResultsEl.innerHTML = '<div class="friends-empty">Search results will appear here</div>';
+      return;
+    }
+    friendsSearchResultsEl.innerHTML = friendSearchResults.map(p => {
+      const uid = escText(p.uid || "");
+      const name = escText(p.displayName || p.uid || "Unknown");
+      const alreadyFriend = !!friendsMap[p.uid];
+      const alreadySent = !!friendRequestsOutgoing[p.uid];
+      const isMe = authUser && p.uid === authUser.uid;
+      let actionLabel = "Send Request";
+      let actionClass = "friends-mini-btn";
+      let disabled = false;
+      if (isMe){ actionLabel = "You"; disabled = true; }
+      else if (alreadyFriend){ actionLabel = "Friends"; disabled = true; }
+      else if (alreadySent){ actionLabel = "Sent"; disabled = true; }
+      if (disabled) actionClass += "";
+      return `<div class="friends-row">
+        ${p.photo ? `<img class="lb-avatar" src="${escText(p.photo)}" alt="${name}">` : '<div class="lb-avatar-ph">👤</div>'}
+        <div class="friends-row-name">${name}<div class="friends-row-sub">UID: ${uid.slice(0, 8)}...</div></div>
+        <div class="${actionClass}" data-act="search-send" data-uid="${uid}" data-name="${name}" data-photo="${escText(p.photo || "")}" ${disabled ? 'style="opacity:.45;pointer-events:none;"' : ""}>${actionLabel}</div>
+      </div>`;
+    }).join("");
+  }
+
+  async function searchRegisteredPlayers(){
+    if (!authUser || !lbDB){
+      setFriendsStatus(friendsReqMsgEl, "Please sign in first.", true);
+      return;
+    }
+    const termRaw = (friendSearchInputEl && friendSearchInputEl.value || "").trim();
+    const term = termRaw.toLowerCase();
+    if (term.length < 2){
+      setFriendsStatus(friendsReqMsgEl, "Type at least 2 characters to search.", true);
+      friendSearchResults = [];
+      renderFriendSearchResults();
+      return;
+    }
+    setFriendsStatus(friendsReqMsgEl, "Searching players...", false);
+    try {
+      const snap = await lbDB.ref("publicProfiles")
+        .orderByChild("displayNameLower")
+        .startAt(term)
+        .endAt(term + "\uf8ff")
+        .limitToFirst(25)
+        .once("value");
+      const raw = snap.val() || {};
+      friendSearchResults = Object.entries(raw).map(([uid, profile]) => ({
+        uid,
+        displayName: profile.displayName || uid,
+        photo: profile.photo || ""
+      }));
+      renderFriendSearchResults();
+      setFriendsStatus(friendsReqMsgEl, friendSearchResults.length ? `Found ${friendSearchResults.length} player(s).` : "No players found.", false);
+    } catch (err) {
+      console.error("[Friends] Search failed:", err);
+      setFriendsStatus(friendsReqMsgEl, "Could not search players. Check Firebase rules/index.", true);
+      friendSearchResults = [];
+      renderFriendSearchResults();
+    }
+  }
+
+  function renderFriendsList(){
+    if (!friendsListEl) return;
+    const entries = Object.entries(friendsMap || {});
+    if (!entries.length){
+      friendsListEl.innerHTML = '<div class="friends-empty">No friends yet</div>';
+      return;
+    }
+    friendsListEl.innerHTML = entries.map(([uid, f]) => {
+      const name = escText(f.name || uid);
+      return `<div class="friends-row">
+        ${f.photo ? `<img class="lb-avatar" src="${escText(f.photo)}" alt="${name}">` : '<div class="lb-avatar-ph">👤</div>'}
+        <div class="friends-row-name">${name}<div class="friends-row-sub">UID: ${escText(uid.slice(0, 8))}...</div></div>
+        <div class="friends-mini-btn" data-act="speech" data-uid="${escText(uid)}" data-name="${name}">Neon Speech</div>
+        <div class="friends-mini-btn danger" data-act="remove" data-uid="${escText(uid)}">Remove</div>
+      </div>`;
+    }).join("");
+  }
+
+  async function renderFriendsLeaderboard(){
+    if (!friendsLeaderboardListEl) return;
+    if (!authUser || !lbDB){
+      friendsLeaderboardListEl.innerHTML = '<div class="friends-empty">Sign in to view friend leaderboard</div>';
+      return;
+    }
+    const friendIds = Object.keys(friendsMap || {});
+    const uids = [authUser.uid, ...friendIds];
+    if (!uids.length){
+      friendsLeaderboardListEl.innerHTML = '<div class="friends-empty">No friends to rank yet</div>';
+      return;
+    }
+    setFriendsStatus(friendsBoardMsgEl, "Loading friend leaderboard...", false);
+    try {
+      const snaps = await Promise.all(uids.map(uid => lbDB.ref("users/" + uid + "/progress").once("value")));
+      const rows = snaps.map((snap, i) => {
+        const uid = uids[i];
+        const data = snap.val() || {};
+        const known = uid === authUser.uid
+          ? { name: getCurrentDisplayName(), photo: getAccountPhoto() }
+          : (friendsMap[uid] || {});
+        return {
+          uid,
+          name: known.name || data.displayName || uid,
+          photo: known.photo || data.profilePhoto || "",
+          score: +data.best || 0
+        };
+      }).sort((a, b) => b.score - a.score);
+      friendsLeaderboardListEl.innerHTML = rows.map((r, idx) => `
+        <div class="friends-row">
+          <div class="lb-rank">#${idx + 1}</div>
+          ${r.photo ? `<img class="lb-avatar" src="${escText(r.photo)}" alt="${escText(r.name)}">` : '<div class="lb-avatar-ph">👤</div>'}
+          <div class="friends-row-name">${escText(r.name)}${r.uid === authUser.uid ? ' <span class="lb-you-badge">YOU</span>' : ''}</div>
+          <div class="lb-score">${r.score.toLocaleString()}</div>
+        </div>
+      `).join("");
+      setFriendsStatus(friendsBoardMsgEl, "", false);
+    } catch (err) {
+      console.error("[Friends] Leaderboard load failed:", err);
+      setFriendsStatus(friendsBoardMsgEl, "Could not load friend leaderboard.", true);
+      friendsLeaderboardListEl.innerHTML = '<div class="friends-empty">Load failed</div>';
+    }
+  }
+
+  function openSpeechWithFriend(uid, name){
+    if (!authUser || !lbDB || !uid) return;
+    activeSpeechFriendUid = uid;
+    activeSpeechFriendName = name || (friendsMap[uid] && friendsMap[uid].name) || "Friend";
+    if (speechActiveTitleEl) speechActiveTitleEl.textContent = "Neon Speech: " + activeSpeechFriendName;
+    if (speechMessagesEl) speechMessagesEl.innerHTML = '<div class="friends-empty">Loading messages...</div>';
+    clearSpeechSubscription();
+    const chatId = getChatId(authUser.uid, uid);
+    speechRef = lbDB.ref("neonSpeech/" + chatId).limitToLast(120);
+    speechHandler = (snap) => {
+      const raw = snap.val() || {};
+      const list = Object.values(raw).sort((a, b) => (+a.ts || 0) - (+b.ts || 0));
+      if (!list.length){
+        speechMessagesEl.innerHTML = '<div class="friends-empty">No messages yet</div>';
+        return;
+      }
+      speechMessagesEl.innerHTML = list.map(m => {
+        const mine = m.fromUid === authUser.uid;
+        return `<div class="speech-bubble ${mine ? "me" : "them"}">
+          ${escText(m.text || "")}
+          <div class="speech-meta">${escText(m.fromName || "Unknown")} · ${escText(formatShortDateTime(m.ts))}</div>
+        </div>`;
+      }).join("");
+      speechMessagesEl.scrollTop = speechMessagesEl.scrollHeight;
+    };
+    speechRef.on("value", speechHandler);
+    setFriendsTab("speech");
+  }
+
+  async function loadFriendsData(){
+    if (!friendsPanelEl || !friendsPanelEl.classList.contains("active")) return;
+    if (!authUser || !lbDB){
+      const msg = '<div class="friends-empty">Sign in to use friends and Neon Speech</div>';
+      if (friendsRequestsListEl) friendsRequestsListEl.innerHTML = msg;
+      if (friendsSearchResultsEl) friendsSearchResultsEl.innerHTML = '<div class="friends-empty">Sign in to search registered players</div>';
+      if (friendsListEl) friendsListEl.innerHTML = msg;
+      if (friendsLeaderboardListEl) friendsLeaderboardListEl.innerHTML = msg;
+      if (speechMessagesEl) speechMessagesEl.innerHTML = msg;
+      return;
+    }
+    try {
+      const [friendsSnap, inSnap, outSnap] = await Promise.all([
+        lbDB.ref("friends/" + authUser.uid).once("value"),
+        lbDB.ref("friendRequests/" + authUser.uid).once("value"),
+        lbDB.ref("friendRequestsSent/" + authUser.uid).once("value")
+      ]);
+      friendsMap = friendsSnap.val() || {};
+      friendRequestsIncoming = inSnap.val() || {};
+      friendRequestsOutgoing = outSnap.val() || {};
+      renderFriendRequests();
+      renderFriendsList();
+      renderFriendSearchResults();
+      if (friendsTab === "board") renderFriendsLeaderboard();
+    } catch (err) {
+      console.error("[Friends] load failed:", err);
+      setFriendsStatus(friendsReqMsgEl, "Could not load friends data.", true);
+    }
+  }
+
+  async function sendFriendRequest(){
+    if (!authUser || !lbDB){
+      setFriendsStatus(friendsReqMsgEl, "Please sign in first.", true);
+      openAuthModal("login");
+      return;
+    }
+    const raw = (friendAddInputEl.value || "").trim();
+    if (!raw){
+      setFriendsStatus(friendsReqMsgEl, "Enter a friend UID or exact leaderboard name.", true);
+      return;
+    }
+    let targetUid = "";
+    let targetName = raw;
+    let targetPhoto = "";
+    if (/^[A-Za-z0-9_-]{10,}$/.test(raw)){
+      targetUid = raw;
+    } else {
+      const found = lbEntries.find(e => e.uid && String(e.name || "").toLowerCase() === raw.toLowerCase());
+      if (found){
+        targetUid = found.uid;
+        targetName = found.name || raw;
+        targetPhoto = found.photo || "";
+      }
+    }
+    if (!targetUid){
+      setFriendsStatus(friendsReqMsgEl, "Could not find that player. Use friend UID or exact leaderboard name.", true);
+      return;
+    }
+    if (targetUid === authUser.uid){
+      setFriendsStatus(friendsReqMsgEl, "You cannot add yourself.", true);
+      return;
+    }
+    if (friendsMap[targetUid]){
+      setFriendsStatus(friendsReqMsgEl, "Already friends.", true);
+      return;
+    }
+    if (friendRequestsOutgoing[targetUid]){
+      setFriendsStatus(friendsReqMsgEl, "Request already sent.", true);
+      return;
+    }
+    const fromName = getCurrentDisplayName();
+    const fromPhoto = getAccountPhoto() || "";
+    const now = Date.now();
+    const updates = {};
+    updates["friendRequests/" + targetUid + "/" + authUser.uid] = { fromUid: authUser.uid, fromName, fromPhoto, createdAt: now };
+    updates["friendRequestsSent/" + authUser.uid + "/" + targetUid] = { toUid: targetUid, toName: targetName, toPhoto: targetPhoto, createdAt: now };
+    try {
+      await lbDB.ref().update(updates);
+      friendAddInputEl.value = "";
+      setFriendsStatus(friendsReqMsgEl, "Friend request sent.", false);
+      loadFriendsData();
+    } catch (err) {
+      console.error("[Friends] request send failed:", err);
+      setFriendsStatus(friendsReqMsgEl, "Could not send request.", true);
+    }
+  }
+
+  async function sendFriendRequestTo(targetUid, targetName, targetPhoto){
+    if (!friendAddInputEl) return;
+    friendAddInputEl.value = targetUid || "";
+    await sendFriendRequest();
+    if (targetName){
+      const idx = friendSearchResults.findIndex(p => p.uid === targetUid);
+      if (idx >= 0){
+        friendSearchResults[idx] = {
+          uid: targetUid,
+          displayName: targetName,
+          photo: targetPhoto || ""
+        };
+      }
+      renderFriendSearchResults();
+    }
+  }
+
+  async function acceptFriendRequest(fromUid){
+    if (!authUser || !lbDB || !fromUid) return;
+    const req = friendRequestsIncoming[fromUid] || {};
+    const now = Date.now();
+    const meName = getCurrentDisplayName();
+    const mePhoto = getAccountPhoto() || "";
+    const updates = {};
+    updates["friends/" + authUser.uid + "/" + fromUid] = { uid: fromUid, name: req.fromName || fromUid, photo: req.fromPhoto || "", since: now };
+    updates["friends/" + fromUid + "/" + authUser.uid] = { uid: authUser.uid, name: meName, photo: mePhoto, since: now };
+    updates["friendRequests/" + authUser.uid + "/" + fromUid] = null;
+    updates["friendRequestsSent/" + fromUid + "/" + authUser.uid] = null;
+    try {
+      await lbDB.ref().update(updates);
+      setFriendsStatus(friendsReqMsgEl, "Friend added.", false);
+      loadFriendsData();
+    } catch (err) {
+      console.error("[Friends] accept failed:", err);
+      setFriendsStatus(friendsReqMsgEl, "Could not accept request.", true);
+    }
+  }
+
+  async function declineOrCancelRequest(uid, isCancel){
+    if (!authUser || !lbDB || !uid) return;
+    const updates = {};
+    if (isCancel){
+      updates["friendRequestsSent/" + authUser.uid + "/" + uid] = null;
+      updates["friendRequests/" + uid + "/" + authUser.uid] = null;
+    } else {
+      updates["friendRequests/" + authUser.uid + "/" + uid] = null;
+      updates["friendRequestsSent/" + uid + "/" + authUser.uid] = null;
+    }
+    try {
+      await lbDB.ref().update(updates);
+      loadFriendsData();
+    } catch (err) {
+      console.error("[Friends] decline/cancel failed:", err);
+    }
+  }
+
+  async function removeFriend(uid){
+    if (!authUser || !lbDB || !uid) return;
+    const updates = {};
+    updates["friends/" + authUser.uid + "/" + uid] = null;
+    updates["friends/" + uid + "/" + authUser.uid] = null;
+    try {
+      await lbDB.ref().update(updates);
+      if (activeSpeechFriendUid === uid){
+        activeSpeechFriendUid = null;
+        activeSpeechFriendName = "";
+        clearSpeechSubscription();
+        if (speechActiveTitleEl) speechActiveTitleEl.textContent = "Neon Speech: Pick a friend in Friends List";
+        if (speechMessagesEl) speechMessagesEl.innerHTML = '<div class="friends-empty">No active conversation</div>';
+      }
+      loadFriendsData();
+    } catch (err) {
+      console.error("[Friends] remove failed:", err);
+    }
+  }
+
+  async function sendSpeechMessage(){
+    if (!authUser || !lbDB){
+      setFriendsStatus(speechMsgEl, "Please sign in first.", true);
+      return;
+    }
+    if (!activeSpeechFriendUid){
+      setFriendsStatus(speechMsgEl, "Pick a friend from Friends List first.", true);
+      return;
+    }
+    const text = (speechInputEl.value || "").trim();
+    if (!text) return;
+    const chatId = getChatId(authUser.uid, activeSpeechFriendUid);
+    const payload = {
+      fromUid: authUser.uid,
+      fromName: getCurrentDisplayName(),
+      text: text.slice(0, 280),
+      ts: Date.now()
+    };
+    try {
+      await lbDB.ref("neonSpeech/" + chatId).push(payload);
+      speechInputEl.value = "";
+      setFriendsStatus(speechMsgEl, "", false);
+    } catch (err) {
+      console.error("[Neon Speech] send failed:", err);
+      setFriendsStatus(speechMsgEl, "Could not send message.", true);
+    }
+  }
+
+  function openFriendsPanel(e){
+    if (e) e.stopPropagation();
+    sfxClick();
+    if (!friendsPanelEl) return;
+    friendsPanelEl.classList.add("active");
+    setFriendsTab("requests");
+    loadFriendsData();
+  }
+
+  function closeFriendsPanel(e){
+    if (e) e.stopPropagation();
+    sfxClick();
+    if (!friendsPanelEl) return;
+    friendsPanelEl.classList.remove("active");
+    clearSpeechSubscription();
+    if (speechActiveTitleEl) speechActiveTitleEl.textContent = "Neon Speech: Pick a friend in Friends List";
+    if (speechMessagesEl) speechMessagesEl.innerHTML = '<div class="friends-empty">No active conversation</div>';
+    if (speechInputEl) speechInputEl.value = "";
+    if (speechMsgEl) setFriendsStatus(speechMsgEl, "", false);
+  }
+
   function openStats(e){
     if (e) e.stopPropagation();
     sfxClick();
@@ -6129,12 +6721,18 @@ const FIREBASE_CONFIG = firebaseConfig;
       // User just signed in or page reloaded while signed in
       loadProgressFromCloud(() => {
         updateAuthUI();
+        syncPublicProfileToCloud();
+        if (friendsPanelEl && friendsPanelEl.classList.contains("active")) loadFriendsData();
         // Refresh leaderboard to show (You) badges
         if (leaderboardPanelEl.classList.contains("active")) renderLeaderboard(false);
       });
     } else {
       authPendingRegisterPhoto = null;
       authProfilePhoto = null;
+      clearSpeechSubscription();
+      activeSpeechFriendUid = null;
+      activeSpeechFriendName = "";
+      if (friendsPanelEl && friendsPanelEl.classList.contains("active")) loadFriendsData();
       updateAuthUI();
     }
   }
@@ -6194,6 +6792,23 @@ const FIREBASE_CONFIG = firebaseConfig;
       profilePhoto: getAccountPhoto() || "",
       lastSync: Date.now()
     }).catch(() => {});
+    syncPublicProfileToCloud();
+  }
+
+  function syncPublicProfileToCloud(){
+    if (!authUser || !lbDB) return;
+    const displayName = getCurrentDisplayName();
+    const payload = {
+      uid: authUser.uid,
+      displayName,
+      displayNameLower: String(displayName).toLowerCase(),
+      photo: getAccountPhoto() || "",
+      best: state.best || 0,
+      updatedAt: Date.now()
+    };
+    lbDB.ref("publicProfiles/" + authUser.uid).set(payload).catch(err => {
+      console.warn("[Friends] Failed to sync public profile:", err && (err.code || err.message || err));
+    });
   }
 
   function updateAuthUI(){
@@ -6256,6 +6871,7 @@ const FIREBASE_CONFIG = firebaseConfig;
         profileInfoEl.innerHTML =
           '<div style="font-size:16px;font-weight:bold;color:var(--neon);margin-bottom:4px;">' + displayName + '</div>' +
           '<div style="font-size:12px;opacity:.65;margin-bottom:8px;">' + authUser.email + '</div>' +
+          '<div style="font-size:10px;opacity:.5;margin-bottom:8px;word-break:break-all;">UID: ' + authUser.uid + '</div>' +
           (verified
             ? '<div class="auth-verified">✓ Email Verified</div>'
             : '<div class="auth-unverified">⚠️ Email not verified</div>') +
@@ -7146,6 +7762,76 @@ const FIREBASE_CONFIG = firebaseConfig;
   openLeaderboardEl.addEventListener("click", openLeaderboard);
   closeLeaderboardEl.addEventListener("click", closeLeaderboard);
   document.getElementById("leaderboardCloseX").addEventListener("click", closeLeaderboard);
+
+  // Friends + Neon Speech
+  if (openFriendsEl) openFriendsEl.addEventListener("click", openFriendsPanel);
+  if (closeFriendsEl) closeFriendsEl.addEventListener("click", closeFriendsPanel);
+  if (friendsPanelEl){
+    friendsPanelEl.addEventListener("click", (e) => {
+      if (e.target === friendsPanelEl) closeFriendsPanel(e);
+    });
+  }
+  if (friendsTabsEl){
+    friendsTabsEl.addEventListener("click", (e) => {
+      const tab = e.target.closest(".friends-tab");
+      if (!tab) return;
+      sfxClick();
+      setFriendsTab(tab.dataset.tab || "requests");
+      if (tab.dataset.tab === "requests" || tab.dataset.tab === "list") loadFriendsData();
+    });
+  }
+  if (friendAddBtnEl) friendAddBtnEl.addEventListener("click", () => { sfxClick(); sendFriendRequest(); });
+  if (friendSearchBtnEl) friendSearchBtnEl.addEventListener("click", () => { sfxClick(); searchRegisteredPlayers(); });
+  if (friendAddInputEl){
+    friendAddInputEl.addEventListener("keydown", (e) => {
+      if (e.code === "Enter") sendFriendRequest();
+      e.stopPropagation();
+    });
+  }
+  if (friendSearchInputEl){
+    friendSearchInputEl.addEventListener("keydown", (e) => {
+      if (e.code === "Enter") searchRegisteredPlayers();
+      e.stopPropagation();
+    });
+  }
+  if (friendsSearchResultsEl){
+    friendsSearchResultsEl.addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-act='search-send']");
+      if (!btn) return;
+      sfxClick();
+      sendFriendRequestTo(btn.dataset.uid, btn.dataset.name || "", btn.dataset.photo || "");
+    });
+  }
+  if (friendsRequestsListEl){
+    friendsRequestsListEl.addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-act]");
+      if (!btn) return;
+      const uid = btn.dataset.uid;
+      const act = btn.dataset.act;
+      sfxClick();
+      if (act === "accept") acceptFriendRequest(uid);
+      else if (act === "decline") declineOrCancelRequest(uid, false);
+      else if (act === "cancel") declineOrCancelRequest(uid, true);
+    });
+  }
+  if (friendsListEl){
+    friendsListEl.addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-act]");
+      if (!btn) return;
+      const uid = btn.dataset.uid;
+      const act = btn.dataset.act;
+      sfxClick();
+      if (act === "speech") openSpeechWithFriend(uid, btn.dataset.name || "Friend");
+      else if (act === "remove") removeFriend(uid);
+    });
+  }
+  if (speechSendBtnEl) speechSendBtnEl.addEventListener("click", () => { sfxClick(); sendSpeechMessage(); });
+  if (speechInputEl){
+    speechInputEl.addEventListener("keydown", (e) => {
+      if (e.code === "Enter") sendSpeechMessage();
+      e.stopPropagation();
+    });
+  }
 
   // Leaderboard category tabs
   document.getElementById("lbCategoryTabs").addEventListener("click", (e) => {
