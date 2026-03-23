@@ -6216,7 +6216,7 @@ const FIREBASE_CONFIG = firebaseConfig;
           : null;
         const cred = await fbAuth.createUserWithEmailAndPassword(email, pw);
         console.log("[Auth] User created, updating profile...");
-        await cred.user.updateProfile({ displayName: name, photoURL: resizedRegisterPhoto || null });
+        await cred.user.updateProfile({ displayName: name });
         if (resizedRegisterPhoto){
           await saveProfilePhotoToCloud(cred.user.uid, resizedRegisterPhoto).catch(() => {});
           authProfilePhoto = resizedRegisterPhoto;
@@ -6259,15 +6259,17 @@ const FIREBASE_CONFIG = firebaseConfig;
       return;
     }
     try {
-      await authUser.updateProfile({ photoURL: resized });
+      // Store avatar in user progress instead of Firebase Auth photoURL.
+      // Auth profile fields are not designed for larger data URLs.
+      await saveProfilePhotoToCloud(authUser.uid, resized);
       authProfilePhoto = resized;
-      await saveProfilePhotoToCloud(authUser.uid, resized).catch(() => {});
       syncLeaderboardPhotoForCurrentUser(resized);
       updateAuthPhotoPreview(resized);
       updateAuthUI();
       authSetOk("authProfilePhotoMsg", "Profile picture updated.");
       syncProgressToCloud();
-    } catch (_err) {
+    } catch (err) {
+      console.error("[Auth] Failed to save profile picture:", err && (err.code || err.message || err));
       authSetError("authProfilePhotoMsg", "Could not save profile picture.");
     }
   }
