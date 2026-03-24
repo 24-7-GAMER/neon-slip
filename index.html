@@ -1083,6 +1083,7 @@
     letter-spacing:1.2px; cursor:pointer; border:1px solid rgba(25,247,255,.3);
     background: rgba(25,247,255,.07); color:var(--text); transition:all .15s ease;
     min-height:40px; display:flex; align-items:center; justify-content:center;
+    position:relative;
   }
   .friends-tab.active{ background:rgba(25,247,255,.2); border-color:var(--neon); color:var(--neon); box-shadow:0 0 8px rgba(25,247,255,.25); }
   @media (max-width: 760px){
@@ -1135,21 +1136,79 @@
   }
   .friends-mini-btn.danger{ border-color:rgba(255,59,122,.45); color:var(--danger); background:rgba(255,59,122,.08); }
   .friends-empty{ text-align:center; opacity:.5; padding:24px 0; font-size:12px; letter-spacing:1px; text-transform:uppercase; }
+  .speech-layout{ display:flex; gap:10px; flex:1 1 auto; min-height:0; }
+  .speech-inbox-col{
+    width:290px; max-width:42%; border:1px solid rgba(25,247,255,.2);
+    border-radius:10px; background:rgba(8,12,20,.65); display:flex; flex-direction:column;
+  }
+  .speech-main-col{ flex:1 1 0; min-width:0; display:flex; flex-direction:column; }
   .speech-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px; }
   .speech-title{ font-size:12px; letter-spacing:1px; text-transform:uppercase; color:var(--neon); }
+  .speech-actions{ display:flex; gap:6px; }
+  .speech-action-btn{
+    font-size:10px; padding:5px 8px; border-radius:7px; cursor:pointer;
+    border:1px solid rgba(25,247,255,.35); background:rgba(25,247,255,.1);
+    letter-spacing:.6px; text-transform:uppercase;
+  }
+  .speech-action-btn.danger{ border-color:rgba(255,59,122,.45); color:var(--danger); background:rgba(255,59,122,.08); }
+  .speech-inbox-head{
+    padding:8px; border-bottom:1px solid rgba(25,247,255,.14);
+    display:flex; gap:7px;
+  }
+  .speech-inbox-list{ flex:1 1 0; overflow:auto; min-height:120px; padding:8px; }
+  .speech-thread-row{
+    display:flex; align-items:flex-start; gap:8px;
+    border:1px solid rgba(25,247,255,.14); background: rgba(25,247,255,.04);
+    border-radius:10px; padding:8px; margin-bottom:7px; cursor:pointer;
+  }
+  .speech-thread-row.active{ border-color:rgba(25,247,255,.45); background:rgba(25,247,255,.12); }
+  .speech-thread-main{ min-width:0; flex:1; }
+  .speech-thread-top{ display:flex; justify-content:space-between; gap:8px; }
+  .speech-thread-name{ font-size:12px; letter-spacing:.6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .speech-thread-preview{ font-size:10px; opacity:.65; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:2px; }
+  .speech-thread-time{ font-size:9px; opacity:.55; white-space:nowrap; }
+  .speech-thread-group{ font-size:9px; opacity:.65; text-transform:uppercase; letter-spacing:.8px; }
+  .unread-badge{
+    background:#ff355d; color:#fff; border-radius:999px;
+    min-width:18px; height:18px; padding:0 5px;
+    font-size:10px; font-weight:bold; display:inline-flex; align-items:center; justify-content:center;
+    box-shadow:0 0 10px rgba(255,53,93,.5);
+  }
+  .unread-badge.hidden{ display:none; }
+  .tab-badge{ position:absolute; top:-6px; right:-6px; }
   .speech-messages{
     flex:1 1 0; overflow:auto; min-height:180px;
     border:1px solid rgba(25,247,255,.2); border-radius:10px;
     background: rgba(8,12,20,.65); padding:10px;
   }
   .speech-bubble{
-    max-width:78%; padding:8px 10px; border-radius:10px; margin-bottom:8px;
-    font-size:12px; letter-spacing:.3px; line-height:1.35;
+    max-width:72%; padding:6px 8px; border-radius:9px; margin-bottom:6px;
+    font-size:11px; letter-spacing:.25px; line-height:1.3;
   }
   .speech-bubble.me{ margin-left:auto; background:rgba(25,247,255,.16); border:1px solid rgba(25,247,255,.35); }
   .speech-bubble.them{ margin-right:auto; background:rgba(138,91,255,.14); border:1px solid rgba(138,91,255,.35); }
-  .speech-meta{ font-size:9px; opacity:.55; margin-top:4px; letter-spacing:.5px; text-transform:uppercase; }
+  .speech-meta{ font-size:8px; opacity:.55; margin-top:3px; letter-spacing:.45px; text-transform:uppercase; }
   .speech-compose{ display:flex; gap:8px; margin-top:8px; }
+  .speech-member-list{ max-height:180px; overflow:auto; margin-top:8px; }
+  .speech-member-row{
+    display:flex; align-items:center; gap:8px;
+    border:1px solid rgba(25,247,255,.14); border-radius:8px;
+    padding:6px 8px; margin-bottom:6px; background:rgba(25,247,255,.03);
+  }
+  .speech-member-role{ font-size:9px; opacity:.65; text-transform:uppercase; letter-spacing:.7px; }
+  .speech-check-row{ display:flex; align-items:center; gap:8px; margin-bottom:6px; font-size:11px; }
+  .speech-check-row input{ accent-color:#19f7ff; }
+  .profile-card-panel{ z-index:70; }
+  .profile-card-box{ width:min(94vw, 360px); text-align:center; }
+  .profile-card-avatar{ width:76px; height:76px; border-radius:50%; object-fit:cover; border:2px solid rgba(25,247,255,.45); box-shadow:0 0 16px rgba(25,247,255,.35); }
+  .profile-card-fallback{
+    width:76px; height:76px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    margin:0 auto; font-size:34px; background:rgba(25,247,255,.08); border:2px solid rgba(25,247,255,.28);
+  }
+  @media (max-width: 820px){
+    .speech-layout{ flex-direction:column; }
+    .speech-inbox-col{ width:100%; max-width:none; max-height:220px; }
+  }
   /* Neon Speech notification banners */
   #speechNotifContainer{
     position:fixed; bottom:20px; right:20px; z-index:200;
@@ -2037,12 +2096,12 @@
       <div class="friends-tab active" data-tab="requests">Requests</div>
       <div class="friends-tab" data-tab="list">Friends List</div>
       <div class="friends-tab" data-tab="board">Friend Leaderboard</div>
-      <div class="friends-tab" data-tab="speech">Neon Speech</div>
+      <div class="friends-tab" data-tab="speech">Neon Speech <span id="speechTabUnreadBadge" class="unread-badge tab-badge hidden">0</span></div>
     </div>
 
     <div class="friends-tab-content active" data-content="requests">
       <div class="friends-actions">
-        <input id="friendAddInput" class="friends-input" maxlength="64" placeholder="Friend UID or exact leaderboard name">
+        <input id="friendAddInput" class="friends-input" maxlength="64" placeholder="Friend name (or account ID)">
         <div id="friendAddBtn" class="btn">Send Request</div>
       </div>
       <div class="friends-actions">
@@ -2065,15 +2124,47 @@
     </div>
 
     <div class="friends-tab-content" data-content="speech">
-      <div class="speech-head">
-        <div class="speech-title" id="speechActiveTitle">Neon Speech: Pick a friend in Friends List</div>
+      <div class="speech-layout">
+        <div class="speech-inbox-col">
+          <div class="speech-inbox-head">
+            <div id="speechNewDmBtn" class="speech-action-btn">New DM</div>
+            <div id="speechNewGroupBtn" class="speech-action-btn">New Group</div>
+          </div>
+          <div id="speechInboxList" class="speech-inbox-list"></div>
+        </div>
+        <div class="speech-main-col">
+          <div class="speech-head">
+            <div class="speech-title" id="speechActiveTitle">Neon Speech: Choose a conversation</div>
+            <div class="speech-actions">
+              <div id="speechManageGroupBtn" class="speech-action-btn" style="display:none;">Manage Group</div>
+            </div>
+          </div>
+          <div id="speechMessages" class="speech-messages"></div>
+          <div class="speech-compose">
+            <input id="speechInput" class="friends-input" maxlength="280" placeholder="Type a Neon Speech message...">
+            <div id="speechSendBtn" class="btn">Send</div>
+          </div>
+          <div id="speechMsg" class="friends-msg"></div>
+        </div>
       </div>
-      <div id="speechMessages" class="speech-messages"></div>
-      <div class="speech-compose">
-        <input id="speechInput" class="friends-input" maxlength="280" placeholder="Type a Neon Speech message...">
-        <div id="speechSendBtn" class="btn">Send</div>
+
+      <div id="speechCreateGroupArea" style="display:none;margin-top:8px;border:1px solid rgba(25,247,255,.2);border-radius:10px;padding:10px;background:rgba(8,12,20,.65);">
+        <div style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--neon);margin-bottom:6px;">Create Group Chat</div>
+        <div class="friends-actions">
+          <input id="speechGroupNameInput" class="friends-input" maxlength="48" placeholder="Group name">
+          <div id="speechCreateGroupSubmit" class="speech-action-btn">Create</div>
+          <div id="speechCreateGroupCancel" class="speech-action-btn danger">Cancel</div>
+        </div>
+        <div id="speechGroupMembers" class="speech-member-list"></div>
       </div>
-      <div id="speechMsg" class="friends-msg"></div>
+
+      <div id="speechManageGroupArea" style="display:none;margin-top:8px;border:1px solid rgba(25,247,255,.2);border-radius:10px;padding:10px;background:rgba(8,12,20,.65);">
+        <div style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--neon);margin-bottom:6px;">Group Members</div>
+        <div id="speechManageMembers" class="speech-member-list"></div>
+        <div class="friends-actions" style="margin-top:6px;">
+          <div id="speechManageClose" class="speech-action-btn">Done</div>
+        </div>
+      </div>
     </div>
 
     <div class="friends-footer">
@@ -2187,6 +2278,20 @@
     </div>
     <!-- Cancel button (hidden in profile view) -->
     <div class="btn" id="authCancelBtn" style="width:100%;margin-top:8px;opacity:.7;box-sizing:border-box;">Cancel</div>
+  </div>
+</div>
+
+<div id="profileCardModal" class="lb-modal profile-card-panel">
+  <div class="lb-modal-box profile-card-box">
+    <div class="title" style="margin-bottom:8px;">Player Profile</div>
+    <div id="profileCardAvatarWrap" style="margin-bottom:10px;"></div>
+    <div id="profileCardName" style="font-size:16px;font-weight:bold;color:var(--neon);"></div>
+    <div id="profileCardSub" style="font-size:12px;opacity:.7;margin:6px 0 10px;"></div>
+    <div id="profileCardStats" style="font-size:12px;opacity:.75;margin-bottom:12px;"></div>
+    <div class="lb-modal-actions">
+      <div id="profileCardDmBtn" class="btn">DM</div>
+      <div id="profileCardClose" class="btn">Close</div>
+    </div>
   </div>
 </div>
 
@@ -2426,11 +2531,31 @@ const FIREBASE_CONFIG = firebaseConfig;
   const friendsListEl = document.getElementById("friendsList");
   const friendsBoardMsgEl = document.getElementById("friendsBoardMsg");
   const friendsLeaderboardListEl = document.getElementById("friendsLeaderboardList");
+  const speechTabUnreadBadgeEl = document.getElementById("speechTabUnreadBadge");
+  const speechInboxListEl = document.getElementById("speechInboxList");
   const speechActiveTitleEl = document.getElementById("speechActiveTitle");
   const speechMessagesEl = document.getElementById("speechMessages");
   const speechInputEl = document.getElementById("speechInput");
   const speechSendBtnEl = document.getElementById("speechSendBtn");
+  const speechNewDmBtnEl = document.getElementById("speechNewDmBtn");
+  const speechNewGroupBtnEl = document.getElementById("speechNewGroupBtn");
+  const speechManageGroupBtnEl = document.getElementById("speechManageGroupBtn");
+  const speechCreateGroupAreaEl = document.getElementById("speechCreateGroupArea");
+  const speechGroupNameInputEl = document.getElementById("speechGroupNameInput");
+  const speechCreateGroupSubmitEl = document.getElementById("speechCreateGroupSubmit");
+  const speechCreateGroupCancelEl = document.getElementById("speechCreateGroupCancel");
+  const speechGroupMembersEl = document.getElementById("speechGroupMembers");
+  const speechManageGroupAreaEl = document.getElementById("speechManageGroupArea");
+  const speechManageMembersEl = document.getElementById("speechManageMembers");
+  const speechManageCloseEl = document.getElementById("speechManageClose");
   const speechMsgEl = document.getElementById("speechMsg");
+  const profileCardModalEl = document.getElementById("profileCardModal");
+  const profileCardAvatarWrapEl = document.getElementById("profileCardAvatarWrap");
+  const profileCardNameEl = document.getElementById("profileCardName");
+  const profileCardSubEl = document.getElementById("profileCardSub");
+  const profileCardStatsEl = document.getElementById("profileCardStats");
+  const profileCardDmBtnEl = document.getElementById("profileCardDmBtn");
+  const profileCardCloseEl = document.getElementById("profileCardClose");
   const lbModalEl = document.getElementById("lbModal");
   const lbModalScoreEl = document.getElementById("lbModalScore");
   const lbNameInputEl = document.getElementById("lbNameInput");
@@ -5689,13 +5814,20 @@ const FIREBASE_CONFIG = firebaseConfig;
   let friendRequestsIncoming = {};
   let friendRequestsOutgoing = {};
   let friendSearchResults = [];
-  let activeSpeechFriendUid = null;
-  let activeSpeechFriendName = "";
+  let activeSpeechThreadId = null;
+  let activeSpeechThreadMeta = null;
+  let speechThreads = {};
+  let speechReadMap = {};
+  let speechUnreadMap = {};
+  let speechInboxRows = [];
+  let speechProfileUid = "";
   let speechRef = null;
   let speechHandler = null;
-  let speechGlobalRefs = {};     // chatId -> Firebase ref
-  let speechGlobalHandlers = {}; // chatId -> handler fn
-  let speechGlobalLastTs = {};   // chatId -> last known msg timestamp
+  let speechMembershipRef = null;
+  let speechMembershipHandler = null;
+  let speechGlobalRefs = {};     // threadId -> Firebase ref
+  let speechGlobalHandlers = {}; // threadId -> handler fn
+  let speechGlobalLastTs = {};   // threadId -> last known msg timestamp
 
   // Initialise Firebase once (safe to call multiple times)
   (function initFirebase(){
@@ -6152,8 +6284,30 @@ const FIREBASE_CONFIG = firebaseConfig;
     el.style.color = msg ? (isErr ? "var(--danger)" : "#7dffb2") : "";
   }
 
-  function getChatId(uidA, uidB){
+  function getDmThreadId(uidA, uidB){
     return [uidA, uidB].sort().join("__");
+  }
+
+  function isDmThreadId(threadId){
+    return !String(threadId || "").startsWith("group__");
+  }
+
+  function shortPreview(text, maxLen){
+    const t = String(text || "").trim();
+    if (!t) return "";
+    return t.length > maxLen ? (t.slice(0, maxLen) + "...") : t;
+  }
+
+  function updateSpeechUnreadBadges(){
+    const total = Object.values(speechUnreadMap || {}).reduce((acc, n) => acc + (+n || 0), 0);
+    if (speechTabUnreadBadgeEl){
+      speechTabUnreadBadgeEl.textContent = total > 99 ? "99+" : String(total);
+      speechTabUnreadBadgeEl.classList.toggle("hidden", !total);
+    }
+    if (openFriendsEl){
+      const badge = total ? `<span class="unread-badge" style="margin-left:8px;">${total > 99 ? "99+" : total}</span>` : "";
+      openFriendsEl.innerHTML = `🤝 Friends${badge}`;
+    }
   }
 
   function clearSpeechSubscription(){
@@ -6165,21 +6319,42 @@ const FIREBASE_CONFIG = firebaseConfig;
   }
 
   function tearDownSpeechGlobalListeners(){
-    Object.entries(speechGlobalRefs).forEach(([chatId, ref]) => {
-      if (speechGlobalHandlers[chatId]) ref.off("value", speechGlobalHandlers[chatId]);
+    Object.entries(speechGlobalRefs).forEach(([threadId, ref]) => {
+      if (speechGlobalHandlers[threadId]) ref.off("value", speechGlobalHandlers[threadId]);
     });
     speechGlobalRefs = {};
     speechGlobalHandlers = {};
     speechGlobalLastTs = {};
   }
 
+  function tearDownSpeechMembershipListener(){
+    if (speechMembershipRef && speechMembershipHandler){
+      speechMembershipRef.off("value", speechMembershipHandler);
+    }
+    speechMembershipRef = null;
+    speechMembershipHandler = null;
+  }
+
+  function setupSpeechMembershipListener(){
+    if (!authUser || !lbDB) return;
+    tearDownSpeechMembershipListener();
+    speechMembershipRef = lbDB.ref("neonSpeechMemberships/" + authUser.uid);
+    speechMembershipHandler = () => {
+      refreshSpeechInbox(true).then(() => {
+        tearDownSpeechGlobalListeners();
+        setupSpeechGlobalListeners();
+      }).catch(() => {});
+    };
+    speechMembershipRef.on("value", speechMembershipHandler);
+  }
+
   function setupSpeechGlobalListeners(){
     if (!authUser || !lbDB) return;
     const myUid = authUser.uid;
-    Object.keys(friendsMap || {}).forEach(uid => {
-      const chatId = getChatId(myUid, uid);
-      if (speechGlobalRefs[chatId]) return; // already listening
-      const ref = lbDB.ref("neonSpeech/" + chatId).limitToLast(1);
+    const threadIds = speechInboxRows.map(r => r.threadId).filter(Boolean);
+    threadIds.forEach(threadId => {
+      if (speechGlobalRefs[threadId]) return;
+      const ref = lbDB.ref("neonSpeech/" + threadId).limitToLast(1);
       let isFirst = true;
       const handler = (snap) => {
         const raw = snap.val();
@@ -6189,38 +6364,43 @@ const FIREBASE_CONFIG = firebaseConfig;
         const msg = msgs[0];
         const ts = +(msg.ts || 0);
         if (isFirst){
-          speechGlobalLastTs[chatId] = ts;
+          speechGlobalLastTs[threadId] = ts;
           isFirst = false;
           return;
         }
         if (msg.fromUid === myUid) return;
-        if (ts <= (speechGlobalLastTs[chatId] || 0)) return;
-        speechGlobalLastTs[chatId] = ts;
-        // Suppress if currently viewing this conversation
-        if (friendsPanelEl && friendsPanelEl.classList.contains("active") && activeSpeechFriendUid === uid) return;
-        // Suppress during an active run
+        if (ts <= (speechGlobalLastTs[threadId] || 0)) return;
+        speechGlobalLastTs[threadId] = ts;
+        if (friendsPanelEl && friendsPanelEl.classList.contains("active") && activeSpeechThreadId === threadId) return;
         if (state.mode === "play" || state.mode === "dying") return;
-        const friendName = (friendsMap[uid] && friendsMap[uid].name) || "Friend";
-        showSpeechNotif(uid, friendName, msg.text || "");
+        const thread = speechThreads[threadId] || {};
+        const title = thread.title || "Conversation";
+        showSpeechNotif(threadId, title, msg.text || "");
+        speechUnreadMap[threadId] = (speechUnreadMap[threadId] || 0) + 1;
+        updateSpeechUnreadBadges();
+        refreshSpeechInbox(false);
       };
-      speechGlobalRefs[chatId] = ref;
-      speechGlobalHandlers[chatId] = handler;
+      speechGlobalRefs[threadId] = ref;
+      speechGlobalHandlers[threadId] = handler;
       ref.on("value", handler);
     });
   }
 
-  function initSpeechNotifListeners(){
+  async function initSpeechNotifListeners(){
     if (!authUser || !lbDB) return;
-    lbDB.ref("friends/" + authUser.uid).once("value").then(snap => {
-      const all = snap.val() || {};
-      Object.assign(friendsMap, all);
+    try {
+      const friendsSnap = await lbDB.ref("friends/" + authUser.uid).once("value");
+      friendsMap = { ...(friendsMap || {}), ...(friendsSnap.val() || {}) };
+      await loadSpeechReads();
+      await refreshSpeechInbox(false);
       setupSpeechGlobalListeners();
-    }).catch(err => {
-      console.warn("[Notif] Could not load friends for notifications:", err);
-    });
+      setupSpeechMembershipListener();
+    } catch (err) {
+      console.warn("[Notif] Could not initialize Neon Speech notifications:", err);
+    }
   }
 
-  function showSpeechNotif(uid, name, text){
+  function showSpeechNotif(threadId, name, text){
     const container = document.getElementById("speechNotifContainer");
     if (!container) return;
     const el = document.createElement("div");
@@ -6239,7 +6419,7 @@ const FIREBASE_CONFIG = firebaseConfig;
     const dismiss = (e) => { e.stopPropagation(); dismissSpeechNotif(el); };
     closeBtn.addEventListener("click", dismiss);
     closeBtn.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); dismiss(e); } });
-    const open = () => { dismissSpeechNotif(el); openFriendsPanel(null); openSpeechWithFriend(uid, name); };
+    const open = () => { dismissSpeechNotif(el); openFriendsPanel(null); openSpeechThread(threadId); };
     el.addEventListener("click", open);
     el.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(); } });
     container.appendChild(el);
@@ -6252,6 +6432,199 @@ const FIREBASE_CONFIG = firebaseConfig;
     setTimeout(() => { if (el.parentNode) el.parentNode.removeChild(el); }, 300);
   }
 
+  async function loadSpeechReads(){
+    if (!authUser || !lbDB) return;
+    try {
+      const snap = await lbDB.ref("users/" + authUser.uid + "/speechReads").once("value");
+      speechReadMap = snap.val() || {};
+    } catch (_err){
+      speechReadMap = {};
+    }
+  }
+
+  async function setSpeechThreadRead(threadId, ts){
+    if (!authUser || !lbDB || !threadId) return;
+    const readTs = +(ts || Date.now());
+    speechReadMap[threadId] = readTs;
+    speechUnreadMap[threadId] = 0;
+    updateSpeechUnreadBadges();
+    try {
+      await lbDB.ref("users/" + authUser.uid + "/speechReads/" + threadId).set(readTs);
+    } catch (_err){}
+  }
+
+  function getThreadTitle(threadMeta){
+    if (!threadMeta) return "Conversation";
+    if (threadMeta.type === "group") return threadMeta.title || "Group Chat";
+    const otherUid = threadMeta.otherUid;
+    if (!otherUid) return threadMeta.title || "Direct Message";
+    return (friendsMap[otherUid] && friendsMap[otherUid].name) || threadMeta.title || "Direct Message";
+  }
+
+  async function ensureDmThreadMeta(otherUid, preferredName, preferredPhoto){
+    if (!authUser || !lbDB || !otherUid) return null;
+    const threadId = getDmThreadId(authUser.uid, otherUid);
+    const existing = speechThreads[threadId] || {};
+    let otherName = preferredName || (friendsMap[otherUid] && friendsMap[otherUid].name) || existing.otherName || "Direct Message";
+    let otherPhoto = preferredPhoto || (friendsMap[otherUid] && friendsMap[otherUid].photo) || existing.otherPhoto || "";
+    if ((!preferredName || !preferredPhoto) && lbDB){
+      try {
+        const profileSnap = await lbDB.ref("publicProfiles/" + otherUid).once("value");
+        const profile = profileSnap.val() || {};
+        if (!preferredName && profile.displayName) otherName = profile.displayName;
+        if (!preferredPhoto && profile.photo) otherPhoto = profile.photo;
+      } catch (_err){}
+    }
+    const title = otherName || "Direct Message";
+    const base = {
+      threadId,
+      type: "dm",
+      title,
+      otherUid,
+      otherName,
+      otherPhoto,
+      members: {
+        [authUser.uid]: { role: "member", name: getCurrentDisplayName(), photo: getAccountPhoto() || "", joinedAt: Date.now() },
+        [otherUid]: { role: "member", name: otherName || otherUid, photo: otherPhoto || "", joinedAt: Date.now() }
+      }
+    };
+    speechThreads[threadId] = { ...base, ...existing, members: { ...(base.members || {}), ...(existing.members || {}) } };
+    try {
+      await lbDB.ref("neonSpeechThreads/" + threadId).update({
+        type: "dm",
+        title,
+        otherUid,
+        otherName,
+        otherPhoto,
+        updatedAt: Date.now(),
+        members: speechThreads[threadId].members
+      });
+    } catch (_err){}
+    return speechThreads[threadId];
+  }
+
+  async function startSpeechDm(targetUid, targetName, targetPhoto){
+    if (!authUser || !lbDB || !targetUid || targetUid === authUser.uid) return;
+    await ensureDmThreadMeta(targetUid, targetName || "", targetPhoto || "");
+    await refreshSpeechInbox(true);
+    openSpeechThread(getDmThreadId(authUser.uid, targetUid), targetName || "Direct Message");
+  }
+
+  async function refreshSpeechInbox(keepSelection){
+    if (!authUser || !lbDB) return;
+    const myUid = authUser.uid;
+    const rows = [];
+    const threadMap = {};
+    const dmFriendIds = Object.keys(friendsMap || {});
+    const groupMembershipSnap = await lbDB.ref("neonSpeechMemberships/" + myUid).once("value").catch(() => ({ val: () => ({}) }));
+    const membership = groupMembershipSnap.val() || {};
+    const threadIds = [];
+
+    dmFriendIds.forEach(uid => threadIds.push(getDmThreadId(myUid, uid)));
+    Object.keys(membership).forEach(threadId => {
+      if (!threadIds.includes(threadId)) threadIds.push(threadId);
+    });
+
+    if (!threadIds.length){
+      speechInboxRows = [];
+      speechThreads = {};
+      renderSpeechInbox();
+      return;
+    }
+
+    const messageSnaps = await Promise.all(threadIds.map(tid => lbDB.ref("neonSpeech/" + tid).limitToLast(1).once("value")));
+    const threadSnaps = await Promise.all(threadIds.map(tid => lbDB.ref("neonSpeechThreads/" + tid).once("value")));
+
+    threadIds.forEach((threadId, i) => {
+      const meta = threadSnaps[i].val() || {};
+      const msgRaw = messageSnaps[i].val() || {};
+      const lastMsg = Object.values(msgRaw)[0] || meta.lastMessage || null;
+      const isDm = isDmThreadId(threadId);
+      const dmParts = String(threadId).split("__");
+      const otherUid = isDm ? (dmParts[0] === myUid ? dmParts[1] : dmParts[0]) : "";
+      const finalMeta = {
+        threadId,
+        type: meta.type || (isDm ? "dm" : "group"),
+        title: meta.title || (isDm ? ((friendsMap[otherUid] && friendsMap[otherUid].name) || "Direct Message") : "Group Chat"),
+        otherUid,
+        members: meta.members || {},
+        createdBy: meta.createdBy || "",
+        createdAt: +meta.createdAt || 0,
+        lastMessage: lastMsg || null,
+        lastTs: +(lastMsg && lastMsg.ts || 0)
+      };
+      threadMap[threadId] = finalMeta;
+      const readTs = +(speechReadMap[threadId] || 0);
+      const unread = finalMeta.lastTs && finalMeta.lastTs > readTs && lastMsg && lastMsg.fromUid !== myUid ? 1 : 0;
+      speechUnreadMap[threadId] = unread;
+      rows.push({
+        threadId,
+        title: getThreadTitle(finalMeta),
+        type: finalMeta.type,
+        preview: lastMsg ? `${(lastMsg.fromUid === myUid ? "You" : (lastMsg.fromName || "Player"))}: ${shortPreview(lastMsg.text || "", 48)}` : "No messages yet",
+        time: finalMeta.lastTs ? formatShortDateTime(finalMeta.lastTs) : "",
+        unread,
+        lastTs: finalMeta.lastTs
+      });
+    });
+
+    rows.sort((a, b) => (b.lastTs || 0) - (a.lastTs || 0));
+    speechThreads = threadMap;
+    speechInboxRows = rows;
+    if (rows.length && !activeSpeechThreadId) activeSpeechThreadId = rows[0].threadId;
+    if (activeSpeechThreadId && !speechThreads[activeSpeechThreadId]){
+      activeSpeechThreadId = rows.length ? rows[0].threadId : null;
+    }
+    updateSpeechUnreadBadges();
+    renderSpeechInbox();
+  }
+
+  function renderSpeechInbox(){
+    if (!speechInboxListEl) return;
+    if (!speechInboxRows.length){
+      speechInboxListEl.innerHTML = '<div class="friends-empty">No conversations yet</div>';
+      return;
+    }
+    speechInboxListEl.innerHTML = speechInboxRows.map(row => {
+      const meta = speechThreads[row.threadId] || {};
+      const photo = isDmThreadId(row.threadId)
+        ? (meta.otherPhoto || (meta.otherUid && friendsMap[meta.otherUid] ? friendsMap[meta.otherUid].photo : ""))
+        : "";
+      const avatar = photo
+        ? `<img class="lb-avatar" src="${escText(photo)}" alt="${escText(row.title)}" data-act="speech-profile" data-uid="${escText(meta.otherUid || "")}">`
+        : `<div class="lb-avatar-ph" ${meta.otherUid ? `data-act="speech-profile" data-uid="${escText(meta.otherUid)}"` : ""}>${row.type === "group" ? "👥" : "👤"}</div>`;
+      return `<div class="speech-thread-row ${activeSpeechThreadId === row.threadId ? "active" : ""}" data-act="speech-open" data-thread-id="${escText(row.threadId)}">
+        ${avatar}
+        <div class="speech-thread-main">
+          <div class="speech-thread-top">
+            <div class="speech-thread-name">${escText(row.title)}</div>
+            <div class="speech-thread-time">${escText(row.time)}</div>
+          </div>
+          <div class="speech-thread-preview">${escText(row.preview)}</div>
+          <div class="speech-thread-group">${row.type === "group" ? "Group" : "Direct Message"}</div>
+        </div>
+        ${row.unread ? `<span class="unread-badge">${row.unread > 99 ? "99+" : row.unread}</span>` : ""}
+      </div>`;
+    }).join("");
+  }
+
+  function setFriendsTab(tab){
+    friendsTab = tab;
+    if (!friendsTabsEl) return;
+    friendsTabsEl.querySelectorAll(".friends-tab").forEach(el => {
+      el.classList.toggle("active", el.dataset.tab === tab);
+    });
+    document.querySelectorAll(".friends-tab-content").forEach(el => {
+      el.classList.toggle("active", el.dataset.content === tab);
+    });
+    if (tab === "board") renderFriendsLeaderboard();
+    if (tab === "speech"){
+      setFriendsStatus(speechMsgEl, "", false);
+      if (speechCreateGroupAreaEl) speechCreateGroupAreaEl.style.display = "none";
+      if (speechManageGroupAreaEl) speechManageGroupAreaEl.style.display = "none";
+      refreshSpeechInbox(true).catch(() => {});
+    }
+  }
 
   function setFriendsTab(tab){
     friendsTab = tab;
@@ -6277,7 +6650,7 @@ const FIREBASE_CONFIG = firebaseConfig;
       const name = escText(req.fromName || uid);
       const when = formatShortDateTime(req.createdAt);
       return `<div class="friends-row">
-        ${req.fromPhoto ? `<img class="lb-avatar" src="${escText(req.fromPhoto)}" alt="${name}">` : '<div class="lb-avatar-ph">👤</div>'}
+        ${req.fromPhoto ? `<img class="lb-avatar" src="${escText(req.fromPhoto)}" alt="${name}" data-act="view-profile" data-uid="${escText(uid)}">` : `<div class="lb-avatar-ph" data-act="view-profile" data-uid="${escText(uid)}">👤</div>`}
         <div class="friends-row-name">${name}<div class="friends-row-sub">Incoming ${escText(when)}</div></div>
         <div class="friends-mini-btn" data-act="accept" data-uid="${escText(uid)}">Accept</div>
         <div class="friends-mini-btn danger" data-act="decline" data-uid="${escText(uid)}">Decline</div>
@@ -6315,8 +6688,9 @@ const FIREBASE_CONFIG = firebaseConfig;
       else if (alreadySent){ actionLabel = "Sent"; disabled = true; }
       if (disabled) actionClass += "";
       return `<div class="friends-row">
-        ${p.photo ? `<img class="lb-avatar" src="${escText(p.photo)}" alt="${name}">` : '<div class="lb-avatar-ph">👤</div>'}
-        <div class="friends-row-name">${name}<div class="friends-row-sub">UID: ${uid.slice(0, 8)}...</div></div>
+        ${p.photo ? `<img class="lb-avatar" src="${escText(p.photo)}" alt="${name}" data-act="view-profile" data-uid="${uid}">` : `<div class="lb-avatar-ph" data-act="view-profile" data-uid="${uid}">👤</div>`}
+        <div class="friends-row-name">${name}<div class="friends-row-sub">Registered account</div></div>
+        <div class="friends-mini-btn" data-act="search-dm" data-uid="${uid}" data-name="${name}" data-photo="${escText(p.photo || "")}" ${isMe ? 'style="opacity:.45;pointer-events:none;"' : ""}>Message</div>
         <div class="${actionClass}" data-act="search-send" data-uid="${uid}" data-name="${name}" data-photo="${escText(p.photo || "")}" ${disabled ? 'style="opacity:.45;pointer-events:none;"' : ""}>${actionLabel}</div>
       </div>`;
     }).join("");
@@ -6368,9 +6742,12 @@ const FIREBASE_CONFIG = firebaseConfig;
     }
     friendsListEl.innerHTML = entries.map(([uid, f]) => {
       const name = escText(f.name || uid);
+      const dmThreadId = authUser ? getDmThreadId(authUser.uid, uid) : "";
+      const unread = dmThreadId ? (+speechUnreadMap[dmThreadId] || 0) : 0;
       return `<div class="friends-row">
-        ${f.photo ? `<img class="lb-avatar" src="${escText(f.photo)}" alt="${name}">` : '<div class="lb-avatar-ph">👤</div>'}
-        <div class="friends-row-name">${name}<div class="friends-row-sub">UID: ${escText(uid.slice(0, 8))}...</div></div>
+        ${f.photo ? `<img class="lb-avatar" src="${escText(f.photo)}" alt="${name}" data-act="view-profile" data-uid="${escText(uid)}">` : `<div class="lb-avatar-ph" data-act="view-profile" data-uid="${escText(uid)}">👤</div>`}
+        <div class="friends-row-name">${name}<div class="friends-row-sub">Tap avatar for profile</div></div>
+        ${unread ? `<span class="unread-badge" title="Unread messages">${unread > 99 ? "99+" : unread}</span>` : ""}
         <div class="friends-mini-btn" data-act="speech" data-uid="${escText(uid)}" data-name="${name}">Neon Speech</div>
         <div class="friends-mini-btn danger" data-act="remove" data-uid="${escText(uid)}">Remove</div>
       </div>`;
@@ -6408,7 +6785,7 @@ const FIREBASE_CONFIG = firebaseConfig;
       friendsLeaderboardListEl.innerHTML = rows.map((r, idx) => `
         <div class="friends-row">
           <div class="lb-rank">#${idx + 1}</div>
-          ${r.photo ? `<img class="lb-avatar" src="${escText(r.photo)}" alt="${escText(r.name)}">` : '<div class="lb-avatar-ph">👤</div>'}
+          ${r.photo ? `<img class="lb-avatar" src="${escText(r.photo)}" alt="${escText(r.name)}" data-act="view-profile" data-uid="${escText(r.uid)}">` : `<div class="lb-avatar-ph" data-act="view-profile" data-uid="${escText(r.uid)}">👤</div>`}
           <div class="friends-row-name">${escText(r.name)}${r.uid === authUser.uid ? ' <span class="lb-you-badge">YOU</span>' : ''}</div>
           <div class="lb-score">${r.score.toLocaleString()}</div>
         </div>
@@ -6421,15 +6798,208 @@ const FIREBASE_CONFIG = firebaseConfig;
     }
   }
 
-  function openSpeechWithFriend(uid, name){
+  async function openProfileCard(uid){
+    if (!uid || !profileCardModalEl) return;
+    speechProfileUid = uid;
+    let profile = null;
+    if (lbDB){
+      try {
+        const snap = await lbDB.ref("publicProfiles/" + uid).once("value");
+        profile = snap.val() || null;
+      } catch (_err){}
+    }
+    const friend = friendsMap[uid] || {};
+    const displayName = (profile && profile.displayName) || friend.name || uid;
+    const photo = (profile && profile.photo) || friend.photo || "";
+    const best = +(profile && profile.best || 0);
+    if (profileCardAvatarWrapEl){
+      profileCardAvatarWrapEl.innerHTML = photo
+        ? `<img class="profile-card-avatar" src="${escText(photo)}" alt="${escText(displayName)}">`
+        : '<div class="profile-card-fallback">👤</div>';
+    }
+    if (profileCardNameEl) profileCardNameEl.textContent = displayName;
+    if (profileCardSubEl) profileCardSubEl.textContent = friend.name ? "Friend" : "Player";
+    if (profileCardStatsEl) profileCardStatsEl.textContent = "Best Score: " + best.toLocaleString();
+    if (profileCardDmBtnEl){
+      const canDm = authUser && uid !== authUser.uid;
+      profileCardDmBtnEl.style.opacity = canDm ? "" : ".45";
+      profileCardDmBtnEl.style.pointerEvents = canDm ? "" : "none";
+      profileCardDmBtnEl.textContent = canDm ? "DM" : "This is you";
+    }
+    profileCardModalEl.classList.add("active");
+  }
+
+  function closeProfileCard(){
+    speechProfileUid = "";
+    if (profileCardModalEl) profileCardModalEl.classList.remove("active");
+  }
+
+  function renderSpeechGroupCreateOptions(){
+    if (!speechGroupMembersEl) return;
+    const entries = Object.entries(friendsMap || {});
+    if (!entries.length){
+      speechGroupMembersEl.innerHTML = '<div class="friends-empty">Add friends first</div>';
+      return;
+    }
+    speechGroupMembersEl.innerHTML = entries.map(([uid, f]) => `
+      <label class="speech-check-row">
+        <input type="checkbox" data-uid="${escText(uid)}">
+        <span>${escText(f.name || uid)}</span>
+      </label>
+    `).join("");
+  }
+
+  function closeSpeechCreateGroupArea(){
+    if (speechCreateGroupAreaEl) speechCreateGroupAreaEl.style.display = "none";
+    if (speechGroupNameInputEl) speechGroupNameInputEl.value = "";
+    if (speechGroupMembersEl) speechGroupMembersEl.innerHTML = "";
+  }
+
+  function openSpeechCreateGroupArea(){
+    setFriendsTab("speech");
+    if (speechManageGroupAreaEl) speechManageGroupAreaEl.style.display = "none";
+    if (speechCreateGroupAreaEl) speechCreateGroupAreaEl.style.display = "block";
+    renderSpeechGroupCreateOptions();
+  }
+
+  async function createSpeechGroup(){
+    if (!authUser || !lbDB){
+      setFriendsStatus(speechMsgEl, "Please sign in first.", true);
+      return;
+    }
+    const name = (speechGroupNameInputEl && speechGroupNameInputEl.value || "").trim().slice(0, 48);
+    if (!name){
+      setFriendsStatus(speechMsgEl, "Group name is required.", true);
+      return;
+    }
+    const selected = Array.from((speechGroupMembersEl || document).querySelectorAll("input[data-uid]:checked")).map(el => el.dataset.uid).filter(Boolean);
+    if (!selected.length){
+      setFriendsStatus(speechMsgEl, "Select at least one friend.", true);
+      return;
+    }
+    const threadKey = lbDB.ref("neonSpeechThreads").push().key;
+    const threadId = "group__" + threadKey;
+    const now = Date.now();
+    const members = {};
+    members[authUser.uid] = { role: "admin", name: getCurrentDisplayName(), photo: getAccountPhoto() || "", joinedAt: now };
+    selected.forEach(uid => {
+      const f = friendsMap[uid] || {};
+      members[uid] = { role: "member", name: f.name || uid, photo: f.photo || "", joinedAt: now };
+    });
+    const updates = {};
+    updates["neonSpeechThreads/" + threadId] = {
+      type: "group",
+      title: name,
+      createdBy: authUser.uid,
+      createdAt: now,
+      updatedAt: now,
+      members
+    };
+    Object.keys(members).forEach(uid => {
+      updates["neonSpeechMemberships/" + uid + "/" + threadId] = { joinedAt: now, role: members[uid].role };
+    });
+    try {
+      await lbDB.ref().update(updates);
+      closeSpeechCreateGroupArea();
+      setFriendsStatus(speechMsgEl, "Group created.", false);
+      await refreshSpeechInbox(false);
+      openSpeechThread(threadId);
+    } catch (err) {
+      console.error("[Neon Speech] Group creation failed:", err);
+      setFriendsStatus(speechMsgEl, "Could not create group.", true);
+    }
+  }
+
+  function isSpeechGroupAdmin(threadMeta){
+    if (!authUser || !threadMeta || threadMeta.type !== "group") return false;
+    const m = (threadMeta.members || {})[authUser.uid] || {};
+    return m.role === "admin";
+  }
+
+  function renderSpeechManageGroup(){
+    if (!speechManageMembersEl || !activeSpeechThreadMeta) return;
+    if (!isSpeechGroupAdmin(activeSpeechThreadMeta)){
+      speechManageMembersEl.innerHTML = '<div class="friends-empty">Admin only</div>';
+      return;
+    }
+    const members = activeSpeechThreadMeta.members || {};
+    const rows = Object.entries(members);
+    const options = Object.entries(friendsMap || {}).filter(([uid]) => !members[uid]);
+    const memberRows = rows.map(([uid, m]) => {
+      const role = m.role || "member";
+      const canEdit = uid !== authUser.uid;
+      return `<div class="speech-member-row">
+        ${m.photo ? `<img class="lb-avatar" src="${escText(m.photo)}" alt="${escText(m.name || uid)}">` : '<div class="lb-avatar-ph">👤</div>'}
+        <div class="friends-row-name">${escText(m.name || uid)}<div class="speech-member-role">${escText(role)}</div></div>
+        ${canEdit && role !== "admin" ? `<div class="speech-action-btn" data-act="group-promote" data-uid="${escText(uid)}">Promote</div>` : ""}
+        ${canEdit && role === "admin" ? `<div class="speech-action-btn" data-act="group-demote" data-uid="${escText(uid)}">Demote</div>` : ""}
+        ${canEdit ? `<div class="speech-action-btn danger" data-act="group-kick" data-uid="${escText(uid)}">Remove</div>` : ""}
+      </div>`;
+    }).join("");
+    const addRows = options.length ? options.map(([uid, f]) => `
+      <div class="speech-member-row">
+        ${f.photo ? `<img class="lb-avatar" src="${escText(f.photo)}" alt="${escText(f.name || uid)}">` : '<div class="lb-avatar-ph">👤</div>'}
+        <div class="friends-row-name">${escText(f.name || uid)}<div class="speech-member-role">Not in group</div></div>
+        <div class="speech-action-btn" data-act="group-add" data-uid="${escText(uid)}">Add</div>
+      </div>`).join("") : '<div class="friends-empty">All friends are already in this group</div>';
+    speechManageMembersEl.innerHTML = memberRows + '<div style="font-size:10px;opacity:.6;letter-spacing:.7px;text-transform:uppercase;margin:8px 0 6px;">Add Friends</div>' + addRows;
+  }
+
+  async function updateSpeechGroupMember(uid, action){
+    if (!authUser || !lbDB || !activeSpeechThreadMeta || activeSpeechThreadMeta.type !== "group") return;
+    if (!isSpeechGroupAdmin(activeSpeechThreadMeta)) return;
+    const threadId = activeSpeechThreadMeta.threadId;
+    const updates = {};
+    const basePath = "neonSpeechThreads/" + threadId + "/members/" + uid;
+    if (action === "promote"){
+      updates[basePath + "/role"] = "admin";
+      updates["neonSpeechMemberships/" + uid + "/" + threadId + "/role"] = "admin";
+    } else if (action === "demote"){
+      updates[basePath + "/role"] = "member";
+      updates["neonSpeechMemberships/" + uid + "/" + threadId + "/role"] = "member";
+    } else if (action === "kick"){
+      updates["neonSpeechThreads/" + threadId + "/members/" + uid] = null;
+      updates["neonSpeechMemberships/" + uid + "/" + threadId] = null;
+    } else if (action === "add"){
+      const f = friendsMap[uid] || {};
+      updates["neonSpeechThreads/" + threadId + "/members/" + uid] = { role: "member", name: f.name || uid, photo: f.photo || "", joinedAt: Date.now() };
+      updates["neonSpeechMemberships/" + uid + "/" + threadId] = { joinedAt: Date.now(), role: "member" };
+    }
+    try {
+      await lbDB.ref().update(updates);
+      const snap = await lbDB.ref("neonSpeechThreads/" + threadId).once("value");
+      activeSpeechThreadMeta = { ...(activeSpeechThreadMeta || {}), ...(snap.val() || {}), threadId };
+      speechThreads[threadId] = activeSpeechThreadMeta;
+      renderSpeechManageGroup();
+      refreshSpeechInbox(true);
+    } catch (err) {
+      console.error("[Neon Speech] Group update failed:", err);
+      setFriendsStatus(speechMsgEl, "Could not update group members.", true);
+    }
+  }
+
+  async function openSpeechWithFriend(uid, name){
     if (!authUser || !lbDB || !uid) return;
-    activeSpeechFriendUid = uid;
-    activeSpeechFriendName = name || (friendsMap[uid] && friendsMap[uid].name) || "Friend";
-    if (speechActiveTitleEl) speechActiveTitleEl.textContent = "Neon Speech: " + activeSpeechFriendName;
+    await ensureDmThreadMeta(uid);
+    await refreshSpeechInbox(true);
+    const threadId = getDmThreadId(authUser.uid, uid);
+    openSpeechThread(threadId, name || (friendsMap[uid] && friendsMap[uid].name) || "Direct Message");
+  }
+
+  function openSpeechThread(threadId, fallbackName){
+    if (!authUser || !lbDB || !threadId) return;
+    activeSpeechThreadId = threadId;
+    activeSpeechThreadMeta = { ...(speechThreads[threadId] || {}), threadId };
+    const title = fallbackName || getThreadTitle(activeSpeechThreadMeta);
+    if (speechActiveTitleEl) speechActiveTitleEl.textContent = "Neon Speech: " + title;
     if (speechMessagesEl) speechMessagesEl.innerHTML = '<div class="friends-empty">Loading messages...</div>';
+    if (speechManageGroupBtnEl){
+      speechManageGroupBtnEl.style.display = activeSpeechThreadMeta.type === "group" ? "inline-flex" : "none";
+    }
+    if (speechManageGroupAreaEl) speechManageGroupAreaEl.style.display = "none";
+    if (speechCreateGroupAreaEl) speechCreateGroupAreaEl.style.display = "none";
     clearSpeechSubscription();
-    const chatId = getChatId(authUser.uid, uid);
-    speechRef = lbDB.ref("neonSpeech/" + chatId).limitToLast(120);
+    speechRef = lbDB.ref("neonSpeech/" + threadId).limitToLast(180);
     speechHandler = (snap) => {
       const raw = snap.val() || {};
       const list = Object.values(raw).sort((a, b) => (+a.ts || 0) - (+b.ts || 0));
@@ -6437,6 +7007,7 @@ const FIREBASE_CONFIG = firebaseConfig;
         speechMessagesEl.innerHTML = '<div class="friends-empty">No messages yet</div>';
         return;
       }
+      const latestTs = +((list[list.length - 1] && list[list.length - 1].ts) || 0);
       speechMessagesEl.innerHTML = list.map(m => {
         const mine = m.fromUid === authUser.uid;
         return `<div class="speech-bubble ${mine ? "me" : "them"}">
@@ -6445,13 +7016,31 @@ const FIREBASE_CONFIG = firebaseConfig;
         </div>`;
       }).join("");
       speechMessagesEl.scrollTop = speechMessagesEl.scrollHeight;
+      setSpeechThreadRead(threadId, latestTs);
+      const idx = speechInboxRows.findIndex(r => r.threadId === threadId);
+      if (idx >= 0){
+        speechInboxRows[idx].unread = 0;
+        speechInboxRows[idx].preview = `${(list[list.length - 1].fromUid === authUser.uid ? "You" : (list[list.length - 1].fromName || "Player"))}: ${shortPreview(list[list.length - 1].text || "", 48)}`;
+        speechInboxRows[idx].time = formatShortDateTime(latestTs);
+        speechInboxRows[idx].lastTs = latestTs;
+        speechInboxRows.sort((a, b) => (b.lastTs || 0) - (a.lastTs || 0));
+        renderSpeechInbox();
+      }
     };
     speechRef.on("value", speechHandler);
+    renderSpeechInbox();
     setFriendsTab("speech");
   }
 
   async function loadFriendsData(){
-    if (!friendsPanelEl || !friendsPanelEl.classList.contains("active")) return;
+    if (!friendsPanelEl || !friendsPanelEl.classList.contains("active")){
+      if (authUser && lbDB){
+        await loadSpeechReads();
+        await refreshSpeechInbox(true);
+        setupSpeechGlobalListeners();
+      }
+      return;
+    }
     if (!authUser || !lbDB){
       const msg = '<div class="friends-empty">Sign in to use friends and Neon Speech</div>';
       setFriendsStatus(friendsReqMsgEl, "Sign in required.", true);
@@ -6459,6 +7048,7 @@ const FIREBASE_CONFIG = firebaseConfig;
       if (friendsSearchResultsEl) friendsSearchResultsEl.innerHTML = '<div class="friends-empty">Sign in to search registered players</div>';
       if (friendsListEl) friendsListEl.innerHTML = msg;
       if (friendsLeaderboardListEl) friendsLeaderboardListEl.innerHTML = msg;
+      if (speechInboxListEl) speechInboxListEl.innerHTML = msg;
       if (speechMessagesEl) speechMessagesEl.innerHTML = msg;
       return;
     }
@@ -6472,6 +7062,11 @@ const FIREBASE_CONFIG = firebaseConfig;
       friendRequestsIncoming = inSnap.val() || {};
       friendRequestsOutgoing = outSnap.val() || {};
       renderFriendRequests();
+      await loadSpeechReads();
+      await refreshSpeechInbox(true);
+      if (friendsTab === "speech" && activeSpeechThreadId && !speechRef){
+        openSpeechThread(activeSpeechThreadId);
+      }
       renderFriendsList();
       renderFriendSearchResults();
       if (friendsTab === "board") renderFriendsLeaderboard();
@@ -6483,6 +7078,7 @@ const FIREBASE_CONFIG = firebaseConfig;
       if (friendsSearchResultsEl) friendsSearchResultsEl.innerHTML = '<div class="friends-empty">Could not load player search</div>';
       if (friendsListEl) friendsListEl.innerHTML = '<div class="friends-empty">Could not load friends list</div>';
       if (friendsLeaderboardListEl) friendsLeaderboardListEl.innerHTML = '<div class="friends-empty">Could not load friend leaderboard</div>';
+      if (speechInboxListEl) speechInboxListEl.innerHTML = '<div class="friends-empty">Could not load conversations</div>';
     }
   }
 
@@ -6494,7 +7090,7 @@ const FIREBASE_CONFIG = firebaseConfig;
     }
     const raw = (friendAddInputEl.value || "").trim();
     if (!raw){
-      setFriendsStatus(friendsReqMsgEl, "Enter a friend UID or exact leaderboard name.", true);
+      setFriendsStatus(friendsReqMsgEl, "Enter a friend name or account ID.", true);
       return;
     }
     let targetUid = "";
@@ -6511,7 +7107,7 @@ const FIREBASE_CONFIG = firebaseConfig;
       }
     }
     if (!targetUid){
-      setFriendsStatus(friendsReqMsgEl, "Could not find that player. Use friend UID or exact leaderboard name.", true);
+      setFriendsStatus(friendsReqMsgEl, "Could not find that player. Try the search box above.", true);
       return;
     }
     if (targetUid === authUser.uid){
@@ -6601,18 +7197,22 @@ const FIREBASE_CONFIG = firebaseConfig;
 
   async function removeFriend(uid){
     if (!authUser || !lbDB || !uid) return;
+    const dmThreadId = getDmThreadId(authUser.uid, uid);
     const updates = {};
     updates["friends/" + authUser.uid + "/" + uid] = null;
     updates["friends/" + uid + "/" + authUser.uid] = null;
     try {
       await lbDB.ref().update(updates);
-      if (activeSpeechFriendUid === uid){
-        activeSpeechFriendUid = null;
-        activeSpeechFriendName = "";
+      if (activeSpeechThreadId === dmThreadId){
+        activeSpeechThreadId = null;
+        activeSpeechThreadMeta = null;
         clearSpeechSubscription();
-        if (speechActiveTitleEl) speechActiveTitleEl.textContent = "Neon Speech: Pick a friend in Friends List";
+        if (speechActiveTitleEl) speechActiveTitleEl.textContent = "Neon Speech: Choose a conversation";
         if (speechMessagesEl) speechMessagesEl.innerHTML = '<div class="friends-empty">No active conversation</div>';
       }
+      delete speechThreads[dmThreadId];
+      delete speechUnreadMap[dmThreadId];
+      updateSpeechUnreadBadges();
       loadFriendsData();
     } catch (err) {
       console.error("[Friends] remove failed:", err);
@@ -6624,13 +7224,13 @@ const FIREBASE_CONFIG = firebaseConfig;
       setFriendsStatus(speechMsgEl, "Please sign in first.", true);
       return;
     }
-    if (!activeSpeechFriendUid){
-      setFriendsStatus(speechMsgEl, "Pick a friend from Friends List first.", true);
+    if (!activeSpeechThreadId){
+      setFriendsStatus(speechMsgEl, "Choose a conversation first.", true);
       return;
     }
     const text = (speechInputEl.value || "").trim();
     if (!text) return;
-    const chatId = getChatId(authUser.uid, activeSpeechFriendUid);
+    const threadId = activeSpeechThreadId;
     const payload = {
       fromUid: authUser.uid,
       fromName: getCurrentDisplayName(),
@@ -6638,8 +7238,15 @@ const FIREBASE_CONFIG = firebaseConfig;
       ts: Date.now()
     };
     try {
-      await lbDB.ref("neonSpeech/" + chatId).push(payload);
+      await lbDB.ref("neonSpeech/" + threadId).push(payload);
+      await lbDB.ref("neonSpeechThreads/" + threadId).update({
+        updatedAt: payload.ts,
+        lastMessage: payload
+      });
       speechInputEl.value = "";
+      speechUnreadMap[threadId] = 0;
+      updateSpeechUnreadBadges();
+      refreshSpeechInbox(true);
       setFriendsStatus(speechMsgEl, "", false);
     } catch (err) {
       console.error("[Neon Speech] send failed:", err);
@@ -6652,7 +7259,7 @@ const FIREBASE_CONFIG = firebaseConfig;
     sfxClick();
     if (!friendsPanelEl) return;
     friendsPanelEl.classList.add("active");
-    setFriendsTab("requests");
+    setFriendsTab("speech");
     if (friendsRequestsListEl) friendsRequestsListEl.innerHTML = '<div class="friends-empty">Loading requests...</div>';
     if (friendsSearchResultsEl) friendsSearchResultsEl.innerHTML = '<div class="friends-empty">Search results will appear here</div>';
     loadFriendsData();
@@ -6664,8 +7271,12 @@ const FIREBASE_CONFIG = firebaseConfig;
     if (!friendsPanelEl) return;
     friendsPanelEl.classList.remove("active");
     clearSpeechSubscription();
-    if (speechActiveTitleEl) speechActiveTitleEl.textContent = "Neon Speech: Pick a friend in Friends List";
+    activeSpeechThreadId = null;
+    activeSpeechThreadMeta = null;
+    if (speechActiveTitleEl) speechActiveTitleEl.textContent = "Neon Speech: Choose a conversation";
     if (speechMessagesEl) speechMessagesEl.innerHTML = '<div class="friends-empty">No active conversation</div>';
+    if (speechCreateGroupAreaEl) speechCreateGroupAreaEl.style.display = "none";
+    if (speechManageGroupAreaEl) speechManageGroupAreaEl.style.display = "none";
     if (speechInputEl) speechInputEl.value = "";
     if (speechMsgEl) setFriendsStatus(speechMsgEl, "", false);
   }
@@ -6900,9 +7511,15 @@ const FIREBASE_CONFIG = firebaseConfig;
       authPendingRegisterPhoto = null;
       authProfilePhoto = null;
       tearDownSpeechGlobalListeners();
+      tearDownSpeechMembershipListener();
       clearSpeechSubscription();
-      activeSpeechFriendUid = null;
-      activeSpeechFriendName = "";
+      activeSpeechThreadId = null;
+      activeSpeechThreadMeta = null;
+      speechThreads = {};
+      speechInboxRows = [];
+      speechReadMap = {};
+      speechUnreadMap = {};
+      updateSpeechUnreadBadges();
       if (friendsPanelEl && friendsPanelEl.classList.contains("active")) loadFriendsData();
       updateAuthUI();
     }
@@ -7948,7 +8565,7 @@ const FIREBASE_CONFIG = firebaseConfig;
       if (!tab) return;
       sfxClick();
       setFriendsTab(tab.dataset.tab || "requests");
-      if (tab.dataset.tab === "requests" || tab.dataset.tab === "list") loadFriendsData();
+      if (tab.dataset.tab === "requests" || tab.dataset.tab === "list" || tab.dataset.tab === "speech") loadFriendsData();
     });
   }
   if (friendAddBtnEl) friendAddBtnEl.addEventListener("click", () => { sfxClick(); sendFriendRequest(); });
@@ -7967,6 +8584,18 @@ const FIREBASE_CONFIG = firebaseConfig;
   }
   if (friendsSearchResultsEl){
     friendsSearchResultsEl.addEventListener("click", (e) => {
+      const avatar = e.target.closest("[data-act='view-profile']");
+      if (avatar){
+        sfxClick();
+        openProfileCard(avatar.dataset.uid || "");
+        return;
+      }
+      const dmBtn = e.target.closest("[data-act='search-dm']");
+      if (dmBtn){
+        sfxClick();
+        startSpeechDm(dmBtn.dataset.uid || "", dmBtn.dataset.name || "", dmBtn.dataset.photo || "");
+        return;
+      }
       const btn = e.target.closest("[data-act='search-send']");
       if (!btn) return;
       sfxClick();
@@ -7975,6 +8604,12 @@ const FIREBASE_CONFIG = firebaseConfig;
   }
   if (friendsRequestsListEl){
     friendsRequestsListEl.addEventListener("click", (e) => {
+      const avatar = e.target.closest("[data-act='view-profile']");
+      if (avatar){
+        sfxClick();
+        openProfileCard(avatar.dataset.uid || "");
+        return;
+      }
       const btn = e.target.closest("[data-act]");
       if (!btn) return;
       const uid = btn.dataset.uid;
@@ -7987,6 +8622,12 @@ const FIREBASE_CONFIG = firebaseConfig;
   }
   if (friendsListEl){
     friendsListEl.addEventListener("click", (e) => {
+      const avatar = e.target.closest("[data-act='view-profile']");
+      if (avatar){
+        sfxClick();
+        openProfileCard(avatar.dataset.uid || "");
+        return;
+      }
       const btn = e.target.closest("[data-act]");
       if (!btn) return;
       const uid = btn.dataset.uid;
@@ -7996,11 +8637,87 @@ const FIREBASE_CONFIG = firebaseConfig;
       else if (act === "remove") removeFriend(uid);
     });
   }
+  if (friendsLeaderboardListEl){
+    friendsLeaderboardListEl.addEventListener("click", (e) => {
+      const avatar = e.target.closest("[data-act='view-profile']");
+      if (!avatar) return;
+      sfxClick();
+      openProfileCard(avatar.dataset.uid || "");
+    });
+  }
+  if (speechInboxListEl){
+    speechInboxListEl.addEventListener("click", (e) => {
+      const profileBtn = e.target.closest("[data-act='speech-profile']");
+      if (profileBtn && profileBtn.dataset.uid){
+        sfxClick();
+        openProfileCard(profileBtn.dataset.uid);
+        return;
+      }
+      const row = e.target.closest("[data-act='speech-open']");
+      if (!row) return;
+      sfxClick();
+      openSpeechThread(row.dataset.threadId || "");
+    });
+  }
+  if (speechNewDmBtnEl){
+    speechNewDmBtnEl.addEventListener("click", () => {
+      sfxClick();
+      setFriendsTab("requests");
+      setFriendsStatus(friendsReqMsgEl, "Search any player and tap Message to DM instantly.", false);
+      if (friendSearchInputEl) friendSearchInputEl.focus();
+    });
+  }
+  if (speechNewGroupBtnEl) speechNewGroupBtnEl.addEventListener("click", () => { sfxClick(); openSpeechCreateGroupArea(); });
+  if (speechCreateGroupSubmitEl) speechCreateGroupSubmitEl.addEventListener("click", () => { sfxClick(); createSpeechGroup(); });
+  if (speechCreateGroupCancelEl) speechCreateGroupCancelEl.addEventListener("click", () => { sfxClick(); closeSpeechCreateGroupArea(); });
+  if (speechManageGroupBtnEl){
+    speechManageGroupBtnEl.addEventListener("click", () => {
+      sfxClick();
+      if (!activeSpeechThreadMeta || activeSpeechThreadMeta.type !== "group") return;
+      if (speechCreateGroupAreaEl) speechCreateGroupAreaEl.style.display = "none";
+      if (speechManageGroupAreaEl) speechManageGroupAreaEl.style.display = "block";
+      renderSpeechManageGroup();
+    });
+  }
+  if (speechManageCloseEl){
+    speechManageCloseEl.addEventListener("click", () => {
+      sfxClick();
+      if (speechManageGroupAreaEl) speechManageGroupAreaEl.style.display = "none";
+    });
+  }
+  if (speechManageMembersEl){
+    speechManageMembersEl.addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-act]");
+      if (!btn) return;
+      sfxClick();
+      const uid = btn.dataset.uid || "";
+      const act = btn.dataset.act || "";
+      if (act === "group-promote") updateSpeechGroupMember(uid, "promote");
+      else if (act === "group-demote") updateSpeechGroupMember(uid, "demote");
+      else if (act === "group-kick") updateSpeechGroupMember(uid, "kick");
+      else if (act === "group-add") updateSpeechGroupMember(uid, "add");
+    });
+  }
   if (speechSendBtnEl) speechSendBtnEl.addEventListener("click", () => { sfxClick(); sendSpeechMessage(); });
   if (speechInputEl){
     speechInputEl.addEventListener("keydown", (e) => {
       if (e.code === "Enter") sendSpeechMessage();
       e.stopPropagation();
+    });
+  }
+  if (profileCardCloseEl) profileCardCloseEl.addEventListener("click", () => { sfxClick(); closeProfileCard(); });
+  if (profileCardModalEl){
+    profileCardModalEl.addEventListener("click", (e) => {
+      if (e.target === profileCardModalEl) closeProfileCard();
+    });
+  }
+  if (profileCardDmBtnEl){
+    profileCardDmBtnEl.addEventListener("click", async () => {
+      if (!speechProfileUid || !authUser || speechProfileUid === authUser.uid) return;
+      sfxClick();
+      closeProfileCard();
+      openFriendsPanel(null);
+      await startSpeechDm(speechProfileUid);
     });
   }
 
