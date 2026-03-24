@@ -1976,9 +1976,9 @@
     <div class="title">🏆 Leaderboard</div>
     <div class="lb-your-score" id="lbYourScore"></div>
     <div class="lb-category-tabs" id="lbCategoryTabs">
-      <div class="lb-category-tab active" data-cat="alltime">All Time</div>
+      <div class="lb-category-tab" data-cat="alltime">All Time</div>
       <div class="lb-category-tab" data-cat="thisweek">This Week</div>
-      <div class="lb-category-tab" data-cat="today">Today</div>
+      <div class="lb-category-tab active" data-cat="today">Today</div>
     </div>
     <div class="leaderboard-list" id="leaderboardList"></div>
     <div class="settings-actions">
@@ -3887,9 +3887,14 @@ const FIREBASE_CONFIG = firebaseConfig;
   function gameOver(){
     setMode("over");
     const isNewBest = state.score > state.best;
+    const prevTodayBest = getTodayBest();
+    const isNewTodayBest = state.score > prevTodayBest;
     if (isNewBest){
       state.best = state.score;
       localStorage.setItem("neonBest", state.best);
+    }
+    if (isNewTodayBest){
+      saveTodayBest(state.score);
     }
     if (FEATURE_FLAGS.progression){
       const earned = Math.floor(state.score * PROGRESSION.earnScore) +
@@ -3929,8 +3934,10 @@ const FIREBASE_CONFIG = firebaseConfig;
     // Monetization hook: show interstitial ad between runs here.
     showInterstitialAd();
 
-    // Leaderboard hook: show submit modal after the breakdown panel appears.
-    state.lbSubmitTimer = setTimeout(() => submitScore(state.score), 1400);
+    // Leaderboard hook: show submit modal only when it's a new today's or all-time best.
+    if (isNewBest || isNewTodayBest){
+      state.lbSubmitTimer = setTimeout(() => submitScore(state.score, isNewBest, isNewTodayBest), 1400);
+    }
 
     overPanel.classList.add("hidden");
   }
@@ -5633,6 +5640,8 @@ const FIREBASE_CONFIG = firebaseConfig;
   const AUTH_CLOUD_TIMEOUT_MS = 25000;
   let lbPendingScore = 0;
   let lbPendingPhoto = null;
+  let lbPendingIsNewAllTimeBest = false;
+  let lbPendingIsNewTodayBest = false;
   let authPendingRegisterPhoto = null;
   let authProfilePhoto = null;
   let lbEntries = [];   // local cache for fast re-render
@@ -5870,7 +5879,7 @@ const FIREBASE_CONFIG = firebaseConfig;
     renderLbSidebar();
   }
 
-  let lbCategory = "alltime"; // current leaderboard filter
+  let lbCategory = "today"; // current leaderboard filter
   let lbSidebarTab = "today"; // current right-sidebar filter
 
   function isToday(dateStr){
@@ -5890,9 +5899,37 @@ const FIREBASE_CONFIG = firebaseConfig;
     return false;
   }
 
+  function getTodayDateStr(){
+    return new Date().toLocaleDateString("en-US", { month:"short", day:"numeric", year:"numeric" });
+  }
+
+  function getTodayBest(){
+    try {
+      const stored = JSON.parse(localStorage.getItem("neonTodayBest") || "{}");
+      if (stored.date === getTodayDateStr()) return stored.best || 0;
+      if (stored.date) localStorage.removeItem("neonTodayBest"); // clear stale entry
+      return 0;
+    } catch(e){ return 0; }
+  }
+
+  function saveTodayBest(score){
+    const today = getTodayDateStr();
+    const current = getTodayBest();
+    if (score > current){
+      localStorage.setItem("neonTodayBest", JSON.stringify({ date: today, best: score }));
+    }
+  }
+
   function renderLeaderboard(loading){
     const lbYourScoreEl = document.getElementById("lbYourScore");
-    lbYourScoreEl.textContent = lbPendingScore > 0 ? `Your last run: ${lbPendingScore.toLocaleString()}` : "";
+    if (lbPendingScore > 0){
+      lbYourScoreEl.textContent = `Your last run: ${lbPendingScore.toLocaleString()}`;
+    } else if (lbCategory === "today"){
+      const tb = getTodayBest();
+      lbYourScoreEl.textContent = tb > 0 ? `Today's best: ${tb.toLocaleString()}` : "";
+    } else {
+      lbYourScoreEl.textContent = state.best > 0 ? `Your best: ${state.best.toLocaleString()}` : "";
+    }
     leaderboardListEl.innerHTML = "";
 
     if (loading){
@@ -5907,10 +5944,27 @@ const FIREBASE_CONFIG = firebaseConfig;
       }
       return;
     }
-    // Apply category filter
-    let filtered = lbEntries;
-    if (lbCategory === "today") filtered = lbEntries.filter(e => isToday(e.date));
-    else if (lbCategory === "thisweek") filtered = lbEntries.filter(e => isThisWeek(e.date));
+    // Apply category filter and deduplicate by uid (keep best score per user)
+    let filtered;
+    if (lbCategory === "today"){
+      const todayEntries = lbEntries.filter(e => isToday(e.date));
+      const seen = new Set();
+      filtered = todayEntries.filter(e => {
+        if (!e.uid) return true;
+        if (seen.has(e.uid)) return false;
+        seen.add(e.uid); return true;
+      });
+    } else if (lbCategory === "thisweek"){
+      filtered = lbEntries.filter(e => isThisWeek(e.date));
+    } else {
+      // alltime — deduplicate by uid, keep highest score (array is sorted desc)
+      const seen = new Set();
+      filtered = lbEntries.filter(e => {
+        if (!e.uid) return true;
+        if (seen.has(e.uid)) return false;
+        seen.add(e.uid); return true;
+      });
+    }
     if (!filtered.length){
       leaderboardListEl.innerHTML = '<div class="lb-empty">No entries for this period.</div>';
       return;
@@ -6667,11 +6721,15 @@ const FIREBASE_CONFIG = firebaseConfig;
 
   function closeLbModal(){
     lbModalEl.classList.remove("active");
+    lbPendingIsNewAllTimeBest = false;
+    lbPendingIsNewTodayBest = false;
   }
 
   function submitLbEntry(){
     const name = (lbNameInputEl.value.trim() || "Anonymous").slice(0, 24);
     const score = lbPendingScore;
+    const isNewAllTime = lbPendingIsNewAllTimeBest;
+    const isNewToday = lbPendingIsNewTodayBest;
     const dateStr = new Date().toLocaleDateString("en-US", { month:"short", day:"numeric", year:"numeric" });
     closeLbModal();
     sfxClick();
@@ -6688,28 +6746,36 @@ const FIREBASE_CONFIG = firebaseConfig;
         entry.photo = photo;
       }
       if (lbDB){
-        // If logged in, check if user already has an entry on the leaderboard
         if (authUser && authUser.emailVerified){
-          let existingIdx = lbEntries.findIndex(e => e.uid === authUser.uid);
-          if (existingIdx >= 0){
-            // User already has an entry — only update if new score is better
-            if (score > lbEntries[existingIdx].score){
+          if (isNewAllTime){
+            // New all-time best: lbEntries is sorted desc, so first match is user's highest entry
+            let existingIdx = lbEntries.findIndex(e => e.uid === authUser.uid);
+            if (existingIdx >= 0){
               const fbKey = lbEntries[existingIdx].fbKey;
               if (fbKey){
-                // Update existing entry in Firebase
                 lbDB.ref("leaderboard/" + fbKey).update(entry).catch(() => {});
-                // Update local cache
-                lbEntries[existingIdx] = {...entry, fbKey: fbKey};
+                lbEntries[existingIdx] = {...entry, fbKey};
               }
+            } else {
+              lbDB.ref("leaderboard").push(entry).catch(() => {});
+              lbEntries.push(entry);
             }
-          } else {
-            // New entry for this user
-            lbDB.ref("leaderboard").push(entry).catch(() => {});
-            // Add to local cache
-            lbEntries.push(entry);
+          } else if (isNewToday){
+            // New today's best but not all-time: create/update a separate today entry
+            let todayIdx = lbEntries.findIndex(e => e.uid === authUser.uid && isToday(e.date));
+            if (todayIdx >= 0){
+              const fbKey = lbEntries[todayIdx].fbKey;
+              if (fbKey){
+                lbDB.ref("leaderboard/" + fbKey).update(entry).catch(() => {});
+                lbEntries[todayIdx] = {...entry, fbKey};
+              }
+            } else {
+              lbDB.ref("leaderboard").push(entry).catch(() => {});
+              lbEntries.push(entry);
+            }
           }
         } else {
-          // Guest (not logged in) — always create new entry
+          // Guest (not logged in) — create new entry
           lbDB.ref("leaderboard").push(entry).catch(() => {});
           lbEntries.push(entry);
         }
@@ -6730,7 +6796,9 @@ const FIREBASE_CONFIG = firebaseConfig;
   }
 
   // Leaderboard hook: show submit modal after game over.
-  function submitScore(score){
+  function submitScore(score, isNewAllTimeBest, isNewTodayBest){
+    lbPendingIsNewAllTimeBest = !!isNewAllTimeBest;
+    lbPendingIsNewTodayBest = !!isNewTodayBest;
     showLbModal(score);
   }
 
@@ -7317,6 +7385,7 @@ const FIREBASE_CONFIG = firebaseConfig;
       if (!confirm("Delete best score?")) return;
       state.best = 0;
       localStorage.removeItem("neonBest");
+      localStorage.removeItem("neonTodayBest");
       bestEl.textContent = 0;
       state.uiBest = 0;
       sfxClick();
@@ -7761,7 +7830,7 @@ const FIREBASE_CONFIG = firebaseConfig;
   document.getElementById("resetAllBtn").addEventListener("click", (e) => {
     e.stopPropagation();
     if (!confirm("Reset EVERYTHING? This deletes your best score, settings, progress, and all data.")) return;
-    ["neonProgress","neonBest","neonSettings","neonTutSeen","neonMuted"].forEach(k => localStorage.removeItem(k));
+    ["neonProgress","neonBest","neonTodayBest","neonSettings","neonTutSeen","neonMuted"].forEach(k => localStorage.removeItem(k));
     location.reload();
   });
   powerupHelpEl.addEventListener("click", (e) => {
