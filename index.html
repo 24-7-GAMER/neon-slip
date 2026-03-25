@@ -6657,9 +6657,11 @@ const FIREBASE_CONFIG = firebaseConfig;
     document.querySelectorAll(".friends-tab-content").forEach(el => {
       el.classList.toggle("active", el.dataset.content === tab);
     });
+    if (friendsReqMsgEl) setFriendsStatus(friendsReqMsgEl, "", false);
+    if (friendsBoardMsgEl) setFriendsStatus(friendsBoardMsgEl, "", false);
+    if (speechMsgEl) setFriendsStatus(speechMsgEl, "", false);
     if (tab === "board") renderFriendsLeaderboard();
     if (tab === "speech"){
-      setFriendsStatus(speechMsgEl, "", false);
       if (speechCreateGroupAreaEl) speechCreateGroupAreaEl.style.display = "none";
       if (speechManageGroupAreaEl) speechManageGroupAreaEl.style.display = "none";
       refreshSpeechInbox(true).catch(() => {
@@ -6798,20 +6800,27 @@ const FIREBASE_CONFIG = firebaseConfig;
     }
     setFriendsStatus(friendsBoardMsgEl, "Loading friend leaderboard...", false);
     try {
-      const snaps = await Promise.all(uids.map(uid => lbDB.ref("users/" + uid + "/progress").once("value")));
-      const rows = snaps.map((snap, i) => {
-        const uid = uids[i];
-        const data = snap.val() || {};
+      const progressResults = await Promise.allSettled(uids.map(uid => lbDB.ref("users/" + uid + "/progress").once("value")));
+      const profileResults = await Promise.allSettled(uids.map(uid => lbDB.ref("publicProfiles/" + uid).once("value")));
+      
+      const rows = uids.map((uid, i) => {
+        let data = {};
+        if (progressResults[i].status === "fulfilled"){
+          data = progressResults[i].value.val() || {};
+        } else if (profileResults[i].status === "fulfilled"){
+          data = profileResults[i].value.val() || {};
+        }
         const known = uid === authUser.uid
           ? { name: getCurrentDisplayName(), photo: getAccountPhoto() }
           : (friendsMap[uid] || {});
         return {
           uid,
           name: known.name || data.displayName || uid,
-          photo: known.photo || data.profilePhoto || "",
+          photo: known.photo || data.photo || "",
           score: +data.best || 0
         };
       }).sort((a, b) => b.score - a.score);
+      
       friendsLeaderboardListEl.innerHTML = rows.map((r, idx) => `
         <div class="friends-row">
           <div class="lb-rank">#${idx + 1}</div>
@@ -7302,20 +7311,21 @@ const FIREBASE_CONFIG = firebaseConfig;
       text: text.slice(0, 280),
       ts: Date.now()
     };
+    speechInputEl.value = "";
     try {
       await lbDB.ref("neonSpeech/" + threadId).push(payload);
       await lbDB.ref("neonSpeechThreads/" + threadId).update({
         updatedAt: payload.ts,
         lastMessage: payload
       });
-      speechInputEl.value = "";
       speechUnreadMap[threadId] = 0;
       updateSpeechUnreadBadges();
       refreshSpeechInbox(true);
       setFriendsStatus(speechMsgEl, "", false);
     } catch (err) {
       console.error("[Neon Speech] send failed:", err);
-      setFriendsStatus(speechMsgEl, "Could not send message.", true);
+      speechInputEl.value = text;
+      setFriendsStatus(speechMsgEl, "Message sync issue, please try again.", true);
     }
   }
 
