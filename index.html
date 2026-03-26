@@ -7317,19 +7317,21 @@ const FIREBASE_CONFIG = firebaseConfig;
     speechInputEl.value = "";
     try {
       await lbDB.ref("neonSpeech/" + threadId).push(payload);
-      await lbDB.ref("neonSpeechThreads/" + threadId).update({
-        updatedAt: payload.ts,
-        lastMessage: payload
-      });
-      speechUnreadMap[threadId] = 0;
-      updateSpeechUnreadBadges();
-      refreshSpeechInbox(true);
-      setFriendsStatus(speechMsgEl, "", false);
     } catch (err) {
       console.error("[Neon Speech] send failed:", err);
       speechInputEl.value = text;
       setFriendsStatus(speechMsgEl, "Message sync issue, please try again.", true);
+      return;
     }
+    // Message sent — update thread metadata silently (non-critical)
+    lbDB.ref("neonSpeechThreads/" + threadId).update({
+      updatedAt: payload.ts,
+      lastMessage: payload
+    }).catch(err => console.warn("[Neon Speech] metadata update failed:", err));
+    speechUnreadMap[threadId] = 0;
+    updateSpeechUnreadBadges();
+    refreshSpeechInbox(true);
+    setFriendsStatus(speechMsgEl, "", false);
   }
 
   function openFriendsPanel(e){
@@ -7571,7 +7573,7 @@ const FIREBASE_CONFIG = firebaseConfig;
       const uid = authUser.uid;
       const todayBest = lbEntries.reduce((best, e) =>
         (e.uid === uid && isToday(e.date) && e.score > best) ? e.score : best, 0);
-      if (score <= todayBest) return;
+      if (score <= todayBest) { navigateToMainMenu(); return; }
     }
     showLbModal(score);
   }
