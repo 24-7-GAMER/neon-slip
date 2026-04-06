@@ -2432,6 +2432,9 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
 <script src="firebase-config.js"></script>
+<script>
+  window.__NEON_FIREBASE_DEFAULT_CONFIG__ = Object.assign({}, window.__NEON_FIREBASE_CONFIG__ || {});
+</script>
 <script src="firebase-config.local.js"></script>
 
 <audio id="menuMusic" src="menu.mp3" preload="auto" loop playsinline webkit-playsinline></audio>
@@ -2458,7 +2461,16 @@
   //      from firebase-config.example.js and fill in your values.
   // Leave databaseURL as "" in a local override to force local-only mode.
   // =====================================================================
-const firebaseConfig = window.__NEON_FIREBASE_CONFIG__ || {};
+const firebaseConfig = (() => {
+  const base = window.__NEON_FIREBASE_DEFAULT_CONFIG__ || {};
+  const local = window.__NEON_FIREBASE_CONFIG__ || {};
+  const merged = Object.assign({}, base, local);
+  const requiredKeys = ["apiKey", "authDomain", "projectId", "messagingSenderId", "appId"];
+  requiredKeys.forEach((key) => {
+    if (typeof local[key] === "string" && local[key].trim() === "") merged[key] = base[key] || "";
+  });
+  return merged;
+})();
 const FIREBASE_CONFIG = firebaseConfig;
   
   // =====================================================================

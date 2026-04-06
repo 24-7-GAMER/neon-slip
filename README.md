@@ -13,8 +13,8 @@ Local override setup:
 2. Fill in your Firebase web app config in `firebase-config.local.js`
 3. Keep `firebase-config.local.js` uncommitted (it is ignored by `.gitignore`)
 
-If your local override has an empty `apiKey`, Firebase is not initialized (auth/cloud features disabled).  
-If `apiKey` is set but `databaseURL` is empty, auth still works but leaderboard/cloud database features stay local-only.
+Local overrides are merged onto production defaults, and blank critical auth fields in local overrides (`apiKey`, `authDomain`, `projectId`, `messagingSenderId`, `appId`) no longer disable Firebase by accident.  
+If `databaseURL` is empty in a local override, auth still works but leaderboard/cloud database features stay local-only.
 
 Security note:
 - Firebase web API keys are client identifiers (not secrets), but should still be restricted in Firebase/Google Cloud console settings (allowed referrer domains + API restrictions).
