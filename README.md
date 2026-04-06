@@ -2,13 +2,18 @@
 
 ## Firebase config (hide keys from repository)
 
-This project now loads Firebase config from a local, gitignored file:
+This project loads Firebase config in two layers:
+
+1. `firebase-config.js` (committed): production defaults used by deployed builds
+2. `firebase-config.local.js` (gitignored): optional local override for development
+
+Local override setup:
 
 1. Copy `firebase-config.example.js` to `firebase-config.local.js`
 2. Fill in your Firebase web app config in `firebase-config.local.js`
 3. Keep `firebase-config.local.js` uncommitted (it is ignored by `.gitignore`)
 
-If `firebase-config.local.js` is empty, the game falls back to local-only mode.
+If your local override has an empty `apiKey`, the game falls back to local-only mode.
 
 ## Admin mode access
 
