@@ -2240,10 +2240,10 @@
 <div id="adminPasswordModal" class="lb-modal" style="z-index:65;">
   <div class="lb-modal-box" style="border-color:rgba(138,91,255,.5);box-shadow:0 0 40px rgba(138,91,255,.25);">
     <div class="title" style="color:var(--neon2);">⚡ Admin Mode</div>
-    <div class="hint" id="adminPasswordHint" style="margin-bottom:12px;">Admin mode requires a signed-in account with admin access.</div>
+    <div class="hint" id="adminAccessHint" style="margin-bottom:12px;">Admin mode requires a signed-in account with admin access.</div>
     <div id="adminPasswordError" style="color:var(--danger);font-size:11px;min-height:16px;margin:4px 0;letter-spacing:1px;"></div>
     <div class="lb-modal-actions">
-      <div class="btn" id="adminPasswordSubmit" style="border-color:rgba(138,91,255,.5);color:var(--neon2);">Open Account</div>
+      <div class="btn" id="adminAccessSubmit" style="border-color:rgba(138,91,255,.5);color:var(--neon2);">Open Account</div>
       <div class="btn" id="adminPasswordCancel">Cancel</div>
     </div>
   </div>
@@ -7754,7 +7754,8 @@ const FIREBASE_CONFIG = firebaseConfig;
         if (!authHasAdminClaim && adminMode) deactivateAdminMode();
         updateAdminButtonState();
       })
-      .catch(() => {
+      .catch((err) => {
+        console.warn("[Auth] Failed to refresh token for admin claim check:", err && (err.code || err.message || err));
         authHasAdminClaim = false;
         if (adminMode) deactivateAdminMode();
         updateAdminButtonState();
@@ -8105,7 +8106,7 @@ const FIREBASE_CONFIG = firebaseConfig;
   let adminHighlightIdx = -1; // entry index to scroll to after rendering leaderboard tab
 
   function openAdminPasswordPrompt(){
-    const hint = document.getElementById("adminPasswordHint");
+    const hint = document.getElementById("adminAccessHint");
     const err = document.getElementById("adminPasswordError");
     if (hint){
       hint.textContent = authUser
@@ -9227,7 +9228,7 @@ const FIREBASE_CONFIG = firebaseConfig;
       openAdminPasswordPrompt();
     }
   });
-  document.getElementById("adminPasswordSubmit").addEventListener("click", (e) => {
+  document.getElementById("adminAccessSubmit").addEventListener("click", (e) => {
     e.stopPropagation();
     submitAdminPassword();
   });
