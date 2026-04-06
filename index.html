@@ -2466,9 +2466,10 @@ const firebaseConfig = (() => {
   const local = window.__NEON_FIREBASE_CONFIG__ || {};
   const merged = Object.assign({}, base, local);
   const hasNonEmptyString = (value) => typeof value === "string" && value.trim() !== "";
+  const isExplicitBlankString = (value) => typeof value === "string" && value.trim() === "";
   const requiredKeys = ["apiKey", "authDomain", "projectId", "messagingSenderId", "appId"];
   requiredKeys.forEach((key) => {
-    if (typeof local[key] === "string" && local[key].trim() === "" && hasNonEmptyString(base[key])) {
+    if (isExplicitBlankString(local[key]) && hasNonEmptyString(base[key])) {
       merged[key] = base[key];
     }
   });
