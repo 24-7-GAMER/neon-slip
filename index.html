@@ -2240,7 +2240,7 @@
 <div id="adminPasswordModal" class="lb-modal" style="z-index:65;">
   <div class="lb-modal-box" style="border-color:rgba(138,91,255,.5);box-shadow:0 0 40px rgba(138,91,255,.25);">
     <div class="title" style="color:var(--neon2);">⚡ Admin Mode</div>
-    <div class="hint" id="adminAccessHint" style="margin-bottom:12px;">Admin mode requires a signed-in account with admin access.</div>
+    <div class="hint" id="adminAccessHint" style="margin-bottom:12px;">Sign in with an account that has admin access. If needed, contact the game administrator.</div>
     <div id="adminPasswordError" style="color:var(--danger);font-size:11px;min-height:16px;margin:4px 0;letter-spacing:1px;"></div>
     <div class="lb-modal-actions">
       <div class="btn" id="adminAccessSubmit" style="border-color:rgba(138,91,255,.5);color:var(--neon2);">Continue</div>
@@ -7755,8 +7755,8 @@ const FIREBASE_CONFIG = firebaseConfig;
         updateAdminButtonState();
       })
       .catch((err) => {
-        console.warn("[Auth] Failed to refresh token for admin claim check.");
-        if (err && (err.code || err.message)) console.warn("[Auth] Claim check detail:", err.code || err.message);
+        const detail = err && (err.code || err.message);
+        console.warn("[Auth] Failed to refresh token for admin claim check" + (detail ? ": " + detail : "."));
         authHasAdminClaim = false;
         if (adminMode) deactivateAdminMode();
         updateAdminButtonState();
