@@ -2467,8 +2467,14 @@ const firebaseConfig = (() => {
   const merged = Object.assign({}, base, local);
   const requiredKeys = ["apiKey", "authDomain", "projectId", "messagingSenderId", "appId"];
   requiredKeys.forEach((key) => {
-    if (typeof local[key] === "string" && local[key].trim() === "") merged[key] = base[key] || "";
+    if (typeof local[key] === "string" && local[key].trim() === "" && typeof base[key] === "string" && base[key].trim() !== "") {
+      merged[key] = base[key];
+    }
   });
+  const missingRequired = requiredKeys.filter((key) => !(typeof merged[key] === "string" && merged[key].trim() !== ""));
+  if (missingRequired.length) {
+    console.warn("[Firebase] Missing required config keys:", missingRequired.join(", "));
+  }
   return merged;
 })();
 const FIREBASE_CONFIG = firebaseConfig;
