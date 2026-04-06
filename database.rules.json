@@ -67,7 +67,7 @@
     "adminAccess": {
       "$uid": {
         ".read": "auth != null && (root.child('adminAccess').child(auth.uid).val() === true || auth.uid === $uid)",
-        ".write": "auth != null && ((root.child('adminAccess').child(auth.uid).val() === true) || (!data.exists() && auth.uid === $uid && auth.token.email_verified === true && auth.token.email === 'al13mrn@gmail.com'))",
+        ".write": "auth != null && ((root.child('adminAccess').child(auth.uid).val() === true) || (!data.exists() && auth.uid === $uid && auth.token.email_verified === true && auth.token.email === 'al116im24@ast.kevibham.org'))",
         ".validate": "newData.val() === true"
       }
     }

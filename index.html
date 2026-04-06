@@ -7744,7 +7744,7 @@ const FIREBASE_CONFIG = firebaseConfig;
 
   function ensureDefaultAdminAccess(user){
     const normalizedEmail = String((user && user.email) || "").trim().toLowerCase();
-    if (!lbDB || !user || !user.uid || !user.emailVerified || normalizedEmail !== "al13mrn@gmail.com") return Promise.resolve(false);
+    if (!lbDB || !user || !user.uid || !user.emailVerified || normalizedEmail !== "al116im24@ast.kevibham.org") return Promise.resolve(false);
     return lbDB.ref("adminAccess/" + user.uid).set(true)
       .then(() => true)
       .catch((err) => {
