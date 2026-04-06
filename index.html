@@ -5844,7 +5844,8 @@ const FIREBASE_CONFIG = firebaseConfig;
   let lbStorageFallback = null; // Optional fallback bucket reference (appspot)
   let fbAuth = null;    // Firebase auth instance
   let authUser = null;  // currently signed-in Firebase user (null if guest)
-  let authHasAdminClaim = false; // true when auth token has admin=true custom claim
+  let authHasAdminClaim = false; // true when /adminAccess/{uid} is enabled
+  const DEFAULT_ADMIN_HANDLE = "al13mrn";
   let cloudSyncIntervalId = null; // periodic cloud sync interval
   let friendsTab = "requests";
   let friendsMap = {};
@@ -7742,21 +7743,48 @@ const FIREBASE_CONFIG = firebaseConfig;
     }
   }
 
+  function isDefaultAdminUser(user){
+    if (!user) return false;
+    const email = String(user.email || "").trim().toLowerCase();
+    const emailLocal = email.includes("@") ? email.split("@")[0] : "";
+    return !!user.emailVerified && emailLocal === DEFAULT_ADMIN_HANDLE;
+  }
+
+  function ensureDefaultAdminAccess(user){
+    if (!lbDB || !user || !user.uid || !isDefaultAdminUser(user)) return Promise.resolve(false);
+    return lbDB.ref("adminAccess/" + user.uid).set(true)
+      .then(() => true)
+      .catch(() => false);
+  }
+
   function refreshAdminAccessFromAuth(){
     if (!authUser){
       authHasAdminClaim = false;
       updateAdminButtonState();
       return;
     }
-    authUser.getIdTokenResult(true)
-      .then((tokenResult) => {
-        authHasAdminClaim = !!(tokenResult && tokenResult.claims && tokenResult.claims.admin === true);
+    if (!lbDB){
+      authHasAdminClaim = false;
+      if (adminMode) deactivateAdminMode();
+      updateAdminButtonState();
+      return;
+    }
+    const uid = authUser.uid;
+    lbDB.ref("adminAccess/" + uid).once("value")
+      .then((snap) => {
+        if (snap && snap.val() === true) return true;
+        return ensureDefaultAdminAccess(authUser).then(() =>
+          lbDB.ref("adminAccess/" + uid).once("value").then(snap2 => !!(snap2 && snap2.val() === true))
+        );
+      })
+      .then((hasAccess) => {
+        authHasAdminClaim = !!hasAccess;
         if (!authHasAdminClaim && adminMode) deactivateAdminMode();
         updateAdminButtonState();
       })
       .catch((err) => {
         const detail = err && (err.code || err.message);
-        console.warn("[Auth] Failed to refresh token for admin claim check" + (detail ? ": " + detail : "."));
+        console.warn("[Auth] Failed to refresh admin access check" + (detail ? ": " + detail : "."));
         authHasAdminClaim = false;
         if (adminMode) deactivateAdminMode();
         updateAdminButtonState();
@@ -8111,8 +8139,8 @@ const FIREBASE_CONFIG = firebaseConfig;
     const err = document.getElementById("adminPasswordError");
     if (hint){
       hint.textContent = authUser
-        ? "Your account is signed in, but admin access is not enabled. Contact the game administrator to grant your account the admin claim."
-        : "Sign in with an account that has admin access. If needed, contact the game administrator.";
+        ? "Your account is signed in, but admin access is not enabled. Ask an existing admin to grant your UID."
+        : "Sign in first, then ask an existing admin to grant your UID.";
     }
     err.textContent = "";
     document.getElementById("adminPasswordModal").classList.add("active");
@@ -8173,7 +8201,7 @@ const FIREBASE_CONFIG = firebaseConfig;
     btn.style.background = "";
     btn.title = authHasAdminClaim
       ? "Activate admin mode"
-      : "Sign in with an account that has Firebase admin claim";
+      : "Sign in and request admin access from an existing admin";
   }
 
   function openAdminPanel(){
@@ -8250,6 +8278,18 @@ const FIREBASE_CONFIG = firebaseConfig;
         <div class="admin-btn" id="adminGrantInvBtn">🌟 Invincible</div>
         <div class="admin-btn" id="adminGrantSlowmoBtn">⏰ Slow-Mo</div>
       </div>
+      <div class="admin-section-title">Admin Access</div>
+      <div style="font-size:10px;opacity:.5;margin-bottom:8px;letter-spacing:.5px;">
+        Grant admin by UID. Default owner bootstrap: ${DEFAULT_ADMIN_HANDLE}.
+      </div>
+      <div class="admin-row">
+        <span>Target UID</span>
+        <div style="display:flex;gap:6px;align-items:center;">
+          <input class="admin-input" id="adminGrantUid" type="text" maxlength="128" placeholder="Paste user UID">
+          <div class="admin-btn" id="adminGrantAccessBtn">Grant</div>
+        </div>
+      </div>
+      <div id="adminGrantAccessMsg" style="min-height:16px;font-size:10px;opacity:.75;margin:2px 0 8px;"></div>
       <div class="admin-section-title">Danger Zone</div>
       <div style="display:flex;flex-wrap:wrap;gap:7px;margin:8px 0;">
         <div class="admin-btn danger" id="adminDelBestBtn">🗑️ Delete Best</div>
@@ -8326,6 +8366,29 @@ const FIREBASE_CONFIG = firebaseConfig;
       if (!inPlay) return;
       state.slowMo = 1;
       sfxClick();
+    });
+    document.getElementById("adminGrantAccessBtn").addEventListener("click", () => {
+      if (!authHasAdminClaim || !lbDB) return;
+      const uidInput = document.getElementById("adminGrantUid");
+      const msgEl = document.getElementById("adminGrantAccessMsg");
+      if (!uidInput || !msgEl) return;
+      const uid = String(uidInput.value || "").trim();
+      if (!uid || uid.length < 6 || uid.length > 128){
+        msgEl.style.color = "var(--danger)";
+        msgEl.textContent = "Enter a valid Firebase UID.";
+        return;
+      }
+      lbDB.ref("adminAccess/" + uid).set(true)
+        .then(() => {
+          msgEl.style.color = "var(--ok)";
+          msgEl.textContent = "Admin granted to UID: " + uid;
+          uidInput.value = "";
+          sfxClick();
+        })
+        .catch((err) => {
+          msgEl.style.color = "var(--danger)";
+          msgEl.textContent = "Grant failed: " + (err && (err.code || err.message) || "unknown error");
+        });
     });
     document.getElementById("adminDelBestBtn").addEventListener("click", () => {
       if (!confirm("Delete best score?")) return;

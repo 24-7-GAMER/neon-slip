@@ -12,17 +12,17 @@ If `firebase-config.local.js` is empty, the game falls back to local-only mode.
 
 ## Admin mode access
 
-Admin mode no longer uses a client-side password.
+Admin mode does **not** use a client-side password.
 
-Access is granted only when the signed-in Firebase Auth user has a custom claim:
+Access is controlled in Realtime Database at:
 
-- claim key: `admin`
-- claim value: `true`
+- path: `adminAccess/{uid}`
+- value: `true`
 
-Example using Firebase Admin SDK:
+How it works:
 
-```js
-await admin.auth().setCustomUserClaims(uid, { admin: true });
-```
+- the default owner bootstrap is the first signed-in verified account with email local-part `al13mrn` (for example `al13mrn@gmail.com`)
+- once signed in, that owner account is auto-granted in `adminAccess/{uid}`
+- any current admin can grant another user by UID from the in-game Admin panel
 
-After setting the claim, the user should sign out/in (or refresh token) to activate access.
+No Firebase custom-claim or Admin SDK step is required.

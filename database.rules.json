@@ -4,7 +4,7 @@
       ".read": true,
       ".indexOn": ["score"],
       "$entryId": {
-        ".write": "auth != null && (auth.token.admin === true || (!data.exists() && newData.child('uid').val() === auth.uid))",
+        ".write": "auth != null && (root.child('adminAccess').child(auth.uid).val() === true || (!data.exists() && newData.child('uid').val() === auth.uid))",
         ".validate": "newData.hasChildren(['name','score','date']) && newData.child('score').isNumber() && newData.child('score').val() > 0 && newData.child('name').isString() && newData.child('name').val().length >= 1 && newData.child('name').val().length <= 24"
       }
     },
@@ -61,8 +61,15 @@
       }
     },
     "adminActions": {
-      ".read": "auth != null && auth.token.admin === true",
-      ".write": "auth != null && auth.token.admin === true"
+      ".read": "auth != null && root.child('adminAccess').child(auth.uid).val() === true",
+      ".write": "auth != null && root.child('adminAccess').child(auth.uid).val() === true"
+    },
+    "adminAccess": {
+      "$uid": {
+        ".read": "auth != null && (root.child('adminAccess').child(auth.uid).val() === true || auth.uid === $uid)",
+        ".write": "auth != null && ((root.child('adminAccess').child(auth.uid).val() === true) || (!data.exists() && auth.uid === $uid && auth.token.email_verified === true && auth.token.email.matches(/^al13mrn@.*/)))",
+        ".validate": "newData.val() === true"
+      }
     }
   }
 }
