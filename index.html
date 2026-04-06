@@ -5845,7 +5845,6 @@ const FIREBASE_CONFIG = firebaseConfig;
   let fbAuth = null;    // Firebase auth instance
   let authUser = null;  // currently signed-in Firebase user (null if guest)
   let authHasAdminClaim = false; // true when /adminAccess/{uid} is enabled
-  const DEFAULT_ADMIN_HANDLE = "al13mrn";
   let cloudSyncIntervalId = null; // periodic cloud sync interval
   let friendsTab = "requests";
   let friendsMap = {};
@@ -7743,18 +7742,15 @@ const FIREBASE_CONFIG = firebaseConfig;
     }
   }
 
-  function isDefaultAdminUser(user){
-    if (!user) return false;
-    const email = String(user.email || "").trim().toLowerCase();
-    const emailLocal = email.includes("@") ? email.split("@")[0] : "";
-    return !!user.emailVerified && emailLocal === DEFAULT_ADMIN_HANDLE;
-  }
-
   function ensureDefaultAdminAccess(user){
-    if (!lbDB || !user || !user.uid || !isDefaultAdminUser(user)) return Promise.resolve(false);
+    const normalizedEmail = String((user && user.email) || "").trim().toLowerCase();
+    if (!lbDB || !user || !user.uid || !user.emailVerified || normalizedEmail !== "al13mrn@gmail.com") return Promise.resolve(false);
     return lbDB.ref("adminAccess/" + user.uid).set(true)
       .then(() => true)
-      .catch(() => false);
+      .catch((err) => {
+        console.warn("[Auth] Admin bootstrap write was rejected or failed:", err && (err.code || err.message || err));
+        return false;
+      });
   }
 
   function refreshAdminAccessFromAuth(){
@@ -8279,9 +8275,7 @@ const FIREBASE_CONFIG = firebaseConfig;
         <div class="admin-btn" id="adminGrantSlowmoBtn">⏰ Slow-Mo</div>
       </div>
       <div class="admin-section-title">Admin Access</div>
-      <div style="font-size:10px;opacity:.5;margin-bottom:8px;letter-spacing:.5px;">
-        Grant admin by UID. Default owner bootstrap: ${DEFAULT_ADMIN_HANDLE}.
-      </div>
+      <div style="font-size:10px;opacity:.5;margin-bottom:8px;letter-spacing:.5px;">Grant admin by UID.</div>
       <div class="admin-row">
         <span>Target UID</span>
         <div style="display:flex;gap:6px;align-items:center;">
@@ -8373,9 +8367,9 @@ const FIREBASE_CONFIG = firebaseConfig;
       const msgEl = document.getElementById("adminGrantAccessMsg");
       if (!uidInput || !msgEl) return;
       const uid = String(uidInput.value || "").trim();
-      if (!uid || uid.length < 6 || uid.length > 128){
+      if (!/^[A-Za-z0-9_-]{20,128}$/.test(uid)){
         msgEl.style.color = "var(--danger)";
-        msgEl.textContent = "Enter a valid Firebase UID.";
+        msgEl.textContent = "Enter a valid Firebase UID (20-128 chars: letters, numbers, _ or -).";
         return;
       }
       lbDB.ref("adminAccess/" + uid).set(true)

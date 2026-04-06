@@ -21,7 +21,7 @@ Access is controlled in Realtime Database at:
 
 How it works:
 
-- the default owner bootstrap is the first signed-in verified account with email local-part `al13mrn` (for example `al13mrn@gmail.com`)
+- the default owner bootstrap is the verified account `al13mrn@gmail.com` (enforced by DB rules)
 - once signed in, that owner account is auto-granted in `adminAccess/{uid}`
 - any current admin can grant another user by UID from the in-game Admin panel
 
