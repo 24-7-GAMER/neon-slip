@@ -2243,7 +2243,7 @@
     <div class="hint" id="adminAccessHint" style="margin-bottom:12px;">Admin mode requires a signed-in account with admin access.</div>
     <div id="adminPasswordError" style="color:var(--danger);font-size:11px;min-height:16px;margin:4px 0;letter-spacing:1px;"></div>
     <div class="lb-modal-actions">
-      <div class="btn" id="adminAccessSubmit" style="border-color:rgba(138,91,255,.5);color:var(--neon2);">Open Account</div>
+      <div class="btn" id="adminAccessSubmit" style="border-color:rgba(138,91,255,.5);color:var(--neon2);">Continue</div>
       <div class="btn" id="adminPasswordCancel">Cancel</div>
     </div>
   </div>
@@ -7755,7 +7755,8 @@ const FIREBASE_CONFIG = firebaseConfig;
         updateAdminButtonState();
       })
       .catch((err) => {
-        console.warn("[Auth] Failed to refresh token for admin claim check:", err && (err.code || err.message || err));
+        console.warn("[Auth] Failed to refresh token for admin claim check.");
+        if (err && (err.code || err.message)) console.warn("[Auth] Claim check detail:", err.code || err.message);
         authHasAdminClaim = false;
         if (adminMode) deactivateAdminMode();
         updateAdminButtonState();
@@ -8110,8 +8111,8 @@ const FIREBASE_CONFIG = firebaseConfig;
     const err = document.getElementById("adminPasswordError");
     if (hint){
       hint.textContent = authUser
-        ? "Your account is signed in. Admin access is granted only to accounts with the admin claim."
-        : "Sign in with an account that has admin access.";
+        ? "Your account is signed in, but admin access is not enabled. Contact the game administrator to grant your account the admin claim."
+        : "Sign in with an account that has admin access. If needed, contact the game administrator.";
     }
     err.textContent = "";
     document.getElementById("adminPasswordModal").classList.add("active");

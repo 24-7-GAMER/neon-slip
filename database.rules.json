@@ -4,7 +4,7 @@
       ".read": true,
       ".indexOn": ["score"],
       "$entryId": {
-        ".write": "!data.exists() || (auth != null && (auth.token.admin === true || (!data.child('uid').exists() && newData.child('uid').val() === auth.uid) || data.child('uid').val() === auth.uid))",
+        ".write": "auth != null && (auth.token.admin === true || (!data.exists() && newData.child('uid').val() === auth.uid) || data.child('uid').val() === auth.uid)",
         ".validate": "newData.hasChildren(['name','score','date']) && newData.child('score').isNumber() && newData.child('score').val() > 0 && newData.child('name').isString() && newData.child('name').val().length >= 1 && newData.child('name').val().length <= 24"
       }
     },
