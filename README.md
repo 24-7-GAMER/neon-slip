@@ -1,5 +1,13 @@
 # Neon Slip
 
+## Ownership
+
+Original game and website by **Ali Imran**.  
+Copyright &copy; Ali Imran 2025-2026. All rights reserved.
+
+The game, branding, visuals, and site presentation are protected.  
+See [license.html](license.html) and [terms.html](terms.html) for usage restrictions.
+
 ## Firebase config (hide keys from repository)
 
 This project loads Firebase config in two layers:

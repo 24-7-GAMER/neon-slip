@@ -14,6 +14,11 @@
   - Added ready-go intro, combo/near-miss UI, and richer WebAudio SFX.
   - Added cached speedlines/noise for performance and extra polish.
 -->
+<!--
+  OWNERSHIP NOTICE:
+  Neon Slip (game, branding, design, and site presentation) is original work by Ali Imran.
+  Copyright © Ali Imran 2025–2026. All rights reserved.
+-->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -21,7 +26,19 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="format-detection" content="telephone=no">
-<title>Neon Slip</title>
+<title>Neon Slip | Endless Runner Game by Ali Imran</title>
+<meta name="description" content="Neon Slip is a fast-paced endless runner where speed never stops increasing. Play now, chase leaderboard scores, and challenge your friends.">
+<meta name="author" content="Ali Imran">
+<meta name="copyright" content="Ali Imran 2025-2026">
+<meta name="keywords" content="Neon Slip, endless runner, browser game, indie game, leaderboard game, Ali Imran">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Neon Slip | Endless Runner Game by Ali Imran">
+<meta property="og:description" content="A fast-paced endless runner where speed never stops increasing.">
+<meta property="og:url" content="https://neonslip.me/">
+<meta property="og:image" content="https://neonslip.me/shard.png">
+<meta property="og:site_name" content="Neon Slip">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#06070b">
 <link rel="icon" type="image/png" href="shard.png">
 <style>
   :root{
@@ -179,17 +196,17 @@
   .btn:active{ transform: translateY(0px) scale(0.97); }
   .btn-start{
     display:block; width:100%; text-align:center;
-    font-size:1.5rem; font-weight:700; letter-spacing:.14em;
-    padding:22px 48px; margin-top:16px;
+    font-size:1.15rem; font-weight:700; letter-spacing:.12em;
+    padding:14px 26px; margin-top:10px;
     border:2px solid rgba(25,247,255,.9);
     background: linear-gradient(135deg, rgba(25,247,255,.22) 0%, rgba(138,91,255,.18) 100%);
-    box-shadow: 0 0 30px rgba(25,247,255,.55), 0 0 70px rgba(25,247,255,.25), inset 0 1px 0 rgba(25,247,255,.4);
+    box-shadow: 0 0 18px rgba(25,247,255,.42), 0 0 36px rgba(25,247,255,.2), inset 0 1px 0 rgba(25,247,255,.35);
     animation: startBtnPulse 2s ease-in-out infinite;
     text-shadow: 0 0 12px rgba(25,247,255,.9), 0 0 24px rgba(25,247,255,.5);
   }
   .btn-start:hover{
-    transform: translateY(-3px);
-    box-shadow: 0 0 55px rgba(25,247,255,.75), 0 0 110px rgba(25,247,255,.45), 0 6px 22px rgba(25,247,255,.3), inset 0 1px 0 rgba(25,247,255,.55);
+    transform: translateY(-2px);
+    box-shadow: 0 0 34px rgba(25,247,255,.62), 0 0 66px rgba(25,247,255,.35), 0 4px 14px rgba(25,247,255,.22), inset 0 1px 0 rgba(25,247,255,.45);
   }
   .btn-start:active{ transform: translateY(0px) scale(0.97); }
   @keyframes startBtnPulse{
@@ -319,8 +336,132 @@
     background: linear-gradient(160deg, rgba(12,20,38,.97), rgba(6,10,20,.97));
     border:1px solid rgba(25,247,255,.4);
     box-shadow: 0 0 36px rgba(25,247,255,.2), 0 0 60px rgba(138,91,255,.12), inset 0 1px 0 rgba(25,247,255,.2);
-    padding:20px 22px; border-radius:16px; min-width:260px;
+    padding:20px 22px; border-radius:16px; min-width:0;
+    width:min(94vw, 540px);
     max-height:88vh; overflow-y:auto;
+  }
+  .credits-panel, .legal-consent-panel{
+    position:fixed; inset:0;
+    display:flex; align-items:center; justify-content:center;
+    background: rgba(4,6,12,.75);
+    pointer-events:none; opacity:0;
+    transition: opacity .25s ease;
+    z-index:28;
+  }
+  .credits-panel.active, .legal-consent-panel.active{
+    pointer-events:auto; opacity:1;
+  }
+  .credits-box, .legal-consent-box{
+    background: linear-gradient(160deg, rgba(12,20,38,.98), rgba(6,10,20,.98));
+    border:1px solid rgba(25,247,255,.4);
+    box-shadow: 0 0 40px rgba(25,247,255,.22), 0 0 64px rgba(138,91,255,.16), inset 0 1px 0 rgba(25,247,255,.2);
+    padding:20px 22px; border-radius:16px;
+    width:min(92vw, 520px);
+    max-height:88vh; overflow-y:auto;
+    text-align:left;
+  }
+  .credits-copy{
+    font-size:12px;
+    line-height:1.55;
+    opacity:.92;
+    margin-bottom:10px;
+  }
+  .credits-link-list{
+    display:grid; gap:8px;
+    margin:10px 0;
+  }
+  .credits-link{
+    display:block;
+    text-decoration:none;
+    border:1px solid rgba(25,247,255,.35);
+    border-radius:10px;
+    background: rgba(25,247,255,.06);
+    color:var(--text);
+    padding:9px 11px;
+    font-size:12px;
+    letter-spacing:.8px;
+    text-transform:uppercase;
+    transition: all .15s ease;
+  }
+  .credits-link:hover{
+    color:var(--neon);
+    border-color:rgba(25,247,255,.7);
+    box-shadow:0 0 12px rgba(25,247,255,.2);
+  }
+  .credits-contact{
+    margin-top:10px;
+    border-top:1px solid rgba(25,247,255,.2);
+    padding-top:10px;
+    font-size:11px;
+    letter-spacing:.6px;
+    text-transform:uppercase;
+    opacity:.88;
+  }
+  .credits-contact a{
+    color:var(--neon);
+    text-decoration:none;
+  }
+  .legal-consent-box{
+    text-align:center;
+    z-index:29;
+  }
+  .legal-consent-copy{
+    font-size:12px;
+    line-height:1.55;
+    margin:8px 0 10px;
+    opacity:.92;
+  }
+  .legal-links{
+    display:flex;
+    justify-content:center;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-bottom:10px;
+  }
+  .legal-links a{
+    text-decoration:none;
+    color:var(--neon);
+    border:1px solid rgba(25,247,255,.35);
+    border-radius:999px;
+    padding:6px 10px;
+    font-size:10px;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    background:rgba(25,247,255,.08);
+  }
+  .legal-links a:hover{
+    border-color:rgba(25,247,255,.7);
+  }
+  .legal-check{
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    text-align:left;
+    border:1px solid rgba(25,247,255,.22);
+    border-radius:10px;
+    background:rgba(25,247,255,.05);
+    padding:10px 12px;
+    margin:8px 0;
+    font-size:12px;
+    line-height:1.45;
+  }
+  .legal-check input{
+    margin-top:2px;
+    accent-color:#19f7ff;
+  }
+  .legal-error{
+    min-height:16px;
+    color:var(--danger);
+    font-size:11px;
+    letter-spacing:.8px;
+    margin-top:4px;
+  }
+  .legal-note{
+    font-size:10px;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    opacity:.75;
+    margin-top:8px;
   }
   .settings-row{
     display:flex; align-items:center; justify-content:space-between;
@@ -415,7 +556,10 @@
     background: linear-gradient(180deg, rgba(10,16,30,.95), rgba(6,10,20,.95));
     border:1px solid rgba(25,247,255,.35);
     box-shadow: 0 0 28px rgba(25,247,255,.25);
-    padding:18px 20px; border-radius:14px; min-width:280px;
+    padding:16px 18px; border-radius:14px; min-width:0;
+    width:min(92vw, 420px);
+    max-height:84vh;
+    overflow-y:auto;
     text-align:center;
   }
   .modifier-badge{
@@ -436,12 +580,14 @@
     background: linear-gradient(180deg, rgba(10,16,30,.98), rgba(6,10,20,.98));
     border:1px solid rgba(25,247,255,.45);
     box-shadow: 0 0 50px rgba(25,247,255,.35), 0 0 100px rgba(25,247,255,.12), inset 0 1px 0 rgba(25,247,255,.15);
-    padding:16px 20px; border-radius:14px; width:min(360px, 85vw);
+    padding:14px 14px 12px; border-radius:14px; width:min(92vw, 420px);
+    max-height:84vh;
+    overflow-y:auto;
     text-align:center;
     animation: slideshowGlow 3s ease-in-out infinite;
   }
   .slideshow-content{
-    min-height:140px; display:flex; flex-direction:column; justify-content:center; align-items:center;
+    min-height:clamp(96px, 22vh, 150px); display:flex; flex-direction:column; justify-content:center; align-items:center;
     animation: slideIn .4s ease;
   }
   @keyframes slideIn{
@@ -449,7 +595,7 @@
     100%{ opacity:1; transform: translateX(0); }
   }
   .mod-icon{
-    font-size:48px; margin:12px 0;
+    font-size:clamp(28px, 8vw, 44px); margin:8px 0;
     animation: modIconGlow 2s ease-in-out infinite;
   }
   @keyframes modIconGlow{
@@ -457,11 +603,11 @@
     50%{ filter: drop-shadow(0 0 22px rgba(138,91,255,.9)); }
   }
   .mod-desc{
-    font-size:13px; letter-spacing:1px; opacity:.85; margin:14px 0;
-    line-height:1.5;
+    font-size:clamp(11px, 2.4vw, 13px); letter-spacing:.8px; opacity:.9; margin:8px 0;
+    line-height:1.35;
   }
   .slideshow-progress{
-    display:flex; gap:8px; justify-content:center; margin:18px 0 14px;
+    display:flex; gap:8px; justify-content:center; margin:10px 0 8px;
   }
   .progress-dot{
     width:10px; height:10px; border-radius:50%;
@@ -482,10 +628,10 @@
     transform: scale(1.25);
   }
   .slideshow-nav{
-    display:flex; gap:12px; justify-content:center; margin-top:16px;
+    display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-top:8px;
   }
   .skip-text{
-    font-size:10px; opacity:.6; margin-top:12px; letter-spacing:1px;
+    font-size:10px; opacity:.7; margin-top:7px; letter-spacing:.8px;
   }
   @keyframes slideshowGlow{
     0%, 100%{ box-shadow: 0 0 50px rgba(25,247,255,.35), 0 0 100px rgba(25,247,255,.12), inset 0 1px 0 rgba(25,247,255,.15); }
@@ -913,26 +1059,32 @@
     background: linear-gradient(180deg, rgba(10,16,30,.98), rgba(6,10,20,.98));
     border:1px solid rgba(25,247,255,.35);
     box-shadow: 0 0 28px rgba(25,247,255,.25);
-    padding:18px 20px; border-radius:14px; width:min(480px, 88vw);
+    padding:14px 12px 12px; border-radius:14px; width:min(94vw, 520px);
+    max-height:84vh;
+    display:flex; flex-direction:column;
+    overflow:hidden;
   }
   .slides{
-    display:flex; gap:16px; overflow-x:auto; scroll-snap-type:x mandatory;
-    padding:12px 6px; scroll-behavior:smooth;
+    display:flex; gap:10px; overflow-x:auto; scroll-snap-type:x mandatory;
+    padding:8px 4px; scroll-behavior:smooth;
+    flex:1 1 auto; min-height:0;
     scrollbar-width:none;
   }
   .slides::-webkit-scrollbar{ display:none; }
   .slide{
-    min-width:min(400px, 74vw); max-width:min(400px, 74vw); scroll-snap-align:center;
+    min-width:min(360px, 78vw); max-width:min(360px, 78vw); scroll-snap-align:center;
     background:
       radial-gradient(110% 90% at 50% -10%, rgba(25,247,255,.14), rgba(25,247,255,0) 58%),
       linear-gradient(165deg, rgba(25,247,255,.09), rgba(138,91,255,.08) 55%, rgba(255,59,122,.06));
     border:1px solid rgba(25,247,255,.3);
     box-shadow: 0 0 20px rgba(25,247,255,.14), inset 0 0 24px rgba(25,247,255,.06);
-    border-radius:14px; padding:18px 16px 16px;
+    border-radius:14px; padding:12px 10px 10px;
+    max-height:min(50vh, 420px);
+    overflow-y:auto;
     text-transform:uppercase; letter-spacing:1px;
-    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    display:flex; flex-direction:column; align-items:center; justify-content:flex-start;
     text-align:center;
-    position:relative; overflow:hidden;
+    position:relative;
   }
   .slide::before{
     content:""; position:absolute; left:12%; right:12%; top:0; height:1px;
@@ -940,9 +1092,9 @@
     opacity:.8;
   }
   .slide h3{
-    margin:0 0 10px 0;
-    font-size:16px;
-    letter-spacing:2.5px;
+    margin:0 0 8px 0;
+    font-size:14px;
+    letter-spacing:2px;
     color:transparent;
     background: linear-gradient(90deg, rgba(25,247,255,1), rgba(138,91,255,1), rgba(25,247,255,1));
     -webkit-background-clip:text;
@@ -959,25 +1111,25 @@
     background: linear-gradient(90deg, rgba(25,247,255,0), rgba(25,247,255,.95), rgba(25,247,255,0));
   }
   .slide p{
-    margin:6px auto;
+    margin:4px auto;
     width:min(96%, 560px);
-    font-size:12px;
-    line-height:1.55;
+    font-size:11px;
+    line-height:1.4;
     opacity:.95;
     color:rgba(224,250,255,.97);
     text-shadow: 0 0 8px rgba(25,247,255,.2);
   }
   .slide p:first-of-type{
-    font-size:13px;
+    font-size:12px;
     font-weight:bold;
     letter-spacing:1.2px;
     color:rgba(236,255,255,1);
   }
   .slide .hint{
-    font-size:11px;
+    font-size:10px;
     width:min(96%, 560px);
-    margin:5px auto;
-    padding:6px 10px;
+    margin:4px auto;
+    padding:5px 8px;
     border-radius:10px;
     background: rgba(25,247,255,.08);
     border:1px solid rgba(25,247,255,.22);
@@ -985,14 +1137,17 @@
     color:rgba(204,246,255,.95);
   }
   @media (max-width:700px){
-    .slide{ min-width:min(340px, 80vw); max-width:min(340px, 80vw); padding:15px 12px 13px; }
-    .slide h3{ font-size:14px; letter-spacing:2px; }
-    .slide p{ font-size:11px; }
-    .slide p:first-of-type{ font-size:12px; }
-    .slide .hint{ font-size:10px; }
+    .intro-box{ width:min(96vw, 470px); max-height:86vh; }
+    .slide{ min-width:min(310px, 82vw); max-width:min(310px, 82vw); max-height:min(52vh, 380px); padding:10px 8px; }
+    .slide h3{ font-size:13px; letter-spacing:1.6px; }
+    .slide p{ font-size:10px; }
+    .slide p:first-of-type{ font-size:11px; }
+    .slide .hint{ font-size:9px; }
   }
   .slide-controls{
-    display:flex; align-items:center; justify-content:space-between; margin-top:8px;
+    display:flex; align-items:center; justify-content:space-between; margin-top:6px;
+    gap:8px;
+    flex-wrap:wrap;
   }
   .dots{ display:flex; gap:6px; }
   .dot{
@@ -1333,8 +1488,8 @@
     background: linear-gradient(160deg, rgba(14,8,30,.98), rgba(6,4,18,.98));
     border:1px solid rgba(138,91,255,.55);
     box-shadow: 0 0 50px rgba(138,91,255,.35), 0 0 100px rgba(138,91,255,.15), inset 0 1px 0 rgba(138,91,255,.3);
-    padding:28px 40px 24px; border-radius:16px;
-    width:min(96vw, 850px); max-height:88vh; min-height:400px;
+    padding:20px 20px 16px; border-radius:16px;
+    width:min(96vw, 850px); max-height:88vh; min-height:0; height:min(88vh, 760px);
     display:flex; flex-direction:column;
     position:relative; overflow:hidden;
   }
@@ -1446,6 +1601,10 @@
   .auth-input:focus{ border-color:var(--neon); }
   .auth-msg{ font-size:11px; letter-spacing:.5px; min-height:16px; margin:6px 0; text-align:center; }
   .auth-err{ color:var(--danger); }
+  #authBox{
+    width:min(96vw, 380px);
+    min-width:0 !important;
+  }
   .auth-ok{ color:#7dffb2; }
   .auth-link{
     font-size:11px; opacity:.6; text-align:center; margin-top:10px; cursor:pointer;
@@ -1599,10 +1758,10 @@
   }
   .boot-core{
     position:relative;
-    width:min(95vw, 1180px);
+    width:min(92vw, 980px);
     border:1px solid rgba(25,247,255,.35);
     border-radius:20px;
-    padding: clamp(20px, 4vw, 42px) clamp(16px, 4vw, 44px);
+    padding: clamp(16px, 3vw, 30px) clamp(14px, 3vw, 30px);
     background: linear-gradient(180deg, rgba(6,12,24,.86), rgba(4,8,16,.9));
     box-shadow:
       0 0 40px rgba(25,247,255,.22),
@@ -1643,8 +1802,8 @@
   }
   .boot-title{
     font-family: "Impact","Haettenschweiler","Arial Black",sans-serif;
-    font-size: clamp(42px, 8vw, 96px);
-    letter-spacing: clamp(4px, .9vw, 14px);
+    font-size: clamp(34px, 6.2vw, 76px);
+    letter-spacing: clamp(3px, .7vw, 10px);
     color: #b8fdff;
     text-transform: uppercase;
     text-shadow:
@@ -1667,7 +1826,7 @@
     transform: translateY(-3px) scale(.995);
   }
   .boot-stage-row{
-    width:min(94vw, 1000px);
+    width:min(90vw, 860px);
     display:grid;
     grid-template-columns: repeat(5, minmax(0, 1fr));
     gap:8px;
@@ -1698,8 +1857,8 @@
   }
   .boot-bar-wrap{
     position:relative;
-    width:min(94vw, 1000px);
-    height: clamp(36px, 6vh, 74px);
+    width:min(90vw, 860px);
+    height: clamp(30px, 4.6vh, 56px);
     border-radius: 999px;
     border: 2px solid rgba(25,247,255,.6);
     background: rgba(6,12,20,.92);
@@ -1730,7 +1889,7 @@
     mix-blend-mode: screen;
   }
   .boot-meta{
-    width:min(94vw, 1000px);
+    width:min(90vw, 860px);
     display:flex; justify-content:space-between; align-items:center;
     font-size:11px;
     letter-spacing:2px;
@@ -1739,7 +1898,7 @@
   }
   .boot-eta{ color:rgba(255,216,107,.95); text-shadow:0 0 8px rgba(255,216,107,.4); }
   .boot-diagnostics{
-    width:min(94vw, 1000px);
+    width:min(90vw, 860px);
     display:grid;
     grid-template-columns: 1.1fr .9fr;
     gap:12px;
@@ -1840,9 +1999,345 @@
     0%{ opacity:.45; transform: scale(.9); }
     100%{ opacity:1; transform: scale(1.2); }
   }
+  /* Site polish shell + ownership markers */
+  .site-shell{
+    position:fixed; inset:0;
+    display:flex; flex-direction:column; justify-content:space-between;
+    pointer-events:none;
+    z-index:4;
+    padding:
+      calc(var(--safe-top) + 10px)
+      calc(var(--safe-right) + 12px)
+      calc(var(--safe-bottom) + 10px)
+      calc(var(--safe-left) + 12px);
+  }
+  .site-topbar{
+    pointer-events:auto;
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    padding:10px 14px;
+    border-radius:14px;
+    border:1px solid rgba(25,247,255,.35);
+    background: linear-gradient(160deg, rgba(10,16,30,.9), rgba(6,10,20,.9));
+    box-shadow: 0 0 24px rgba(25,247,255,.18), inset 0 1px 0 rgba(25,247,255,.22);
+  }
+  .site-brand{
+    display:flex; align-items:center; gap:9px;
+    letter-spacing:1px; text-transform:uppercase;
+    color:#d9fcff;
+    min-width:0;
+  }
+  .site-brand-dot{
+    width:10px; height:10px; border-radius:50%;
+    background:#7dffb2;
+    box-shadow:0 0 10px rgba(125,255,178,.75);
+    flex-shrink:0;
+  }
+  .site-brand strong{
+    display:block;
+    font-size:13px;
+    color:var(--neon);
+    text-shadow:0 0 10px rgba(25,247,255,.5);
+  }
+  .site-brand span{
+    display:block;
+    font-size:10px;
+    opacity:.72;
+    white-space:nowrap;
+  }
+  .site-nav{
+    display:flex; align-items:center; justify-content:flex-end; gap:8px; flex-wrap:wrap;
+    pointer-events:auto;
+  }
+  .site-nav-link,
+  .site-nav-btn{
+    border:1px solid rgba(25,247,255,.33);
+    border-radius:999px;
+    background:rgba(25,247,255,.08);
+    color:var(--text);
+    text-decoration:none;
+    padding:7px 12px;
+    font-size:11px;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    cursor:pointer;
+    transition: all .16s ease;
+    font-family:inherit;
+  }
+  .site-nav-link:hover,
+  .site-nav-btn:hover{
+    color:var(--neon);
+    border-color:rgba(25,247,255,.7);
+    box-shadow:0 0 14px rgba(25,247,255,.28);
+    transform:translateY(-1px);
+  }
+  .site-footer{
+    pointer-events:auto;
+    display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
+    padding:10px 14px;
+    border-radius:14px;
+    border:1px solid rgba(25,247,255,.25);
+    background: linear-gradient(165deg, rgba(8,12,24,.85), rgba(4,8,16,.9));
+    box-shadow: 0 0 16px rgba(25,247,255,.12), inset 0 1px 0 rgba(25,247,255,.16);
+    font-size:11px;
+    letter-spacing:.8px;
+  }
+  .site-footer-main{
+    color:rgba(220,252,255,.86);
+  }
+  .site-footer-links{
+    display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+  }
+  .site-footer-links a{
+    color:rgba(25,247,255,.95);
+    text-decoration:none;
+    border-bottom:1px solid transparent;
+    transition: border-color .15s ease, color .15s ease;
+    text-transform:uppercase;
+    font-size:10px;
+    letter-spacing:1.2px;
+  }
+  .site-footer-links a:hover{
+    color:#bfffff;
+    border-bottom-color:rgba(25,247,255,.7);
+  }
+  .site-owner-mark{
+    position:fixed;
+    right:14px;
+    bottom:14px;
+    z-index:5;
+    pointer-events:none;
+    font-size:10px;
+    letter-spacing:1px;
+    color:rgba(205,248,255,.62);
+    text-shadow:0 0 8px rgba(25,247,255,.3);
+    padding:4px 8px;
+    border-radius:999px;
+    border:1px solid rgba(25,247,255,.22);
+    background:rgba(5,10,18,.5);
+  }
+  /* Start panel layout polish */
+  .start-panel{
+    width:min(88vw, 560px);
+    max-width:560px;
+    max-height:72vh;
+    overflow-y:auto;
+    padding:14px 12px 10px;
+    scrollbar-width:thin;
+    scrollbar-color:rgba(25,247,255,.35) transparent;
+  }
+  .start-panel::-webkit-scrollbar{ width:4px; }
+  .start-panel::-webkit-scrollbar-track{ background:transparent; }
+  .start-panel::-webkit-scrollbar-thumb{ background:rgba(25,247,255,.35); border-radius:4px; }
+  .start-panel::after{
+    display:none;
+  }
+  .start-panel .neon-title{
+    font-size: clamp(24px, 4.2vw, 36px);
+    letter-spacing:2px;
+    margin-bottom:3px;
+  }
+  .start-eyebrow{
+    margin:0 0 4px 0;
+    font-size:9px;
+    letter-spacing:1.4px;
+    text-transform:uppercase;
+    color:rgba(125,255,178,.95);
+    text-shadow:0 0 8px rgba(125,255,178,.4);
+  }
+  .start-tagline{
+    margin:4px auto 8px;
+    width:min(100%, 520px);
+    font-size:11px;
+    line-height:1.45;
+    color:rgba(225,252,255,.96);
+  }
+  .start-section-title{
+    margin:6px 0 4px;
+    font-size:10px;
+    letter-spacing:1.4px;
+    text-transform:uppercase;
+    color:var(--neon);
+    text-shadow:0 0 10px rgba(25,247,255,.45);
+  }
+  .start-action-grid{
+    display:grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap:6px;
+    margin-top:6px;
+  }
+  .start-action-grid .btn{
+    margin-top:0;
+    padding:8px 10px;
+    font-size:11px;
+  }
+  .start-action-grid .btn-start{
+    grid-column:1 / -1;
+    margin-top:0;
+    font-size:1rem;
+    letter-spacing:.08em;
+    padding:10px 12px;
+  }
+  .start-feature-grid{
+    margin-top:7px;
+    display:grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap:6px;
+    text-align:left;
+  }
+  .start-feature-card{
+    border:1px solid rgba(25,247,255,.2);
+    border-radius:12px;
+    padding:8px;
+    background: linear-gradient(155deg, rgba(25,247,255,.06), rgba(138,91,255,.08));
+    box-shadow: inset 0 1px 0 rgba(25,247,255,.2);
+  }
+  .start-feature-card h2{
+    margin:0 0 4px 0;
+    font-size:10px;
+    letter-spacing:1.1px;
+    text-transform:uppercase;
+    color:var(--neon);
+  }
+  .start-feature-card p{
+    margin:0 0 6px 0;
+    font-size:10px;
+    line-height:1.3;
+    opacity:.88;
+  }
+  .start-mini-btn{
+    width:100%;
+    margin-top:0;
+    text-align:center;
+    font-size:9px;
+    letter-spacing:.8px;
+    text-transform:uppercase;
+    padding:6px 8px;
+  }
+  .start-ownership{
+    margin-top:8px;
+    font-size:9px;
+    letter-spacing:.8px;
+    text-transform:uppercase;
+    color:rgba(210,252,255,.68);
+    border-top:1px solid rgba(25,247,255,.2);
+    padding-top:9px;
+  }
+  .lb-sidebar-subtitle{
+    font-size:10px;
+    letter-spacing:1.2px;
+    text-transform:uppercase;
+    color:rgba(215,249,255,.72);
+    text-align:center;
+    margin:-2px 0 8px 0;
+  }
+  .lb-sidebar-cta{
+    margin-top:10px;
+  }
+  .lb-sidebar-btn{
+    margin-top:0;
+    width:100%;
+    text-align:center;
+    font-size:10px;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    padding:8px 10px;
+  }
+  .boot-credit{
+    font-size:11px;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    color:rgba(215,249,255,.82);
+    text-shadow:0 0 10px rgba(25,247,255,.42);
+  }
+  .boot-copyright{
+    font-size:10px;
+    letter-spacing:1.4px;
+    text-transform:uppercase;
+    color:rgba(205,248,255,.7);
+    opacity:.92;
+  }
+  body[data-state="start"] .ui{
+    align-items:flex-start;
+    padding-top: calc(var(--safe-top) + 66px);
+    padding-bottom: calc(var(--safe-bottom) + 62px);
+  }
+  body[data-state="play"] .site-shell,
+  body[data-state="dying"] .site-shell{
+    opacity:0;
+    visibility:hidden;
+  }
+  body[data-state="play"] .site-owner-mark,
+  body[data-state="dying"] .site-owner-mark{
+    opacity:.16;
+  }
+  @media (max-width: 980px){
+    .start-feature-grid{ grid-template-columns:1fr; }
+    .start-action-grid{ grid-template-columns:repeat(2, minmax(0, 1fr)); }
+    .start-action-grid .btn-start{ grid-column:1 / -1; }
+    .site-topbar{ flex-direction:column; align-items:flex-start; }
+    .site-nav{ justify-content:flex-start; }
+  }
+  @media (max-width: 760px){
+    .site-footer{
+      gap:7px;
+      padding:9px 10px;
+      font-size:10px;
+    }
+    .site-footer-links{ gap:8px; }
+    .site-footer-links a{ font-size:9px; }
+    .site-owner-mark{
+      bottom:calc(var(--safe-bottom) + 66px);
+      right:10px;
+      font-size:9px;
+    }
+    .start-panel{
+      width:min(92vw, 520px);
+      max-height:76vh;
+      padding:12px 10px 10px;
+    }
+    .start-action-grid{ grid-template-columns:1fr; }
+  }
+  @media (max-height: 760px){
+    .slideshow-box{ max-height:88vh; }
+    .intro-box{ max-height:88vh; }
+    .slide{ max-height:min(54vh, 360px); }
+    .mods-box{ max-height:88vh; }
+    .admin-box{ height:min(88vh, 680px); }
+  }
 </style>
 </head>
 <body>
+<div class="site-shell">
+  <header class="site-topbar" role="banner">
+    <div class="site-brand" aria-label="Neon Slip branding">
+      <span class="site-brand-dot" aria-hidden="true"></span>
+      <div>
+        <strong>Neon Slip</strong>
+        <span>Created by Ali Imran</span>
+      </div>
+    </div>
+    <nav class="site-nav" aria-label="Primary navigation">
+      <button id="siteNavPlay" class="site-nav-btn" type="button">Play Now</button>
+      <button id="siteNavLeaderboard" class="site-nav-btn" type="button">Leaderboard</button>
+      <button id="siteNavHowTo" class="site-nav-btn" type="button">How to Play</button>
+      <button id="siteNavFriends" class="site-nav-btn" type="button">Challenge Friends</button>
+      <button id="siteNavCredits" class="site-nav-btn" type="button">Credits</button>
+      <a class="site-nav-link" href="about.html">About</a>
+      <a class="site-nav-link" href="contact.html">Contact</a>
+    </nav>
+  </header>
+  <footer class="site-footer">
+    <div class="site-footer-main">Copyright &copy; Ali Imran 2025-2026. All rights reserved.</div>
+    <nav class="site-footer-links" aria-label="Footer legal links">
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+      <a href="privacy-policy.html">Privacy Policy</a>
+      <a href="license.html">License</a>
+      <a href="terms.html">Terms</a>
+    </nav>
+  </footer>
+</div>
+<div class="site-owner-mark" aria-hidden="true">Original game and site by Ali Imran</div>
 <div id="bootLoader" class="boot-loader">
   <div class="boot-corner tl"></div>
   <div class="boot-corner tr"></div>
@@ -1858,6 +2353,7 @@
   <div class="boot-core">
     <div class="boot-kicker">System Loading...</div>
     <div class="boot-title">Neon Slip</div>
+    <div class="boot-credit">Created by Ali Imran</div>
     <div id="bootMessage" class="boot-msg">Initializing neon core...</div>
     <div id="bootStages" class="boot-stage-row">
       <div class="boot-stage">Core Sync</div>
@@ -1887,6 +2383,7 @@
       </div>
     </div>
     <div id="bootPercent" class="boot-percent">0%</div>
+    <div class="boot-copyright">&copy; Ali Imran 2025-2026</div>
   </div>
 </div>
 <canvas id="game"></canvas>
@@ -1916,19 +2413,44 @@
 </div>
 
 <div class="ui">
-  <div id="startPanel" class="panel">
-    <div class="title neon-title">Neon Slip</div>
-    <div>Move left/right to slip through the neon gates.</div>
-    <div class="hint">Keys: A/D or Arrows. Touch: drag or tap.</div>
+  <div id="startPanel" class="panel start-panel">
+    <p class="start-eyebrow">Neon Slip - Created by Ali Imran</p>
+    <h1 class="title neon-title">Neon Slip</h1>
+    <p class="start-tagline">A fast-paced endless runner where speed never stops increasing</p>
+    <div class="start-section-title">Play Now</div>
+    <div>Move left and right to slip through the neon gates.</div>
+    <div class="hint">Controls: A/D or arrows. Touch devices: drag or tap to move.</div>
     <div id="mainMenuShards" class="main-menu-shards"><img src="shard.png" alt="Shard" class="shard-icon-sm"> 0 Neon Shards</div>
     <div class="btn user-btn" id="mainMenuUserBtn">👤 Sign In / Register</div>
-    <div class="btn btn-start" id="startRunBtn">START RUN</div>
+    <div class="start-action-grid">
+    <div class="btn btn-start" id="startRunBtn">Start Run</div>
     <div class="btn" id="openUpgrades">Upgrades</div>
     <div class="btn" id="openLeaderboard">🏆 Leaderboard</div>
     <div class="btn" id="openFriends">🤝 Friends</div>
     <div class="btn" id="openAchievements">🎖️ Achievements</div>
     <div class="btn" id="openStats">📊 Stats</div>
     <div class="btn" id="openSettings">Settings</div>
+    <div class="btn" id="openCredits">Credits</div>
+    </div>
+    <div class="start-feature-grid">
+      <section class="start-feature-card" aria-label="How to play section">
+        <h2>How to Play</h2>
+        <p>Learn controls, scoring, modifiers, and run strategy before your next attempt.</p>
+        <button id="openHowToPlayQuick" class="btn start-mini-btn" type="button">Open Guide</button>
+      </section>
+      <section class="start-feature-card" aria-label="Challenge your friends section">
+        <h2>Challenge Your Friends</h2>
+        <p>Send friend requests, compare scores, and use Neon Speech to coordinate rival runs.</p>
+        <button id="startChallengeFriends" class="btn start-mini-btn" type="button">Open Friends</button>
+      </section>
+      <section class="start-feature-card" aria-label="Leaderboard section">
+        <h2>Leaderboard</h2>
+        <p>Can you beat the high score? Track top players and push for first place today.</p>
+        <button id="startLeaderboardCta" class="btn start-mini-btn" type="button">View Leaderboard</button>
+      </section>
+    </div>
+    <div class="start-ownership">Original game and site by Ali Imran | &copy; Ali Imran 2025-2026</div>
+    <div class="hint">Terms, Privacy, and License acceptance is required before first play.</div>
   </div>
   <div id="overPanel" class="panel hidden">
     <div class="title">Crashed</div>
@@ -1947,8 +2469,12 @@
     <div class="sidebar-tab active" id="lbTabToday">🏆 Today</div>
     <div class="sidebar-tab" id="lbTabAllTime">📅 All Time</div>
   </div>
-  <div class="lb-sidebar-title" id="lbSidebarTitle">Today's Top Players</div>
+  <div class="lb-sidebar-title" id="lbSidebarTitle">Today's Best</div>
+  <div class="lb-sidebar-subtitle">Can you beat the high score?</div>
   <div id="lbSidebarList"><div class="lb-sidebar-empty">No scores yet today</div></div>
+  <div class="lb-sidebar-cta">
+    <button id="lbSidebarOpenBoard" class="btn lb-sidebar-btn" type="button">View Full Leaderboard</button>
+  </div>
 </div>
 
 <div id="leftSidebar" class="left-sidebar">
@@ -1961,7 +2487,7 @@
     <div id="leftStatsList"></div>
   </div>
   <div id="leftSectionGuide" class="sidebar-section">
-    <div class="lb-sidebar-title">Quick Guide</div>
+    <div class="lb-sidebar-title">How to Play</div>
     <div class="guide-row"><div class="guide-key">Move</div>A/D, Arrows, or Touch</div>
     <div class="guide-row"><div class="guide-key">Pause</div>P or Esc</div>
     <div class="guide-row"><div class="guide-key">Center</div>PERFECT + bonus pts</div>
@@ -2026,6 +2552,50 @@
     <div class="settings-actions">
       <div id="closePowerupInfo" class="btn">Close</div>
     </div>
+  </div>
+</div>
+
+<div id="creditsPanel" class="credits-panel">
+  <div class="credits-box">
+    <div class="title">Credits</div>
+    <div class="credits-copy">Neon Slip is an original game and site by Ali Imran. Use this panel to access core project pages directly from inside Neon Slip.</div>
+    <div class="credits-link-list">
+      <a class="credits-link" href="about.html">About Neon Slip</a>
+      <a class="credits-link" href="contact.html">Contact</a>
+      <a class="credits-link" href="privacy-policy.html">Privacy Policy</a>
+      <a class="credits-link" href="license.html">License</a>
+      <a class="credits-link" href="terms.html">Terms of Use</a>
+    </div>
+    <div class="credits-contact">
+      Contact: <a href="mailto:al116im24@ast.kevibham.org">al116im24@ast.kevibham.org</a><br>
+      Discord: add <strong>24_7gamer_</strong>
+    </div>
+    <div class="settings-actions">
+      <div id="closeCredits" class="btn">Close</div>
+    </div>
+  </div>
+</div>
+
+<div id="legalConsentPanel" class="legal-consent-panel">
+  <div class="legal-consent-box">
+    <div class="title">Before You Play</div>
+    <div class="legal-consent-copy">You must accept Neon Slip legal terms before starting gameplay.</div>
+    <div class="legal-links">
+      <a href="terms.html" target="_blank" rel="noopener">Terms</a>
+      <a href="privacy-policy.html" target="_blank" rel="noopener">Privacy</a>
+      <a href="license.html" target="_blank" rel="noopener">License</a>
+      <a href="contact.html" target="_blank" rel="noopener">Contact</a>
+    </div>
+    <label class="legal-check" for="legalConsentCheck">
+      <input id="legalConsentCheck" type="checkbox">
+      <span>I have read and accept the Terms of Use, Privacy Policy, and License for Neon Slip.</span>
+    </label>
+    <div id="legalConsentError" class="legal-error"></div>
+    <div class="settings-actions">
+      <div id="legalConsentAcceptBtn" class="btn">Accept and Play</div>
+      <div id="legalConsentCancelBtn" class="btn danger-btn">Cancel</div>
+    </div>
+    <div class="legal-note">Created by Ali Imran | &copy; Ali Imran 2025-2026</div>
   </div>
 </div>
 
@@ -2273,7 +2843,7 @@
 
 <!-- Account / Auth modal -->
 <div id="authModal" class="lb-modal" style="z-index:55;">
-  <div class="lb-modal-box" id="authBox" style="min-width:300px;">
+  <div class="lb-modal-box" id="authBox" style="width:min(96vw,380px);min-width:0;">
     <div class="title" id="authTitle" style="color:var(--neon);">👤 Account</div>
     <!-- Tab navigation -->
     <div class="auth-tabs" id="authTabs">
@@ -2439,6 +3009,9 @@
 
 <script>
 (() => {
+  // Neon Slip ownership note:
+  // Original game and website by Ali Imran.
+  // Copyright © Ali Imran 2025-2026. All rights reserved.
   // =====================================================================
   // ONLINE LEADERBOARD — FIREBASE CONFIGURATION
   // =====================================================================
@@ -2614,6 +3187,26 @@ const FIREBASE_CONFIG = firebaseConfig;
   const bootLogEl = document.getElementById("bootLog");
   const bootSignalBarsEl = document.getElementById("bootSignalBars");
   const bootParticleFieldEl = document.getElementById("bootParticleField");
+  const siteNavPlayEl = document.getElementById("siteNavPlay");
+  const siteNavLeaderboardEl = document.getElementById("siteNavLeaderboard");
+  const siteNavHowToEl = document.getElementById("siteNavHowTo");
+  const siteNavFriendsEl = document.getElementById("siteNavFriends");
+  const siteNavCreditsEl = document.getElementById("siteNavCredits");
+  const openHowToPlayQuickEl = document.getElementById("openHowToPlayQuick");
+  const startChallengeFriendsEl = document.getElementById("startChallengeFriends");
+  const startLeaderboardCtaEl = document.getElementById("startLeaderboardCta");
+  const lbSidebarOpenBoardEl = document.getElementById("lbSidebarOpenBoard");
+  const openCreditsEl = document.getElementById("openCredits");
+  const creditsPanelEl = document.getElementById("creditsPanel");
+  const closeCreditsEl = document.getElementById("closeCredits");
+  const legalConsentPanelEl = document.getElementById("legalConsentPanel");
+  const legalConsentCheckEl = document.getElementById("legalConsentCheck");
+  const legalConsentErrorEl = document.getElementById("legalConsentError");
+  const legalConsentAcceptBtnEl = document.getElementById("legalConsentAcceptBtn");
+  const legalConsentCancelBtnEl = document.getElementById("legalConsentCancelBtn");
+
+  const LEGAL_ACCEPT_KEY = "neonLegalAcceptedV1";
+  let pendingStartAfterConsent = false;
 
   let w, h, dpr;
   function resize(){
@@ -4022,6 +4615,29 @@ const FIREBASE_CONFIG = firebaseConfig;
     pausePanelEl.classList.toggle("active", isPaused);
   }
 
+  function hasAcceptedLegalTerms(){
+    return localStorage.getItem(LEGAL_ACCEPT_KEY) === "1";
+  }
+
+  function openLegalConsentPanel(){
+    if (!legalConsentPanelEl) return;
+    if (legalConsentCheckEl) legalConsentCheckEl.checked = false;
+    if (legalConsentErrorEl) legalConsentErrorEl.textContent = "";
+    legalConsentPanelEl.classList.add("active");
+  }
+
+  function closeLegalConsentPanel(){
+    if (!legalConsentPanelEl) return;
+    legalConsentPanelEl.classList.remove("active");
+  }
+
+  function ensureLegalConsentForGameplay(){
+    if (hasAcceptedLegalTerms()) return true;
+    pendingStartAfterConsent = true;
+    openLegalConsentPanel();
+    return false;
+  }
+
   function shakeScale(){
     if (SETTINGS.shake === "low") return 0.6;
     if (SETTINGS.shake === "high") return 1.2;
@@ -4035,6 +4651,7 @@ const FIREBASE_CONFIG = firebaseConfig;
   }
 
   function startGame(){
+    if (!ensureLegalConsentForGameplay()) return;
     initAudio();
     unlockAudio();
     if (state.introRequired){
@@ -6259,7 +6876,7 @@ const FIREBASE_CONFIG = firebaseConfig;
     const entries = lbSidebarTab === "today"
       ? deduplicateByUid(lbEntries.filter(e => isToday(e.date)))
       : deduplicateByUid(lbEntries.slice(0, 50));
-    if (titleEl) titleEl.textContent = lbSidebarTab === "today" ? "Today's Top Players" : "All-Time Best";
+    if (titleEl) titleEl.textContent = lbSidebarTab === "today" ? "Today's Best" : "All-Time Best";
     if (!entries.length){
       listEl.innerHTML = `<div class="lb-sidebar-empty">No scores ${lbSidebarTab === "today" ? "today" : "yet"}</div>`;
       sidebarEl.classList.add("active");
@@ -7527,6 +8144,9 @@ const FIREBASE_CONFIG = firebaseConfig;
     state.slideshowActive = false;
     modsPanelEl.classList.remove("active");
     breakdownPanelEl.classList.remove("active");
+    if (creditsPanelEl) creditsPanelEl.classList.remove("active");
+    closeLegalConsentPanel();
+    pendingStartAfterConsent = false;
     setMode("start");
     overPanel.classList.add("hidden");
     startPanel.classList.remove("hidden");
@@ -8803,10 +9423,28 @@ const FIREBASE_CONFIG = firebaseConfig;
     upgradesPanelEl.classList.add("active");
     updateUpgradeUI();
   }
+  function openCreditsPanel(e){
+    if (e) e.stopPropagation();
+    sfxClick();
+    if (creditsPanelEl) creditsPanelEl.classList.add("active");
+  }
+  function closeCreditsPanel(e){
+    if (e) e.stopPropagation();
+    sfxClick();
+    if (creditsPanelEl) creditsPanelEl.classList.remove("active");
+  }
   openSettingsEl.addEventListener("click", openSettings);
   openSettingsOverEl.addEventListener("click", openSettings);
   openUpgradesEl.addEventListener("click", openUpgrades);
   openUpgradesOverEl.addEventListener("click", openUpgrades);
+  if (openCreditsEl) openCreditsEl.addEventListener("click", openCreditsPanel);
+  if (siteNavCreditsEl) siteNavCreditsEl.addEventListener("click", openCreditsPanel);
+  if (closeCreditsEl) closeCreditsEl.addEventListener("click", closeCreditsPanel);
+  if (creditsPanelEl){
+    creditsPanelEl.addEventListener("click", (e) => {
+      if (e.target === creditsPanelEl) closeCreditsPanel(e);
+    });
+  }
   document.getElementById("openStats").addEventListener("click", openStats);
   document.getElementById("closeStats").addEventListener("click", (e) => { e.stopPropagation(); sfxClick(); statsPanelEl.classList.remove("active"); });
   document.getElementById("openAchievements").addEventListener("click", openAchievements);
@@ -8868,9 +9506,12 @@ const FIREBASE_CONFIG = firebaseConfig;
   openLeaderboardEl.addEventListener("click", openLeaderboard);
   closeLeaderboardEl.addEventListener("click", closeLeaderboard);
   document.getElementById("leaderboardCloseX").addEventListener("click", closeLeaderboard);
+  if (startLeaderboardCtaEl) startLeaderboardCtaEl.addEventListener("click", openLeaderboard);
+  if (lbSidebarOpenBoardEl) lbSidebarOpenBoardEl.addEventListener("click", openLeaderboard);
 
   // Friends + Neon Speech
   if (openFriendsEl) openFriendsEl.addEventListener("click", openFriendsPanel);
+  if (startChallengeFriendsEl) startChallengeFriendsEl.addEventListener("click", openFriendsPanel);
   if (closeFriendsEl) closeFriendsEl.addEventListener("click", closeFriendsPanel);
   if (friendsPanelEl){
     friendsPanelEl.addEventListener("click", (e) => {
@@ -8900,6 +9541,55 @@ const FIREBASE_CONFIG = firebaseConfig;
       e.stopPropagation();
     });
   }
+
+  function openHowToPlayPanel(e){
+    if (e) e.stopPropagation();
+    sfxClick();
+    introPanelEl.classList.add("active");
+  }
+  if (siteNavHowToEl) siteNavHowToEl.addEventListener("click", openHowToPlayPanel);
+  if (openHowToPlayQuickEl) openHowToPlayQuickEl.addEventListener("click", openHowToPlayPanel);
+
+  function openRunModifiersFromSite(e){
+    if (e) e.stopPropagation();
+    initAudio();
+    unlockAudio();
+    sfxClick();
+    modsPanelEl.classList.add("active");
+  }
+  if (siteNavPlayEl) siteNavPlayEl.addEventListener("click", openRunModifiersFromSite);
+  if (siteNavLeaderboardEl) siteNavLeaderboardEl.addEventListener("click", openLeaderboard);
+  if (siteNavFriendsEl) siteNavFriendsEl.addEventListener("click", openFriendsPanel);
+  if (legalConsentAcceptBtnEl){
+    legalConsentAcceptBtnEl.addEventListener("click", () => {
+      if (!legalConsentCheckEl || !legalConsentCheckEl.checked){
+        if (legalConsentErrorEl) legalConsentErrorEl.textContent = "Please confirm acceptance before playing.";
+        return;
+      }
+      localStorage.setItem(LEGAL_ACCEPT_KEY, "1");
+      closeLegalConsentPanel();
+      if (legalConsentErrorEl) legalConsentErrorEl.textContent = "";
+      if (pendingStartAfterConsent){
+        pendingStartAfterConsent = false;
+        startGame();
+      }
+    });
+  }
+  if (legalConsentCancelBtnEl){
+    legalConsentCancelBtnEl.addEventListener("click", () => {
+      pendingStartAfterConsent = false;
+      closeLegalConsentPanel();
+    });
+  }
+  if (legalConsentPanelEl){
+    legalConsentPanelEl.addEventListener("click", (e) => {
+      if (e.target === legalConsentPanelEl){
+        pendingStartAfterConsent = false;
+        closeLegalConsentPanel();
+      }
+    });
+  }
+
   if (friendsSearchResultsEl){
     friendsSearchResultsEl.addEventListener("click", (e) => {
       const avatar = e.target.closest("[data-act='view-profile']");
@@ -9436,4 +10126,3 @@ const FIREBASE_CONFIG = firebaseConfig;
 </script>
 </body>
 </html>
-  // Thank you for checking out the code! If you have any questions or want to know more about how it works, feel free to ask.
