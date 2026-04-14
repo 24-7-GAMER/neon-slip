@@ -5757,14 +5757,49 @@ const FIREBASE_CONFIG = firebaseConfig;
     }
   }
 
+  function tryPlayMedia(mediaEl){
+    if (!mediaEl) return Promise.resolve(false);
+    mediaEl.loop = true;
+    mediaEl.muted = false;
+    mediaEl.playsInline = true;
+    const maybePromise = mediaEl.play();
+    if (maybePromise && typeof maybePromise.then === "function"){
+      return maybePromise.then(() => true).catch((err) => {
+        console.warn("[Audio] media play blocked:", err && (err.name || err.message || err));
+        return false;
+      });
+    }
+    return Promise.resolve(true);
+  }
+
+  function recoverMusicPlayback(target = null){
+    if (!state.audioUnlocked || state.audioMuted) return;
+    const wantsGame = target ? target === "game" : state.mode === "play";
+    const primary = wantsGame ? gameMusic : menuMusic;
+    const secondary = wantsGame ? menuMusic : gameMusic;
+    const targetVolume = (wantsGame ? AUDIO.gameVolume : AUDIO.menuVolume) * SETTINGS.musicVolume;
+
+    tryPlayMedia(primary).then((ok) => {
+      if (!ok) return;
+      if (secondary && !secondary.paused){
+        crossfade(secondary, primary, AUDIO.crossfadeMs);
+      } else {
+        primary.volume = state.audioMuted ? 0 : targetVolume;
+      }
+      if (secondary && !secondary.paused && secondary !== primary){
+        secondary.volume = 0;
+        secondary.pause();
+      }
+    });
+  }
+
   function unlockAudio(){
-    if (state.audioUnlocked) return;
     state.audioUnlocked = true;
     initAudio();
     menuMusic.volume = 0;
     gameMusic.volume = 0;
     if (!state.audioMuted){
-      playMenuMusic();
+      recoverMusicPlayback();
     }
   }
 
@@ -5799,26 +5834,12 @@ const FIREBASE_CONFIG = firebaseConfig;
 
   function playMenuMusic(){
     if (!state.audioUnlocked) return;
-    if (menuMusic.paused){
-      menuMusic.play().catch(() => {});
-    }
-    if (!gameMusic.paused){
-      crossfade(gameMusic, menuMusic, AUDIO.crossfadeMs);
-    } else {
-      menuMusic.volume = state.audioMuted ? 0 : AUDIO.menuVolume * SETTINGS.musicVolume;
-    }
+    recoverMusicPlayback("menu");
   }
 
   function playGameMusic(){
     if (!state.audioUnlocked) return;
-    if (gameMusic.paused){
-      gameMusic.play().catch(() => {});
-    }
-    if (!menuMusic.paused){
-      crossfade(menuMusic, gameMusic, AUDIO.crossfadeMs);
-    } else {
-      gameMusic.volume = state.audioMuted ? 0 : AUDIO.gameVolume * SETTINGS.musicVolume;
-    }
+    recoverMusicPlayback("game");
   }
 
   function setMuted(isMuted){
@@ -5828,8 +5849,10 @@ const FIREBASE_CONFIG = firebaseConfig;
     if (isMuted){
       menuMusic.volume = 0;
       gameMusic.volume = 0;
+      menuMusic.pause();
+      gameMusic.pause();
     } else {
-      playMenuMusic();
+      unlockAudio();
     }
   }
 
@@ -6643,6 +6666,8 @@ const FIREBASE_CONFIG = firebaseConfig;
       }
     }
     if (audioCtx && audioCtx.state === "suspended") audioCtx.resume().catch(() => {});
+    if (menuMusic && menuMusic.readyState === 0) menuMusic.load();
+    if (gameMusic && gameMusic.readyState === 0) gameMusic.load();
   }
   function playTone(freq, duration, type, volume){
     if (!audioCtx) return;
@@ -6703,11 +6728,7 @@ const FIREBASE_CONFIG = firebaseConfig;
     }
     if (!state.audioUnlocked || state.audioMuted) return;
     initAudio();
-    if (state.mode === "play"){
-      playGameMusic();
-    } else {
-      playMenuMusic();
-    }
+    recoverMusicPlayback();
   }
 
   // Monetization hook: cosmetic skins could change player color/glow here.
@@ -7822,7 +7843,12 @@ const FIREBASE_CONFIG = firebaseConfig;
     }
     if (profileCardNameEl) profileCardNameEl.textContent = displayName;
     if (profileCardSubEl) profileCardSubEl.textContent = friend.name ? "Friend" : "Player";
-    if (profileCardStatsEl) profileCardStatsEl.textContent = "Best Score: " + best.toLocaleString();
+    if (profileCardStatsEl){
+      const adminUidLine = adminMode
+        ? `<div style="margin-top:6px;font-size:10px;opacity:.58;word-break:break-all;">UID: ${escText(uid)}</div>`
+        : "";
+      profileCardStatsEl.innerHTML = `Best Score: ${best.toLocaleString()}${adminUidLine}`;
+    }
     if (profileCardDmBtnEl){
       const canDm = authUser && uid !== authUser.uid;
       profileCardDmBtnEl.style.opacity = canDm ? "" : ".45";
@@ -9062,6 +9088,9 @@ const FIREBASE_CONFIG = firebaseConfig;
     btn.style.background = "rgba(138,91,255,.2)";
     settingsPanelEl.classList.remove("active");
     adminCurrentTab = "player";
+    if (profileCardModalEl && profileCardModalEl.classList.contains("active") && speechProfileUid){
+      openProfileCard(speechProfileUid);
+    }
     openAdminPanel();
   }
 
@@ -9072,6 +9101,9 @@ const FIREBASE_CONFIG = firebaseConfig;
     const btn = document.getElementById("adminModeBtn");
     btn.textContent = "Activate";
     btn.style.background = "";
+    if (profileCardModalEl && profileCardModalEl.classList.contains("active") && speechProfileUid){
+      openProfileCard(speechProfileUid);
+    }
     closeAdminPanel();
     sfxClick();
     updateAdminButtonState();
@@ -10499,14 +10531,20 @@ const FIREBASE_CONFIG = firebaseConfig;
   if (mainMenuShardsEl) mainMenuShardsEl.innerHTML = `<img src="shard.png" alt="Shard" class="shard-icon-sm"> ${state.shards} Neon Shards`;
   loadLeaderboardOnline();
   
-  // Unlock audio on first user interaction (required by browser autoplay policy)
+  // Keep retrying audio unlock on real user interactions so music can recover
+  // after autoplay blocks, tab restores, or browser audio interruptions.
   function unlockOnInteraction(){
     unlockAudio();
-    document.removeEventListener("click", unlockOnInteraction);
-    document.removeEventListener("keydown", unlockOnInteraction);
   }
-  document.addEventListener("click", unlockOnInteraction, { once: true });
-  document.addEventListener("keydown", unlockOnInteraction, { once: true });
+  document.addEventListener("pointerdown", unlockOnInteraction, { passive: true });
+  document.addEventListener("keydown", unlockOnInteraction);
+  window.addEventListener("focus", unlockOnInteraction);
+  menuMusic.addEventListener("canplay", () => {
+    if (!state.audioMuted && state.audioUnlocked && state.mode !== "play") recoverMusicPlayback("menu");
+  });
+  gameMusic.addEventListener("canplay", () => {
+    if (!state.audioMuted && state.audioUnlocked && state.mode === "play") recoverMusicPlayback("game");
+  });
   
   initBootLoader().finally(() => {
     requestAnimationFrame(loop);
