@@ -26,19 +26,18 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="format-detection" content="telephone=no">
-<title>Neon Slip | Endless Runner Game by Ali Imran</title>
+<title>Neon Slip | Endless Runner by Ali Imran</title>
 <meta name="description" content="Neon Slip is a fast-paced endless runner where speed never stops increasing. Play now, chase leaderboard scores, and challenge your friends.">
 <meta name="author" content="Ali Imran">
 <meta name="copyright" content="Ali Imran 2025-2026">
 <meta name="keywords" content="Neon Slip, endless runner, browser game, indie game, leaderboard game, Ali Imran">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Neon Slip | Endless Runner Game by Ali Imran">
+<meta property="og:title" content="Neon Slip | Endless Runner by Ali Imran">
 <meta property="og:description" content="A fast-paced endless runner where speed never stops increasing.">
 <meta property="og:url" content="https://neonslip.me/">
 <meta property="og:image" content="https://neonslip.me/shard.png">
 <meta property="og:site_name" content="Neon Slip">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="theme-color" content="#06070b">
 <link rel="icon" type="image/png" href="shard.png">
 <style>
   :root{
@@ -962,8 +961,6 @@
   .upgrades-scroll{
     flex:1 1 0; overflow-x:hidden; overflow-y:auto; min-height:0;
     padding-bottom:6px;
-    scrollbar-width:thin;
-    scrollbar-color:rgba(25,247,255,.4) transparent;
   }
   .upgrades-scroll::-webkit-scrollbar{ width:4px; }
   .upgrades-scroll::-webkit-scrollbar-track{ background:transparent; }
@@ -997,13 +994,44 @@
   .upg-icon{ font-size:18px; line-height:1; flex-shrink:0; }
   .upg-name{ font-size:12px; color:var(--neon); font-weight:bold; line-height:1.2; }
   .upg-desc{ font-size:10px; opacity:.65; line-height:1.4; }
-  .upg-dots{ display:flex; gap:4px; align-items:center; }
-  .upg-dot{
-    width:9px; height:9px; border-radius:50%;
-    border:1px solid rgba(25,247,255,.45); flex-shrink:0;
+  .upg-dots{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    min-width:0;
   }
-  .upg-dot.filled{ background:var(--neon); border-color:var(--neon); box-shadow:0 0 5px rgba(25,247,255,.55); }
-  .upg-dot.maxed-dot{ background:var(--neon2); border-color:var(--neon2); box-shadow:0 0 5px rgba(138,91,255,.55); }
+  .upg-level-meta{
+    flex-shrink:0;
+    font-size:10px;
+    letter-spacing:.9px;
+    color:rgba(215,249,255,.82);
+    min-width:54px;
+  }
+  .upg-dot-track{
+    flex:1 1 auto;
+    min-width:0;
+    display:grid;
+    grid-template-columns:repeat(10, minmax(0, 1fr));
+    gap:4px;
+  }
+  .upg-dot{
+    height:8px;
+    min-width:0;
+    border-radius:999px;
+    border:1px solid rgba(25,247,255,.28);
+    background:rgba(25,247,255,.05);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
+  }
+  .upg-dot.filled{
+    background:linear-gradient(90deg, rgba(25,247,255,.92), rgba(125,255,178,.82));
+    border-color:rgba(25,247,255,.75);
+    box-shadow:0 0 8px rgba(25,247,255,.32);
+  }
+  .upg-dot.maxed-dot{
+    background:linear-gradient(90deg, rgba(138,91,255,.92), rgba(25,247,255,.82));
+    border-color:rgba(138,91,255,.8);
+    box-shadow:0 0 8px rgba(138,91,255,.32);
+  }
   .upg-effect{ font-size:10px; color:#7dffb2; letter-spacing:.5px; min-height:13px; }
   .upg-progress{ height:3px; border-radius:2px; background:rgba(25,247,255,.15); overflow:hidden; }
   .upg-progress-fill{ height:100%; border-radius:2px; background:var(--neon); transition:width .3s ease; }
@@ -1064,8 +1092,6 @@
   .leaderboard-close-x:hover{ background: rgba(25,247,255,.3); }
   .leaderboard-list{
     flex:1 1 0; overflow-y:auto;
-    scrollbar-width:thin;
-    scrollbar-color:rgba(25,247,255,.4) transparent;
     margin:8px 0;
   }
   .leaderboard-list::-webkit-scrollbar{ width:4px; }
@@ -1275,7 +1301,6 @@
     display:flex; gap:0; overflow-x:hidden; scroll-snap-type:x mandatory;
     padding:0; scroll-behavior:smooth;
     flex:1 1 auto; min-height:0;
-    scrollbar-width:none;
     overscroll-behavior-x:contain;
   }
   .slides::-webkit-scrollbar{ display:none; }
@@ -1374,8 +1399,6 @@
     width:min(94vw, 620px);
     max-height:88vh;
     overflow-y:auto;
-    scrollbar-width:thin;
-    scrollbar-color:rgba(25,247,255,.72) rgba(8,13,24,.35);
     text-align:center;
   }
   .breakdown-box::-webkit-scrollbar{
@@ -1564,26 +1587,6 @@
     line-height:1.5;
     letter-spacing:.5px;
     color:rgba(214,246,255,.72);
-  }
-  .settings-box,
-  .pause-box,
-  .credits-box,
-  .legal-consent-box,
-  .challenge-box,
-  .mods-box,
-  .stats-box,
-  .achievements-box,
-  .upgrades-scroll,
-  .leaderboard-list,
-  .breakdown-box,
-  .friends-list,
-  .friends-search-results,
-  .speech-inbox-list,
-  .speech-messages,
-  .speech-member-list,
-  .admin-content{
-    scrollbar-width:thin;
-    scrollbar-color:rgba(25,247,255,.72) rgba(8,13,24,.35);
   }
   .settings-box::-webkit-scrollbar,
   .pause-box::-webkit-scrollbar,
@@ -2057,8 +2060,6 @@
   .admin-tab:hover:not(.active){ background:rgba(138,91,255,.12); }
   .admin-content{
     flex:1 1 0; overflow-y:auto; min-height:0; padding-bottom:6px;
-    scrollbar-width:thin;
-    scrollbar-color:rgba(138,91,255,.4) transparent;
   }
   .admin-content::-webkit-scrollbar{ width:4px; }
   .admin-content::-webkit-scrollbar-track{ background:transparent; }
@@ -2183,6 +2184,104 @@
     border-color:rgba(25,247,255,.3) !important;
   }
   .user-btn.signed-in{ border-color:rgba(125,255,178,.4) !important; color:#7dffb2 !important; }
+  .admin-theme-toggle,
+  .admin-theme-btn,
+  .admin-theme-title{
+    color:var(--neon2);
+  }
+  .admin-theme-toggle,
+  .admin-theme-btn{
+    border-color:rgba(138,91,255,.5);
+  }
+  .powerup-guide-copy{
+    text-align:left;
+    padding:10px 0;
+    font-size:13px;
+    line-height:1.8;
+  }
+  .powerup-guide-hint{ margin-top:8px; }
+  .mission-tracker-hidden{ display:none; }
+  .mission-title{
+    font-weight:bold;
+    margin-bottom:6px;
+  }
+  .speech-action-hidden{ display:none; }
+  .speech-group-area{
+    display:none;
+    margin-top:8px;
+    border:1px solid rgba(25,247,255,.2);
+    border-radius:10px;
+    padding:10px;
+    background:rgba(8,12,20,.65);
+  }
+  .speech-group-title{
+    font-size:11px;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    color:var(--neon);
+    margin-bottom:6px;
+  }
+  .friends-actions-top-gap{ margin-top:6px; }
+  .shards-earned-tight{ margin-bottom:4px; }
+  .lb-submit-hint{ margin-bottom:8px; }
+  .visually-hidden-input{ display:none; }
+  .admin-modal-top{ z-index:65; }
+  .admin-modal-box{
+    border-color:rgba(138,91,255,.5);
+    box-shadow:0 0 40px rgba(138,91,255,.25);
+  }
+  .admin-access-hint{ margin-bottom:12px; }
+  .admin-password-error{
+    color:var(--danger);
+    font-size:11px;
+    min-height:16px;
+    margin:4px 0;
+    letter-spacing:1px;
+  }
+  .admin-title-tight{ margin-bottom:6px; }
+  .admin-actions-tight{
+    margin-top:10px;
+    flex-shrink:0;
+  }
+  .auth-modal-top{ z-index:55; }
+  .auth-view-hidden{ display:none; }
+  .auth-profile-info{
+    text-align:center;
+    margin:8px 0 14px;
+  }
+  .auth-msg-tight{ margin-top:0; }
+  .auth-verify-section{
+    display:none;
+    text-align:center;
+    margin-bottom:10px;
+  }
+  .auth-sync-info{
+    font-size:11px;
+    opacity:.55;
+  }
+  .auth-cancel-btn{
+    width:100%;
+    margin-top:8px;
+    opacity:.7;
+    box-sizing:border-box;
+  }
+  .profile-card-title{ margin-bottom:8px; }
+  .profile-card-avatar-wrap{ margin-bottom:10px; }
+  .profile-card-name{
+    font-size:16px;
+    font-weight:bold;
+    color:var(--neon);
+  }
+  .profile-card-sub{
+    font-size:12px;
+    opacity:.7;
+    margin:6px 0 10px;
+  }
+  .profile-card-stats{
+    font-size:12px;
+    opacity:.75;
+    margin-bottom:12px;
+  }
   .lb-verified-badge{
     font-size:10px; color:#7dffb2; background:rgba(125,255,178,.12);
     border:1px solid rgba(125,255,178,.3); border-radius:4px;
@@ -3004,17 +3103,17 @@
 <div id="settingsPanel" class="settings-panel">
   <div class="settings-box">
     <div class="title">Settings</div>
-    <div class="settings-row"><span>Music</span><input id="musicVol" type="range" min="0" max="1" step="0.01"></div>
-    <div class="settings-row"><span>SFX</span><input id="sfxVol" type="range" min="0" max="1" step="0.01"></div>
+    <div class="settings-row"><span>Music</span><input id="musicVol" type="range" min="0" max="1" step="0.01" aria-label="Music volume"></div>
+    <div class="settings-row"><span>SFX</span><input id="sfxVol" type="range" min="0" max="1" step="0.01" aria-label="SFX volume"></div>
     <div class="settings-row"><span>Shake</span>
-      <select id="shakeLevel" class="toggle">
+      <select id="shakeLevel" class="toggle" aria-label="Shake level">
         <option value="low">Low</option>
         <option value="med">Med</option>
         <option value="high">High</option>
       </select>
     </div>
     <div class="settings-row"><span>Motion Intensity</span>
-      <select id="motionLevel" class="toggle">
+      <select id="motionLevel" class="toggle" aria-label="Motion intensity level">
         <option value="low">Low</option>
         <option value="med">Med</option>
         <option value="high">High</option>
@@ -3031,7 +3130,7 @@
     <hr class="settings-divider">
     <div class="settings-row">
       <span>Admin Mode</span>
-      <button id="adminModeBtn" class="toggle" style="border-color:rgba(138,91,255,.5);color:var(--neon2);">Activate</button>
+      <button id="adminModeBtn" class="toggle admin-theme-toggle">Activate</button>
     </div>
     <div class="settings-actions">
       <div id="closeSettings" class="btn">Close</div>
@@ -3042,7 +3141,7 @@
 <div id="powerupInfoPanel" class="settings-panel">
   <div class="settings-box">
     <div class="title">Power-ups Guide</div>
-    <div style="text-align:left; padding:10px 0; font-size:13px; line-height:1.8;">
+    <div class="powerup-guide-copy">
       <div><strong>🛡️ Shield:</strong> Blocks one death. Protects you once.</div>
       <div><strong>🧲 Magnet:</strong> Auto-attracts orbs for 8 seconds.</div>
       <div><strong>⏰ Time Slow:</strong> Slows game to 70% speed for 5s.</div>
@@ -3051,7 +3150,7 @@
       <div><strong>✖️ Multiplier:</strong> 2x score bonus for 8 seconds.</div>
       <div><strong>🌟 Invincibility:</strong> God mode for 4 seconds.</div>
     </div>
-    <div class="hint" style="margin-top:8px;">Power-ups spawn every 12 seconds. Collect them for advantages!</div>
+    <div class="hint powerup-guide-hint">Power-ups spawn every 12 seconds. Collect them for advantages!</div>
     <div class="settings-actions">
       <div id="closePowerupInfo" class="btn">Close</div>
     </div>
@@ -3084,7 +3183,7 @@
   <div class="challenge-box">
     <div class="title">Challenge Friends</div>
     <div class="challenge-copy">Send your ready-made Neon Slip challenge. Copy it, email it, or open Discord with the message prepared for you.</div>
-    <textarea id="challengeMessage" class="challenge-message" readonly>HEY!! BET YOU CAN'T BEAT MY HIGH SCORE ON NEON SLIP! COME PLAY AT https://neonslip.me so I can DESTROY YOU!!</textarea>
+    <textarea id="challengeMessage" class="challenge-message" aria-label="Challenge message" readonly>HEY!! BET YOU CAN'T BEAT MY HIGH SCORE ON NEON SLIP! COME PLAY AT https://neonslip.me so I can DESTROY YOU!!</textarea>
     <div class="challenge-actions">
       <div id="challengeCopyBtn" class="btn">Copy Message</div>
       <div id="challengeEmailBtn" class="btn">Email</div>
@@ -3156,8 +3255,8 @@
 <div id="multiplierIndicator" class="shield-indicator">✖️ 2X SCORE</div>
 <div id="invincibleIndicator" class="shield-indicator">🌟 INVINCIBLE</div>
 
-<div id="missionTracker" class="mission-tracker" style="display:none;">
-  <div style="font-weight:bold; margin-bottom:6px;">MISSIONS</div>
+<div id="missionTracker" class="mission-tracker mission-tracker-hidden">
+  <div class="mission-title">MISSIONS</div>
   <div id="missionList"></div>
 </div>
 
@@ -3298,8 +3397,8 @@
           <div class="speech-head">
             <div class="speech-title" id="speechActiveTitle">Neon Speech: Choose a conversation</div>
             <div class="speech-actions">
-              <div id="speechManageGroupBtn" class="speech-action-btn" style="display:none;">Manage Group</div>
-              <div id="speechLeaveGroupBtn" class="speech-action-btn danger" style="display:none;">Leave Group</div>
+              <div id="speechManageGroupBtn" class="speech-action-btn speech-action-hidden">Manage Group</div>
+              <div id="speechLeaveGroupBtn" class="speech-action-btn danger speech-action-hidden">Leave Group</div>
             </div>
           </div>
           <div id="speechMessages" class="speech-messages"></div>
@@ -3311,8 +3410,8 @@
         </div>
       </div>
 
-      <div id="speechCreateGroupArea" style="display:none;margin-top:8px;border:1px solid rgba(25,247,255,.2);border-radius:10px;padding:10px;background:rgba(8,12,20,.65);">
-        <div style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--neon);margin-bottom:6px;">Create Group Chat</div>
+      <div id="speechCreateGroupArea" class="speech-group-area">
+        <div class="speech-group-title">Create Group Chat</div>
         <div class="friends-actions">
           <input id="speechGroupNameInput" class="friends-input" maxlength="48" placeholder="Group name">
           <div id="speechCreateGroupSubmit" class="speech-action-btn">Create</div>
@@ -3321,10 +3420,10 @@
         <div id="speechGroupMembers" class="speech-member-list"></div>
       </div>
 
-      <div id="speechManageGroupArea" style="display:none;margin-top:8px;border:1px solid rgba(25,247,255,.2);border-radius:10px;padding:10px;background:rgba(8,12,20,.65);">
-        <div style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--neon);margin-bottom:6px;">Group Members</div>
+      <div id="speechManageGroupArea" class="speech-group-area">
+        <div class="speech-group-title">Group Members</div>
         <div id="speechManageMembers" class="speech-member-list"></div>
-        <div class="friends-actions" style="margin-top:6px;">
+        <div class="friends-actions friends-actions-top-gap">
           <div id="speechManageClose" class="speech-action-btn">Done</div>
         </div>
       </div>
@@ -3340,12 +3439,12 @@
   <div class="lb-modal-box">
     <div class="title">Run Complete!</div>
     <div class="lb-modal-score" id="lbModalScore">0</div>
-    <div id="lbModalShards" class="shards-earned" style="margin-bottom:4px;"></div>
+    <div id="lbModalShards" class="shards-earned shards-earned-tight"></div>
     <div id="lbSignedInLabel" class="auth-signed-in"></div>
-    <div class="hint" id="lbSubmitHint" style="margin-bottom:8px;">Enter your name to save to the leaderboard.</div>
+    <div class="hint lb-submit-hint" id="lbSubmitHint">Enter your name to save to the leaderboard.</div>
     <img id="lbPhotoPreview" class="lb-photo-preview" alt="Preview" src="">
     <label class="lb-photo-label" id="lbPhotoLabel" for="lbPhotoInput">📷 Add a photo (optional)</label>
-    <input type="file" id="lbPhotoInput" accept="image/*,.heic,.heif,.avif,.webp,.bmp,.tif,.tiff,.svg,.ico" style="display:none">
+    <input type="file" id="lbPhotoInput" class="visually-hidden-input" accept="image/*,.heic,.heif,.avif,.webp,.bmp,.tif,.tiff,.svg,.ico">
     <input type="text" id="lbNameInput" class="lb-name-input" placeholder="Your name…" maxlength="24" autocomplete="off">
     <div class="lb-modal-actions">
       <div class="btn" id="lbSubmitBtn">Submit</div>
@@ -3355,13 +3454,13 @@
 </div>
 
 <!-- Admin access modal -->
-<div id="adminPasswordModal" class="lb-modal" style="z-index:65;">
-  <div class="lb-modal-box" style="border-color:rgba(138,91,255,.5);box-shadow:0 0 40px rgba(138,91,255,.25);">
-    <div class="title" style="color:var(--neon2);">⚡ Admin Mode</div>
-    <div class="hint" id="adminAccessHint" style="margin-bottom:12px;">Sign in with an account that has admin access. If needed, contact the game administrator.</div>
-    <div id="adminPasswordError" style="color:var(--danger);font-size:11px;min-height:16px;margin:4px 0;letter-spacing:1px;"></div>
+<div id="adminPasswordModal" class="lb-modal admin-modal-top">
+  <div class="lb-modal-box admin-modal-box">
+    <div class="title admin-theme-title">⚡ Admin Mode</div>
+    <div class="hint admin-access-hint" id="adminAccessHint">Sign in with an account that has admin access. If needed, contact the game administrator.</div>
+    <div id="adminPasswordError" class="admin-password-error"></div>
     <div class="lb-modal-actions">
-      <div class="btn" id="adminAccessSubmit" style="border-color:rgba(138,91,255,.5);color:var(--neon2);">Continue</div>
+      <div class="btn admin-theme-btn" id="adminAccessSubmit">Continue</div>
       <div class="btn" id="adminPasswordCancel">Cancel</div>
     </div>
   </div>
@@ -3371,7 +3470,7 @@
 <div id="adminPanel" class="admin-panel">
   <div class="admin-box">
     <div id="adminCloseX" class="admin-close-x" title="Close">✕</div>
-    <div class="title" style="color:var(--neon2);margin-bottom:6px;">⚡ Admin Mode</div>
+    <div class="title admin-theme-title admin-title-tight">⚡ Admin Mode</div>
     <div class="admin-tabs">
       <div class="admin-tab active" data-tab="player">👤 Player</div>
       <div class="admin-tab" data-tab="leaderboard">🏆 Leaderboard</div>
@@ -3379,8 +3478,8 @@
       <div class="admin-tab" data-tab="progression">📈 Progression</div>
     </div>
     <div class="admin-content" id="adminContent"></div>
-    <div class="settings-actions" style="margin-top:10px;flex-shrink:0;">
-      <div class="btn" id="adminCloseBtn" style="border-color:rgba(138,91,255,.5);color:var(--neon2);">Close</div>
+    <div class="settings-actions admin-actions-tight">
+      <div class="btn admin-theme-btn" id="adminCloseBtn">Close</div>
       <div class="btn danger-btn" id="adminDeactivateBtn">Deactivate</div>
     </div>
   </div>
@@ -3390,9 +3489,9 @@
 <div id="adminBadge" class="admin-badge">⚡ Admin Mode Active</div>
 
 <!-- Account / Auth modal -->
-<div id="authModal" class="lb-modal" style="z-index:55;">
-  <div class="lb-modal-box" id="authBox" style="width:min(96vw,380px);min-width:0;">
-    <div class="title" id="authTitle" style="color:var(--neon);">👤 Account</div>
+<div id="authModal" class="lb-modal auth-modal-top">
+  <div class="lb-modal-box" id="authBox">
+    <div class="title" id="authTitle">👤 Account</div>
     <!-- Tab navigation -->
     <div class="auth-tabs" id="authTabs">
       <div class="auth-tab active" data-view="login">Sign In</div>
@@ -3409,47 +3508,47 @@
       <div class="auth-link" id="authForgotLink">Forgot password?</div>
     </div>
     <!-- Register view -->
-    <div id="authViewRegister" style="display:none;">
+    <div id="authViewRegister" class="auth-view-hidden">
       <input type="text" id="authRegName" class="auth-input" placeholder="Display name (shown on leaderboard)" maxlength="24" autocomplete="username">
       <input type="email" id="authRegEmail" class="auth-input" placeholder="Email address" autocomplete="email">
       <input type="password" id="authRegPw" class="auth-input" placeholder="Password (6+ characters)" autocomplete="new-password">
       <img id="authRegPhotoPreview" class="auth-avatar-preview" alt="Register profile preview" src="">
       <label class="auth-avatar-label" id="authRegPhotoLabel" for="authRegPhotoInput">📷 Add profile picture (optional)</label>
-      <input type="file" id="authRegPhotoInput" accept="image/*,.heic,.heif,.avif,.webp,.bmp,.tif,.tiff,.svg,.ico" style="display:none">
+      <input type="file" id="authRegPhotoInput" class="visually-hidden-input" accept="image/*,.heic,.heif,.avif,.webp,.bmp,.tif,.tiff,.svg,.ico">
       <div id="authRegErr" class="auth-msg"></div>
       <div class="lb-modal-actions">
         <div class="btn" id="authRegisterBtn">Create Account</div>
       </div>
     </div>
     <!-- Profile view (shown when signed in) -->
-    <div id="authViewProfile" style="display:none;">
+    <div id="authViewProfile" class="auth-view-hidden">
       <div class="auth-avatar-wrap">
         <img id="authProfilePhotoPreview" class="auth-avatar-preview" alt="Profile picture" src="">
         <div id="authProfilePhotoFallback" class="auth-avatar-fallback">👤</div>
       </div>
       <label class="auth-avatar-label" id="authProfilePhotoLabel" for="authProfilePhotoInput">📷 Change profile picture</label>
-      <input type="file" id="authProfilePhotoInput" accept="image/*,.heic,.heif,.avif,.webp,.bmp,.tif,.tiff,.svg,.ico" style="display:none">
-      <div id="authProfileInfo" style="text-align:center;margin:8px 0 14px;"></div>
-      <div id="authProfilePhotoMsg" class="auth-msg" style="margin-top:0;"></div>
-      <div id="authVerifySection" style="display:none;text-align:center;margin-bottom:10px;"></div>
-      <div id="authSyncInfo" class="auth-msg" style="font-size:11px;opacity:.55;"></div>
+      <input type="file" id="authProfilePhotoInput" class="visually-hidden-input" accept="image/*,.heic,.heif,.avif,.webp,.bmp,.tif,.tiff,.svg,.ico">
+      <div id="authProfileInfo" class="auth-profile-info"></div>
+      <div id="authProfilePhotoMsg" class="auth-msg auth-msg-tight"></div>
+      <div id="authVerifySection" class="auth-verify-section"></div>
+      <div id="authSyncInfo" class="auth-msg auth-sync-info"></div>
       <div class="lb-modal-actions">
         <div class="btn" id="authSignOutBtn">Sign Out</div>
         <div class="btn" id="authCloseProfileBtn">Close</div>
       </div>
     </div>
     <!-- Cancel button (hidden in profile view) -->
-    <div class="btn" id="authCancelBtn" style="width:100%;margin-top:8px;opacity:.7;box-sizing:border-box;">Cancel</div>
+    <div class="btn auth-cancel-btn" id="authCancelBtn">Cancel</div>
   </div>
 </div>
 
 <div id="profileCardModal" class="lb-modal profile-card-panel">
   <div class="lb-modal-box profile-card-box">
-    <div class="title" style="margin-bottom:8px;">Player Profile</div>
-    <div id="profileCardAvatarWrap" style="margin-bottom:10px;"></div>
-    <div id="profileCardName" style="font-size:16px;font-weight:bold;color:var(--neon);"></div>
-    <div id="profileCardSub" style="font-size:12px;opacity:.7;margin:6px 0 10px;"></div>
-    <div id="profileCardStats" style="font-size:12px;opacity:.75;margin-bottom:12px;"></div>
+    <div class="title profile-card-title">Player Profile</div>
+    <div id="profileCardAvatarWrap" class="profile-card-avatar-wrap"></div>
+    <div id="profileCardName" class="profile-card-name"></div>
+    <div id="profileCardSub" class="profile-card-sub"></div>
+    <div id="profileCardStats" class="profile-card-stats"></div>
     <div class="lb-modal-actions">
       <div id="profileCardDmBtn" class="btn">DM</div>
       <div id="profileCardClose" class="btn">Close</div>
@@ -3553,8 +3652,8 @@
 <script src="firebase-config.js"></script>
 <script src="firebase-config.local.js"></script>
 
-<audio id="menuMusic" src="menu.mp3" preload="auto" loop playsinline webkit-playsinline disableremoteplayback></audio>
-<audio id="gameMusic" src="game.mp3" preload="auto" loop playsinline webkit-playsinline disableremoteplayback></audio>
+<audio id="menuMusic" src="menu.mp3" preload="auto" loop playsinline webkit-playsinline></audio>
+<audio id="gameMusic" src="game.mp3" preload="auto" loop playsinline webkit-playsinline></audio>
 
 <script>
 (() => {
@@ -4807,14 +4906,23 @@ const FIREBASE_CONFIG = firebaseConfig;
       desc.className = "upg-desc";
       desc.textContent = up.desc;
       card.appendChild(desc);
-      // Level dots
+      // Compact level meter
       const dots = document.createElement("div");
       dots.className = "upg-dots";
-      for (let i = 0; i < up.max; i++){
+      const levelMeta = document.createElement("div");
+      levelMeta.className = "upg-level-meta";
+      levelMeta.textContent = `Lv ${up.level}/${up.max}`;
+      dots.appendChild(levelMeta);
+      const dotTrack = document.createElement("div");
+      dotTrack.className = "upg-dot-track";
+      const dotCount = Math.min(10, Math.max(1, up.max));
+      const filledCount = up.max ? Math.round((up.level / up.max) * dotCount) : 0;
+      for (let i = 0; i < dotCount; i++){
         const d = document.createElement("div");
-        d.className = "upg-dot" + (i < up.level ? (maxed ? " maxed-dot" : " filled") : "");
-        dots.appendChild(d);
+        d.className = "upg-dot" + (i < filledCount ? (maxed ? " maxed-dot" : " filled") : "");
+        dotTrack.appendChild(d);
       }
+      dots.appendChild(dotTrack);
       card.appendChild(dots);
       // Progress bar
       const bar = document.createElement("div");
@@ -4832,8 +4940,10 @@ const FIREBASE_CONFIG = firebaseConfig;
       // Maxed badge
       const badge = document.createElement("div");
       badge.className = "upg-maxed-badge";
+      badge.textContent = "MAXED OUT";
       badge.textContent = "✦ MAXED ✦";
       card.appendChild(badge);
+      badge.textContent = "MAXED OUT";
       // Buy button
       if (!maxed){
         const btn = document.createElement("div");
