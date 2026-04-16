@@ -1145,6 +1145,30 @@
   }
   .lb-category-tab.active{ background:rgba(25,247,255,.2); border-color:var(--neon); color:var(--neon); box-shadow:0 0 8px rgba(25,247,255,.2); }
   .lb-category-tab:hover:not(.active){ background:rgba(25,247,255,.12); }
+  .leaderboard-actions{
+    display:flex; justify-content:flex-end; margin:-2px 0 10px; flex-shrink:0;
+  }
+  .lb-refresh-btn,
+  .lb-sidebar-refresh-btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:6px;
+    border-radius:999px; border:1px solid rgba(25,247,255,.34);
+    background:rgba(25,247,255,.08); color:var(--text); cursor:pointer;
+    transition:transform .15s ease, background .15s ease, box-shadow .15s ease, opacity .15s ease;
+  }
+  .lb-refresh-btn:hover,
+  .lb-sidebar-refresh-btn:hover{
+    background:rgba(25,247,255,.16); box-shadow:0 0 12px rgba(25,247,255,.18); transform:translateY(-1px);
+  }
+  .lb-refresh-btn:disabled,
+  .lb-sidebar-refresh-btn:disabled{
+    cursor:default; opacity:.62; transform:none; box-shadow:none;
+  }
+  .lb-refresh-btn{
+    padding:8px 14px; font-size:11px; letter-spacing:1px; text-transform:uppercase;
+  }
+  .lb-sidebar-head{
+    display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:8px;
+  }
   /* Leaderboard sidebar on main menu */
   .lb-sidebar{
     position:fixed; top:50%; right:max(20px, calc(25vw - 265px)); transform:translateY(-50%);
@@ -1160,10 +1184,15 @@
   @media(max-width:900px){ .lb-sidebar{ display:none !important; } }
   .lb-sidebar-title{
     font-size:13px; letter-spacing:2px; text-transform:uppercase;
-    color:rgba(25,247,255,.9); margin-bottom:12px; text-align:center;
+    color:rgba(25,247,255,.9); margin-bottom:0; text-align:center;
     border-bottom:1px solid rgba(25,247,255,.2); padding-bottom:10px;
     text-shadow: 0 0 10px rgba(25,247,255,.5);
+    flex:1 1 auto;
   }
+  .lb-sidebar-refresh-btn{
+    width:30px; height:30px; padding:0; font-size:15px; flex:0 0 auto;
+  }
+  .lb-refresh-spinning{ animation: lb-spin 0.8s linear infinite; }
   .lb-sidebar-empty{
     font-size:13px; opacity:.5; text-align:center; padding:10px 0;
   }
@@ -3071,7 +3100,10 @@
     <div class="sidebar-tab active" id="lbTabToday">🏆 Today</div>
     <div class="sidebar-tab" id="lbTabAllTime">📅 All Time</div>
   </div>
-  <div class="lb-sidebar-title" id="lbSidebarTitle">Today's Best</div>
+  <div class="lb-sidebar-head">
+    <div class="lb-sidebar-title" id="lbSidebarTitle">Today's Best</div>
+    <button id="lbSidebarRefreshBtn" class="lb-sidebar-refresh-btn" type="button" title="Refresh leaderboard" aria-label="Refresh leaderboard">🔄</button>
+  </div>
   <div class="lb-sidebar-subtitle">Can you beat the high score?</div>
   <div id="lbSidebarList"><div class="lb-sidebar-empty">No scores yet today</div></div>
   <div class="lb-sidebar-cta">
@@ -3342,6 +3374,9 @@
       <div class="lb-category-tab active" data-cat="alltime">All Time</div>
       <div class="lb-category-tab" data-cat="thisweek">This Week</div>
       <div class="lb-category-tab" data-cat="today">Today</div>
+    </div>
+    <div class="leaderboard-actions">
+      <button id="leaderboardRefreshBtn" class="lb-refresh-btn" type="button">🔄 Refresh</button>
     </div>
     <div class="leaderboard-list" id="leaderboardList"></div>
     <div class="settings-actions">
@@ -3772,6 +3807,7 @@ const FIREBASE_CONFIG = firebaseConfig;
   const liveShardValueEl = document.getElementById("liveShardValue");
   const leaderboardPanelEl = document.getElementById("leaderboardPanel");
   const leaderboardListEl = document.getElementById("leaderboardList");
+  const leaderboardRefreshBtnEl = document.getElementById("leaderboardRefreshBtn");
   const closeLeaderboardEl = document.getElementById("closeLeaderboard");
   const openLeaderboardEl = document.getElementById("openLeaderboard");
   const openFriendsEl = document.getElementById("openFriends");
@@ -3849,6 +3885,7 @@ const FIREBASE_CONFIG = firebaseConfig;
   const openHowToPlayQuickEl = document.getElementById("openHowToPlayQuick");
   const startChallengeFriendsEl = document.getElementById("startChallengeFriends");
   const lbSidebarOpenBoardEl = document.getElementById("lbSidebarOpenBoard");
+  const lbSidebarRefreshBtnEl = document.getElementById("lbSidebarRefreshBtn");
   const openCreditsEl = document.getElementById("openCredits");
   const creditsPanelEl = document.getElementById("creditsPanel");
   const closeCreditsEl = document.getElementById("closeCredits");
@@ -7753,6 +7790,7 @@ const FIREBASE_CONFIG = firebaseConfig;
 
   let lbCategory = "alltime"; // current leaderboard filter
   let lbSidebarTab = "today"; // current right-sidebar filter
+  let lbRefreshInFlight = false;
 
   function isToday(dateStr){
     if (!dateStr) return false;
@@ -7782,6 +7820,19 @@ const FIREBASE_CONFIG = firebaseConfig;
       seen.add(e.uid);
       return true;
     });
+  }
+
+  function setLeaderboardRefreshBusy(loading){
+    lbRefreshInFlight = loading;
+    if (leaderboardRefreshBtnEl){
+      leaderboardRefreshBtnEl.disabled = loading;
+      leaderboardRefreshBtnEl.classList.toggle("lb-refresh-spinning", loading);
+      leaderboardRefreshBtnEl.textContent = loading ? "🔄 Refreshing" : "🔄 Refresh";
+    }
+    if (lbSidebarRefreshBtnEl){
+      lbSidebarRefreshBtnEl.disabled = loading;
+      lbSidebarRefreshBtnEl.classList.toggle("lb-refresh-spinning", loading);
+    }
   }
 
   function renderLeaderboard(loading){
@@ -7892,38 +7943,61 @@ const FIREBASE_CONFIG = firebaseConfig;
     });
   }
 
-  function loadLeaderboardOnline(){
+  function loadLeaderboardOnline(options = {}){
+    const {
+      showLeaderboardLoading = leaderboardPanelEl.classList.contains("active"),
+      showSidebarLoading = state.mode === "start"
+    } = options;
+    setLeaderboardRefreshBusy(true);
     if (!lbDB){
-      renderLeaderboard(false);
-      renderLbSidebar();
+      if (showLeaderboardLoading) renderLeaderboard(false);
+      if (showSidebarLoading) renderLbSidebar(false);
+      setLeaderboardRefreshBusy(false);
       return;
     }
-    renderLeaderboard(true);
+    if (showLeaderboardLoading) renderLeaderboard(true);
+    if (showSidebarLoading) renderLbSidebar(true);
     lbDB.ref("leaderboard").orderByChild("score").limitToLast(LB_MAX).once("value")
       .then(snap => {
         const raw = snap.val();
-        if (!raw){ lbEntries = []; renderLeaderboard(false); renderLbSidebar(); return; }
+        if (!raw){
+          lbEntries = [];
+          if (showLeaderboardLoading) renderLeaderboard(false);
+          if (showSidebarLoading) renderLbSidebar(false);
+          return;
+        }
         // Preserve Firebase keys so we can update entries instead of creating duplicates
         lbEntries = Object.entries(raw).map(([key, value]) => ({...value, fbKey: key}));
         lbEntries.sort((a, b) => b.score - a.score);
         if (lbEntries.length > LB_MAX) lbEntries.length = LB_MAX;
-        renderLeaderboard(false);
-        renderLbSidebar();
+        if (showLeaderboardLoading) renderLeaderboard(false);
+        if (showSidebarLoading) renderLbSidebar(false);
       })
-      .catch(() => { renderLeaderboard(false); renderLbSidebar(); });
+      .catch(() => {
+        if (showLeaderboardLoading) renderLeaderboard(false);
+        if (showSidebarLoading) renderLbSidebar(false);
+      })
+      .finally(() => {
+        setLeaderboardRefreshBusy(false);
+      });
   }
 
-  function renderLbSidebar(){
+  function renderLbSidebar(loading){
     const sidebarEl = document.getElementById("lbSidebar");
     const listEl = document.getElementById("lbSidebarList");
     const titleEl = document.getElementById("lbSidebarTitle");
     if (!sidebarEl || !listEl) return;
     // Only show on start screen
     if (state.mode !== "start"){ sidebarEl.classList.remove("active"); return; }
+    if (titleEl) titleEl.textContent = lbSidebarTab === "today" ? "Today's Best" : "All-Time Best";
+    if (loading){
+      listEl.innerHTML = '<div class="lb-sidebar-empty"><span class="lb-loading">⟳</span> Loading…</div>';
+      sidebarEl.classList.add("active");
+      return;
+    }
     const entries = lbSidebarTab === "today"
       ? deduplicateByUid(lbEntries.filter(e => isToday(e.date)))
       : deduplicateByUid(lbEntries.slice(0, 50));
-    if (titleEl) titleEl.textContent = lbSidebarTab === "today" ? "Today's Best" : "All-Time Best";
     if (!entries.length){
       listEl.innerHTML = `<div class="lb-sidebar-empty">No scores ${lbSidebarTab === "today" ? "today" : "yet"}</div>`;
       sidebarEl.classList.add("active");
@@ -9205,7 +9279,7 @@ const FIREBASE_CONFIG = firebaseConfig;
     startPanel.classList.add("enter");
     setTimeout(() => startPanel.classList.remove("enter"), 600);
     // Refresh sidebars and shard count
-    renderLbSidebar();
+    loadLeaderboardOnline({ showLeaderboardLoading: false, showSidebarLoading: true });
     renderLeftSidebar();
     const mainMenuShardsEl = document.getElementById("mainMenuShards");
     if (mainMenuShardsEl) mainMenuShardsEl.innerHTML = `<img src="shard.png" alt="Shard" class="shard-icon-sm"> ${state.shards} Neon Shards`;
@@ -9215,7 +9289,7 @@ const FIREBASE_CONFIG = firebaseConfig;
     if (e) e.stopPropagation();
     sfxClick();
     leaderboardPanelEl.classList.add("active");
-    loadLeaderboardOnline();
+    loadLeaderboardOnline({ showLeaderboardLoading: true, showSidebarLoading: state.mode === "start" });
   }
 
   function closeLeaderboard(){
@@ -10695,6 +10769,8 @@ const FIREBASE_CONFIG = firebaseConfig;
   closeLeaderboardEl.addEventListener("click", closeLeaderboard);
   document.getElementById("leaderboardCloseX").addEventListener("click", closeLeaderboard);
   if (lbSidebarOpenBoardEl) lbSidebarOpenBoardEl.addEventListener("click", openLeaderboard);
+  if (leaderboardRefreshBtnEl) leaderboardRefreshBtnEl.addEventListener("click", () => loadLeaderboardOnline({ showLeaderboardLoading: true, showSidebarLoading: state.mode === "start" }));
+  if (lbSidebarRefreshBtnEl) lbSidebarRefreshBtnEl.addEventListener("click", () => loadLeaderboardOnline({ showLeaderboardLoading: leaderboardPanelEl.classList.contains("active"), showSidebarLoading: true }));
 
   // Friends + Neon Speech
   if (openFriendsEl) openFriendsEl.addEventListener("click", openFriendsPanel);
@@ -11151,13 +11227,13 @@ const FIREBASE_CONFIG = firebaseConfig;
     lbSidebarTab = "today";
     document.getElementById("lbTabToday").classList.add("active");
     document.getElementById("lbTabAllTime").classList.remove("active");
-    renderLbSidebar();
+    loadLeaderboardOnline({ showLeaderboardLoading: leaderboardPanelEl.classList.contains("active"), showSidebarLoading: true });
   });
   document.getElementById("lbTabAllTime").addEventListener("click", () => {
     lbSidebarTab = "alltime";
     document.getElementById("lbTabAllTime").classList.add("active");
     document.getElementById("lbTabToday").classList.remove("active");
-    renderLbSidebar();
+    loadLeaderboardOnline({ showLeaderboardLoading: leaderboardPanelEl.classList.contains("active"), showSidebarLoading: true });
   });
 
   // Admin Mode event listeners
