@@ -351,8 +351,8 @@
     background: linear-gradient(160deg, rgba(12,20,38,.97), rgba(6,10,20,.97));
     border:1px solid rgba(25,247,255,.4);
     box-shadow: 0 0 36px rgba(25,247,255,.2), 0 0 60px rgba(138,91,255,.12), inset 0 1px 0 rgba(25,247,255,.2);
-    padding:20px 22px; border-radius:16px; min-width:0;
-    width:min(94vw, 540px);
+    padding:18px 18px 14px; border-radius:16px; min-width:0;
+    width:min(92vw, 500px);
     max-height:88vh; overflow-y:auto;
   }
   .credits-panel, .legal-consent-panel, .challenge-panel{
@@ -370,8 +370,8 @@
     background: linear-gradient(160deg, rgba(12,20,38,.98), rgba(6,10,20,.98));
     border:1px solid rgba(25,247,255,.4);
     box-shadow: 0 0 40px rgba(25,247,255,.22), 0 0 64px rgba(138,91,255,.16), inset 0 1px 0 rgba(25,247,255,.2);
-    padding:20px 22px; border-radius:16px;
-    width:min(92vw, 520px);
+    padding:18px 18px 14px; border-radius:16px;
+    width:min(92vw, 460px);
     max-height:88vh; overflow-y:auto;
     text-align:left;
   }
@@ -434,7 +434,7 @@
   .credits-action-grid .user-btn{
     margin-top:0;
     width:100%;
-    padding:9px 10px;
+    padding:8px 9px;
     font-size:10px;
   }
   .credits-action-grid .user-btn{
@@ -451,7 +451,7 @@
     border:1px solid rgba(25,247,255,.24);
     border-radius:14px;
     background:rgba(6,13,24,.82);
-    padding:10px;
+    padding:8px;
     box-shadow: inset 0 0 18px rgba(25,247,255,.08);
   }
   .challenge-card-preview{
@@ -462,7 +462,8 @@
     border:1px solid rgba(25,247,255,.24);
     background:linear-gradient(160deg, rgba(11,18,34,.98), rgba(5,8,17,.98));
     box-shadow:0 0 22px rgba(25,247,255,.12);
-    aspect-ratio:9 / 16;
+    aspect-ratio:4 / 5;
+    max-height:320px;
     object-fit:cover;
   }
   .challenge-message{
@@ -487,7 +488,7 @@
   }
   .challenge-actions .btn{
     margin-top:0;
-    padding:9px 10px;
+    padding:8px 9px;
     font-size:10px;
   }
   .challenge-subactions{
@@ -498,7 +499,7 @@
   }
   .challenge-subactions .btn{
     margin-top:0;
-    padding:9px 10px;
+    padding:8px 9px;
     font-size:10px;
   }
   .challenge-note,
@@ -994,8 +995,8 @@
     background: linear-gradient(180deg, rgba(10,16,30,.95), rgba(6,10,20,.95));
     border:1px solid rgba(25,247,255,.35);
     box-shadow: 0 0 28px rgba(25,247,255,.25);
-    padding:18px 20px 14px; border-radius:14px;
-    width:min(98vw, 860px);
+    padding:16px 18px 12px; border-radius:14px;
+    width:min(96vw, 760px);
     height:88vh;
     max-height:88vh;
     display:flex; flex-direction:column;
@@ -1128,8 +1129,8 @@
     background: linear-gradient(180deg, rgba(10,16,30,.97), rgba(6,10,20,.97));
     border:1px solid rgba(25,247,255,.35);
     box-shadow: 0 0 32px rgba(25,247,255,.2);
-    padding:26px 30px 20px; border-radius:14px;
-    width:min(96vw, 700px);
+    padding:20px 22px 16px; border-radius:14px;
+    width:min(94vw, 620px);
     height:90vh;
     max-height:90vh;
     display:flex; flex-direction:column;
@@ -1326,8 +1327,8 @@
     text-shadow: 0 0 10px rgba(125,255,178,.5); margin:4px 0 2px;
   }
   .daily-card{
-    margin:14px 0 12px;
-    padding:14px 14px 12px;
+    margin:12px 0 10px;
+    padding:12px 12px 10px;
     border:1px solid rgba(255,216,107,.42);
     border-radius:14px;
     background:
@@ -1342,11 +1343,11 @@
     margin-bottom:8px;
   }
   .daily-card-title{
-    font-size:17px; color:#fff5bf; letter-spacing:1px; font-weight:700;
+    font-size:14px; color:#fff5bf; letter-spacing:.7px; font-weight:700;
     text-transform:uppercase; margin-bottom:6px;
   }
   .daily-card-copy{
-    font-size:12px; line-height:1.45; opacity:.82; margin-bottom:10px;
+    font-size:11px; line-height:1.4; opacity:.82; margin-bottom:8px;
   }
   .daily-pill-row, .habit-pill-row{
     display:flex; flex-wrap:wrap; gap:6px; margin:8px 0;
@@ -1362,6 +1363,11 @@
   .daily-pill.warn, .habit-pill.warn{ border-color:rgba(255,157,0,.35); color:#ffcf7c; background:rgba(255,157,0,.08); }
   .daily-mission-list, .weekly-goal-list, .friend-activity-list{
     display:flex; flex-direction:column; gap:7px; margin:8px 0 0;
+  }
+  .start-panel .daily-mission-list{
+    max-height:122px;
+    overflow:auto;
+    padding-right:3px;
   }
   .daily-mission-item, .weekly-goal-item, .friend-activity-item{
     display:flex; justify-content:space-between; gap:10px; align-items:flex-start;
@@ -1996,8 +2002,8 @@
     background: linear-gradient(160deg, rgba(18,26,52,.97), rgba(6,10,20,.99));
     border:1px solid rgba(25,247,255,.4);
     box-shadow: 0 0 40px rgba(25,247,255,.2), inset 0 1px 0 rgba(25,247,255,.2);
-    padding:22px 24px 16px; border-radius:16px;
-    width:min(98vw, 980px); height:90vh; max-height:90vh;
+    padding:18px 20px 14px; border-radius:16px;
+    width:min(96vw, 860px); height:88vh; max-height:88vh;
     display:flex; flex-direction:column;
     overflow:hidden;
   }
@@ -8335,43 +8341,41 @@ const FIREBASE_CONFIG = firebaseConfig;
   }
 
   function loop(ts){
-    if (!state.lastTime){
+    try{
+      if (!state.lastTime){
+        state.lastTime = ts;
+        return;
+      }
+      const elapsedMs = Math.min(50, ts - state.lastTime);
       state.lastTime = ts;
-      requestAnimationFrame(loop);
-      return;
-    }
-    const elapsedMs = Math.min(50, ts - state.lastTime);
-    state.lastTime = ts;
-    state.frameAccumulatorMs += elapsedMs;
-    if (state.frameAccumulatorMs < state.frameIntervalMs){
-      requestAnimationFrame(loop);
-      return;
-    }
-    const dt = Math.min(0.033, state.frameAccumulatorMs / 1000 || 0);
-    state.frameAccumulatorMs %= state.frameIntervalMs;
-    if (state.slowMo > 0){
-      // Smooth ease-in: approach slowMoScale quickly
-      state.slowMoEase = Math.max(TUNING.slowMoScale, state.slowMoEase - dt * TUNING.slowMoEaseInRate);
-    } else if (state.slowMoEase < 1){
-      state.slowMoEase = Math.min(1, state.slowMoEase + dt * TUNING.slowMoEaseRate);
-    }
-    const timeScale = state.slowMoEase;
-    state.visualTime += dt;
+      state.frameAccumulatorMs += elapsedMs;
+      if (state.frameAccumulatorMs < state.frameIntervalMs){
+        return;
+      }
+      const dt = Math.min(0.033, state.frameAccumulatorMs / 1000 || 0);
+      state.frameAccumulatorMs %= state.frameIntervalMs;
+      if (state.slowMo > 0){
+        // Smooth ease-in: approach slowMoScale quickly
+        state.slowMoEase = Math.max(TUNING.slowMoScale, state.slowMoEase - dt * TUNING.slowMoEaseInRate);
+      } else if (state.slowMoEase < 1){
+        state.slowMoEase = Math.min(1, state.slowMoEase + dt * TUNING.slowMoEaseRate);
+      }
+      const timeScale = state.slowMoEase;
+      state.visualTime += dt;
 
-    if (state.paused){
-      updateHud(dt);
-      draw();
-      requestAnimationFrame(loop);
-      return;
-    }
+      if (state.paused){
+        updateHud(dt);
+        draw();
+        return;
+      }
 
-    if (state.mode === "play"){
-      const dtScaled = dt * timeScale;
-      // Advance game time in scaled units so passETA/speed calculations stay
-      // in sync with gate movement (which also uses dtScaled).  Real-world
-      // timers such as state.slowMo and powerup durations still use raw dt.
-      state.time += dtScaled;
-      state.score += Math.floor(dtScaled * 8);
+      if (state.mode === "play"){
+        const dtScaled = dt * timeScale;
+        // Advance game time in scaled units so passETA/speed calculations stay
+        // in sync with gate movement (which also uses dtScaled).  Real-world
+        // timers such as state.slowMo and powerup durations still use raw dt.
+        state.time += dtScaled;
+        state.score += Math.floor(dtScaled * 8);
       state.intensityPeak = Math.max(state.intensityPeak, intensity());
       if (state.announceCooldown > 0) state.announceCooldown -= dt;
       if (intensityNorm() > 0.85 && state.announceCooldown <= 0){
@@ -8410,29 +8414,36 @@ const FIREBASE_CONFIG = firebaseConfig;
           readyGoEl.classList.remove("show");
         }
       }
-    } else if (state.mode === "dying"){
-      if (state.deathTimer > 0){
-        state.deathTimer -= dt;
-        if (state.deathTimer <= 0){
-          try{
-            gameOver();
-          }catch(err){
-            console.error("[NeonSlip] death transition failed:", err);
-            setMode("over");
-            overPanel.classList.remove("hidden");
+      } else if (state.mode === "dying"){
+        if (state.deathTimer > 0){
+          state.deathTimer -= dt;
+          if (state.deathTimer <= 0){
+            try{
+              gameOver();
+            }catch(err){
+              console.error("[NeonSlip] death transition failed:", err);
+              setMode("over");
+              overPanel.classList.remove("hidden");
+            }
           }
         }
+        if (state.freeze > 0) state.freeze -= dt;
+        if (state.shake > 0) state.shake -= dt;
+        if (state.flash > 0) state.flash -= dt;
+        if (state.glitch > 0) state.glitch -= dt;
+        if (state.zoom > 0) state.zoom = Math.max(0, state.zoom - dt * 0.06);
       }
-      if (state.freeze > 0) state.freeze -= dt;
-      if (state.shake > 0) state.shake -= dt;
-      if (state.flash > 0) state.flash -= dt;
-      if (state.glitch > 0) state.glitch -= dt;
-      if (state.zoom > 0) state.zoom = Math.max(0, state.zoom - dt * 0.06);
-    }
 
-    updateHud(dt);
-    draw();
-    requestAnimationFrame(loop);
+      updateHud(dt);
+      draw();
+    }catch(err){
+      console.error("[NeonSlip] frame loop failed:", err);
+      setMode("over");
+      if (breakdownPanelEl) breakdownPanelEl.classList.remove("active");
+      if (overPanel) overPanel.classList.remove("hidden");
+    }finally{
+      requestAnimationFrame(loop);
+    }
   }
 
   // Audio
