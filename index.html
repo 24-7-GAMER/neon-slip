@@ -426,7 +426,7 @@
   }
   .credits-action-grid{
     display:grid;
-    grid-template-columns:repeat(2, minmax(0, 1fr));
+    grid-template-columns:repeat(3, minmax(0, 1fr));
     gap:8px;
     margin-top:8px;
   }
@@ -435,7 +435,7 @@
     margin-top:0;
     width:100%;
     padding:8px 9px;
-    font-size:10px;
+    font-size:9px;
   }
   .credits-action-grid .user-btn{
     grid-column:1 / -1;
@@ -463,8 +463,9 @@
     background:linear-gradient(160deg, rgba(11,18,34,.98), rgba(5,8,17,.98));
     box-shadow:0 0 22px rgba(25,247,255,.12);
     aspect-ratio:4 / 5;
-    max-height:320px;
+    max-height:min(42vh, 300px);
     object-fit:cover;
+    margin:0 auto;
   }
   .challenge-message{
     width:100%;
@@ -2981,9 +2982,9 @@
   }
   /* Start panel layout polish */
   .start-panel{
-    width:min(86vw, 520px);
-    max-width:520px;
-    max-height:min(88vh, 760px);
+    width:min(86vw, 500px);
+    max-width:500px;
+    max-height:min(84vh, 700px);
     overflow-x:hidden;
     overflow-y:auto;
     padding:16px 16px 14px;
@@ -2997,8 +2998,8 @@
     margin-bottom:3px;
   }
   .start-panel .daily-card{
-    margin:10px 0 10px;
-    padding:11px 11px 10px;
+    margin:8px 0 8px;
+    padding:9px 10px 9px;
   }
   .start-panel .daily-card-title{
     font-size:14px;
@@ -3010,9 +3011,12 @@
     margin-bottom:8px;
   }
   .start-panel .daily-mission-list{
-    max-height:132px;
+    max-height:82px;
     overflow:auto;
     padding-right:3px;
+  }
+  .start-panel .daily-mission-item:nth-child(n+4){
+    display:none;
   }
   .start-eyebrow{
     margin:0 0 4px 0;
@@ -3079,6 +3083,25 @@
     color:var(--neon);
     border-color:rgba(25,247,255,.55);
   }
+  .start-utility-link-primary{
+    padding:9px 15px;
+    font-size:10px;
+    letter-spacing:1.2px;
+    border-color:rgba(25,247,255,.44);
+    background:
+      linear-gradient(180deg, rgba(25,247,255,.14), rgba(25,247,255,.08)),
+      rgba(25,247,255,.08);
+    color:#f1fcff;
+    box-shadow:0 0 18px rgba(25,247,255,.12), inset 0 1px 0 rgba(25,247,255,.18);
+  }
+  .start-utility-link-primary:hover{
+    border-color:rgba(25,247,255,.72);
+    background:
+      linear-gradient(180deg, rgba(25,247,255,.2), rgba(25,247,255,.12)),
+      rgba(25,247,255,.1);
+    box-shadow:0 0 24px rgba(25,247,255,.2), inset 0 1px 0 rgba(25,247,255,.24);
+    transform:translateY(-1px);
+  }
   .start-ownership{
     margin-top:10px;
     font-size:9px;
@@ -3142,6 +3165,7 @@
     .start-action-grid .btn-start{ grid-column:1 / -1; }
     .site-topbar{ flex-direction:column; align-items:flex-start; }
     .site-nav{ justify-content:flex-start; }
+    .credits-action-grid{ grid-template-columns:repeat(2, minmax(0, 1fr)); }
   }
   @media (max-width: 760px){
     .site-footer{
@@ -3314,18 +3338,18 @@
     </div>
     <div class="start-utility-row">
       <button id="openHowToPlayQuick" class="start-utility-link" type="button">How to Play</button>
-      <button id="openCredits" class="start-utility-link" type="button">Credits &amp; More</button>
+      <button id="openCredits" class="start-utility-link start-utility-link-primary" type="button">Credits &amp; More</button>
     </div>
     <div class="start-ownership">Original game and site by Ali Imran | &copy; Ali Imran 2025-2026</div>
     <div class="hint">One-time Terms, Privacy, and License confirmation is remembered before you play.</div>
   </div>
-  <div id="overPanel" class="panel hidden">
-    <div class="title">Crashed</div>
+  <div id="overPanel" class="panel hidden" aria-hidden="true">
+    <div class="title">Run Complete</div>
     <div>Score: <span id="finalScore">0</span></div>
     <div>Best: <span id="finalBest">0</span></div>
     <div id="shardsEarned" class="shards-earned"></div>
     <div class="btn" id="tryAgainBtn">Try Again</div>
-    <div class="hint">Instant restart keeps the flow.</div>
+    <div class="hint">Legacy fallback panel. The detailed run results should appear instead.</div>
     <div class="btn" id="openUpgradesOver">Upgrades</div>
     <div class="btn" id="openSettingsOver">Settings</div>
   </div>
@@ -3618,7 +3642,7 @@
         <div id="breakdownMissions" class="breakdown-list"></div>
       </section>
     </div>
-    <div class="breakdown-note">New personal bests submit automatically. Close returns you to the main menu, and Leaderboard opens the rankings.</div>
+    <div class="breakdown-note">Any new qualifying leaderboard score submits automatically. Close returns you to the main menu, and Leaderboard opens the rankings.</div>
     <div class="settings-actions breakdown-actions">
       <div id="breakdownViewLeaderboard" class="btn">Leaderboard</div>
       <div id="closeBreakdown" class="btn">Close</div>
@@ -4548,6 +4572,7 @@ const FIREBASE_CONFIG = firebaseConfig;
     lbTargetRank: null,
     lastRunWasNewBest: false,
     lastRunPreviousBest: 0,
+    lastRunLeaderboardUpdate: null,
     dangerZoneTimer: 0,
     bossGateTimer: 0,
     perfectCount: 0,
@@ -5759,23 +5784,25 @@ const FIREBASE_CONFIG = firebaseConfig;
     const daily = state.dailyChallenge || currentDailyEntry();
     if (dailyChallengeDateEl) dailyChallengeDateEl.textContent = utcDateLabelFromKey(daily.date);
     if (dailyChallengeCopyEl){
-      dailyChallengeCopyEl.textContent = `${daily.theme.name} theme with ${daily.pos.name} and ${daily.neg.name}. Hit score tiers and clear fixed missions for one-time rewards.`;
+      dailyChallengeCopyEl.textContent = `${daily.theme.name} theme. ${daily.pos.name} helps, ${daily.neg.name} fights back.`;
     }
     if (dailyChallengePillsEl){
       dailyChallengePillsEl.innerHTML = [
         `<span class="daily-pill">${daily.theme.name}</span>`,
         `<span class="daily-pill">${daily.pos.icon || "+"} ${daily.pos.name}</span>`,
         `<span class="daily-pill warn">${daily.neg.icon || "-"} ${daily.neg.name}</span>`,
-        `<span class="daily-pill gold">Bronze ${daily.targetBronze.toLocaleString()}</span>`,
-        `<span class="daily-pill gold">Silver ${daily.targetSilver.toLocaleString()}</span>`,
         `<span class="daily-pill gold">Gold ${daily.targetGold.toLocaleString()}</span>`
       ].join("");
     }
     if (dailyMissionListEl){
-      dailyMissionListEl.innerHTML = daily.missions.map(m => {
+      const missionRows = daily.missions.slice(0, 2).map(m => {
         const done = (daily.claimedRewards.completedMissionIds || []).includes(m.id);
         return `<div class="daily-mission-item"><div><strong>${escText(m.name)}</strong><div>${escText(m.desc || "Fixed daily objective")}</div></div><div class="meta">${done ? "Done" : `${m.reward} shards`}</div></div>`;
-      }).join("");
+      });
+      if (daily.missions.length > 2){
+        missionRows.push(`<div class="daily-mission-item"><div><strong>${daily.missions.length - 2} more missions</strong><div>Open the daily run to see the full board.</div></div><div class="meta">Live</div></div>`);
+      }
+      dailyMissionListEl.innerHTML = missionRows.join("");
     }
     if (dailyChallengeCalloutEl){
       const tiers = [];
@@ -5783,7 +5810,7 @@ const FIREBASE_CONFIG = firebaseConfig;
       if (daily.claimedRewards.bronze) tiers.push("Bronze claimed");
       if (daily.claimedRewards.silver) tiers.push("Silver claimed");
       if (daily.claimedRewards.gold) tiers.push("Gold claimed");
-      dailyChallengeCalloutEl.textContent = `Best today: ${(daily.bestScore || 0).toLocaleString()}${tiers.length ? ` • ${tiers.join(" • ")}` : ""}`;
+      dailyChallengeCalloutEl.textContent = `Best today: ${(daily.bestScore || 0).toLocaleString()}${tiers.length ? ` | ${tiers.join(" | ")}` : ""}`;
     }
   }
 
@@ -6242,6 +6269,7 @@ const FIREBASE_CONFIG = firebaseConfig;
     state.scorePulse = 0;
     state.lastRunWasNewBest = false;
     state.lastRunPreviousBest = state.best;
+    state.lastRunLeaderboardUpdate = null;
     state.dangerPulse = 0;
     state.deathTimer = 0;
     state.freeze = 0;
@@ -6371,10 +6399,10 @@ const FIREBASE_CONFIG = firebaseConfig;
     introPanelEl.classList.add("active");
   }
 
-  function closeBreakdownPanel(showOverPanel = true){
+  function closeBreakdownPanel(showOverPanel = false){
     if (!breakdownPanelEl) return;
     breakdownPanelEl.classList.remove("active");
-    if (showOverPanel){
+    if (showOverPanel && overPanel){
       overPanel.classList.remove("hidden");
     }
   }
@@ -6566,6 +6594,7 @@ const FIREBASE_CONFIG = firebaseConfig;
     state.lastRunPreviousBest = state.best;
     const isNewBest = state.score > state.best;
     state.lastRunWasNewBest = isNewBest;
+    state.lastRunLeaderboardUpdate = getLeaderboardSubmissionDecision(state.score);
     let baseShardEarned = 0;
     const missionShardEarned = missions.reduce((sum, mission) => sum + (mission.completed ? (mission.reward || 0) : 0), 0);
     if (isNewBest){
@@ -6619,21 +6648,20 @@ const FIREBASE_CONFIG = firebaseConfig;
       bestCombo: state.bestCombo,
       newBest: isNewBest
     });
-    grantDailyAndStreakRewards(runSummary);
-    updateWeeklyProgressFromRun(runSummary);
-    if (runSummary.runType === "daily" && state.dailyChallenge){
-      publishFriendActivity(`posted a daily score of ${(state.dailyChallenge.bestScore || 0).toLocaleString()}`);
-    } else if (isNewBest){
-      publishFriendActivity(`set a new personal best of ${state.best.toLocaleString()}`);
-    }
-    checkAchievements();
-    saveProgress();
-    syncProgressToCloud();
     finalScoreEl.textContent = state.score;
     finalBestEl.textContent = state.best;
     scoreEl.textContent = state.score;
     bestEl.textContent = state.best;
-    showBreakdownPanel(isNewBest, baseShardEarned, missionShardEarned);
+    let showedBreakdown = false;
+    try{
+      showBreakdownPanel(isNewBest, baseShardEarned, missionShardEarned);
+      showedBreakdown = true;
+    }catch(err){
+      console.error("[NeonSlip] breakdown render failed:", err);
+      if (breakdownPanelEl) breakdownPanelEl.classList.remove("active");
+      navigateToMainMenu();
+      return;
+    }
     if (isNewBest){
       bestBurstEl.classList.remove("show");
       void bestBurstEl.offsetWidth;
@@ -6643,10 +6671,21 @@ const FIREBASE_CONFIG = firebaseConfig;
     // Monetization hook: show interstitial ad between runs here.
     showInterstitialAd();
 
-    overPanel.classList.add("hidden");
-    renderDailyChallengeCard();
-    renderHabitSidebar();
-    renderFriendActivity();
+    if (showedBreakdown && overPanel) overPanel.classList.add("hidden");
+    try{
+      grantDailyAndStreakRewards(runSummary);
+      updateWeeklyProgressFromRun(runSummary);
+      if (runSummary.runType === "daily" && state.dailyChallenge){
+        publishFriendActivity(`posted a daily score of ${(state.dailyChallenge.bestScore || 0).toLocaleString()}`);
+      } else if (isNewBest){
+        publishFriendActivity(`set a new personal best of ${state.best.toLocaleString()}`);
+      }
+      checkAchievements();
+      saveProgress();
+      syncProgressToCloud();
+    }catch(err){
+      console.error("[NeonSlip] post-run sync failed:", err);
+    }
   }
 
   function beginDeath(){
@@ -8422,8 +8461,7 @@ const FIREBASE_CONFIG = firebaseConfig;
               gameOver();
             }catch(err){
               console.error("[NeonSlip] death transition failed:", err);
-              setMode("over");
-              overPanel.classList.remove("hidden");
+              navigateToMainMenu();
             }
           }
         }
@@ -8438,9 +8476,8 @@ const FIREBASE_CONFIG = firebaseConfig;
       draw();
     }catch(err){
       console.error("[NeonSlip] frame loop failed:", err);
-      setMode("over");
       if (breakdownPanelEl) breakdownPanelEl.classList.remove("active");
-      if (overPanel) overPanel.classList.remove("hidden");
+      navigateToMainMenu();
     }finally{
       requestAnimationFrame(loop);
     }
@@ -8849,6 +8886,27 @@ const FIREBASE_CONFIG = firebaseConfig;
     if (category === "thisweek") return deduplicateByUid(lbEntries.filter(e => isThisWeek(e.date)));
     if (category === "daily") return deduplicateByUid(lbDailyEntries.filter(e => e.dateKey === utcDateKey()));
     return deduplicateByUid(lbEntries);
+  }
+
+  function getLeaderboardSubmissionDecision(score = state.score, identity = getLeaderboardIdentity()){
+    const allTimeBest = lbEntries.reduce((best, e) => e.uid === identity.uid ? Math.max(best, +e.score || 0) : best, 0);
+    const dailyBest = lbDailyEntries.reduce((best, e) => (
+      e.uid === identity.uid && e.dateKey === utcDateKey() ? Math.max(best, +e.score || 0) : best
+    ), 0);
+    const isDailyRun = state.currentRunType === "daily";
+    const submitAllTime = score > allTimeBest;
+    const submitDaily = isDailyRun && score > dailyBest;
+    return {
+      identity,
+      score,
+      isDailyRun,
+      allTimeBest,
+      dailyBest,
+      submitAllTime,
+      submitDaily,
+      shouldSubmit: submitAllTime || submitDaily,
+      primaryCategory: submitDaily ? "daily" : "alltime"
+    };
   }
 
   function upsertLeaderboardCache(list, entry){
@@ -10682,11 +10740,20 @@ const FIREBASE_CONFIG = firebaseConfig;
   function submitLbEntry(){
     const score = lbPendingScore;
     const dateStr = legacyDateLabel();
-    const isDailyRun = state.currentRunType === "daily";
     const dailyKey = utcDateKey();
-    const identity = getLeaderboardIdentity();
+    const submission = getLeaderboardSubmissionDecision(score);
+    const { identity, isDailyRun, submitAllTime, submitDaily, shouldSubmit, primaryCategory } = submission;
+    if (!shouldSubmit){
+      navigateToMainMenu();
+      return;
+    }
     sfxClick();
-    const previousAllTimeRank = getLeaderboardRowsForCategory("alltime").findIndex(e => e.uid === identity.uid);
+    const previousAllTimeRank = submitAllTime
+      ? getLeaderboardRowsForCategory("alltime").findIndex(e => e.uid === identity.uid)
+      : -1;
+    const previousDailyRank = submitDaily
+      ? getLeaderboardRowsForCategory("daily").findIndex(e => e.uid === identity.uid)
+      : -1;
     const entry = {
       name: identity.name,
       score,
@@ -10699,14 +10766,16 @@ const FIREBASE_CONFIG = firebaseConfig;
       score,
       leaderboardUid: identity.uid,
       verified: !!identity.verified,
-      boardType: isDailyRun ? "daily+alltime" : "alltime"
+      boardType: submitDaily && submitAllTime ? "daily+alltime" : (submitDaily ? "daily" : "alltime")
     });
     if (lbDB){
-      lbDB.ref(`leaderboard/${identity.uid}`).transaction((current) => {
-        if (!current || score > (+current.score || 0)) return { ...current, ...entry };
-        return current;
-      }).catch(() => {});
-      if (isDailyRun){
+      if (submitAllTime){
+        lbDB.ref(`leaderboard/${identity.uid}`).transaction((current) => {
+          if (!current || score > (+current.score || 0)) return { ...current, ...entry };
+          return current;
+        }).catch(() => {});
+      }
+      if (submitDaily){
         const dailyEntry = { ...entry, dateKey: dailyKey, seed: state.dailyChallenge ? state.dailyChallenge.seed : null };
         lbDB.ref(`leaderboardDaily/${dailyKey}/${identity.uid}`).transaction((current) => {
           if (!current || score > (+current.score || 0)) return { ...current, ...dailyEntry };
@@ -10714,35 +10783,52 @@ const FIREBASE_CONFIG = firebaseConfig;
         }).catch(() => {});
         upsertLeaderboardCache(lbDailyEntries, { ...dailyEntry, fbKey: identity.uid });
       }
+    } else if (submitDaily){
+      upsertLeaderboardCache(lbDailyEntries, { ...entry, dateKey: dailyKey, seed: state.dailyChallenge ? state.dailyChallenge.seed : null, fbKey: identity.uid });
     }
-    upsertLeaderboardCache(lbEntries, { ...entry, fbKey: identity.uid });
-    const newAllTimeRank = getLeaderboardRowsForCategory("alltime").findIndex(e => e.uid === identity.uid);
-    queueLeaderboardCelebration(
-      "alltime",
-      identity.uid,
-      previousAllTimeRank >= 0 ? previousAllTimeRank + 1 : Math.min(lbEntries.length + 1, 12),
-      newAllTimeRank >= 0 ? newAllTimeRank + 1 : 1
-    );
-    lbCategory = "alltime";
+    if (submitAllTime){
+      upsertLeaderboardCache(lbEntries, { ...entry, fbKey: identity.uid });
+      const newAllTimeRank = getLeaderboardRowsForCategory("alltime").findIndex(e => e.uid === identity.uid);
+      if (primaryCategory === "alltime"){
+        queueLeaderboardCelebration(
+          "alltime",
+          identity.uid,
+          previousAllTimeRank >= 0 ? previousAllTimeRank + 1 : Math.min(lbEntries.length + 1, 12),
+          newAllTimeRank >= 0 ? newAllTimeRank + 1 : 1
+        );
+      }
+    }
+    if (submitDaily){
+      const newDailyRank = getLeaderboardRowsForCategory("daily").findIndex(e => e.uid === identity.uid);
+      if (primaryCategory === "daily"){
+        queueLeaderboardCelebration(
+          "daily",
+          identity.uid,
+          previousDailyRank >= 0 ? previousDailyRank + 1 : Math.min(lbDailyEntries.length + 1, 12),
+          newDailyRank >= 0 ? newDailyRank + 1 : 1
+        );
+      }
+    }
+    lbCategory = primaryCategory;
     document.getElementById("lbCategoryTabs").querySelectorAll(".lb-category-tab").forEach(t => {
-      t.classList.toggle("active", (t.dataset.cat || "alltime") === "alltime");
+      t.classList.toggle("active", (t.dataset.cat || "alltime") === primaryCategory);
     });
     track("leaderboard_open", { surface: "score_submit" });
     leaderboardPanelEl.classList.add("active");
     renderLeaderboard(false);
     renderLbSidebar();
-    loadLeaderboardOnline({ showLeaderboardLoading: false, showSidebarLoading: state.mode === "start" });
+    clearLbTimer();
+    state.lbSubmitTimer = setTimeout(() => {
+      loadLeaderboardOnline({ showLeaderboardLoading: false, showSidebarLoading: state.mode === "start" });
+      state.lbSubmitTimer = null;
+    }, 1200);
   }
 
   function submitScore(score){
     lbPendingScore = score;
-    if (!state.lastRunWasNewBest){
-      navigateToMainMenu();
-      return;
-    }
-    const identity = getLeaderboardIdentity();
-    const existingBest = lbEntries.reduce((best, e) => e.uid === identity.uid ? Math.max(best, +e.score || 0) : best, 0);
-    if (score <= existingBest){
+    const submission = state.lastRunLeaderboardUpdate || getLeaderboardSubmissionDecision(score);
+    state.lastRunLeaderboardUpdate = submission;
+    if (!submission.shouldSubmit){
       navigateToMainMenu();
       return;
     }
@@ -12397,13 +12483,13 @@ const FIREBASE_CONFIG = firebaseConfig;
   if (closeBreakdownEl) closeBreakdownEl.addEventListener("click", () => {
     sfxClick();
     closeBreakdownPanel(false);
-    if (state.lastRunWasNewBest) submitScore(state.score);
+    if (state.lastRunLeaderboardUpdate?.shouldSubmit) submitScore(state.score);
     else navigateToMainMenu();
   });
   if (breakdownViewLeaderboardEl) breakdownViewLeaderboardEl.addEventListener("click", () => {
     sfxClick();
     closeBreakdownPanel(false);
-    if (state.lastRunWasNewBest) submitScore(state.score);
+    if (state.lastRunLeaderboardUpdate?.shouldSubmit) submitScore(state.score);
     else {
       leaderboardPanelEl.classList.add("active");
       loadLeaderboardOnline({ showLeaderboardLoading: true, showSidebarLoading: state.mode === "start" });
