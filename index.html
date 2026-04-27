@@ -1338,11 +1338,22 @@
       linear-gradient(160deg, rgba(18,22,38,.98), rgba(8,12,24,.98));
     box-shadow: 0 0 28px rgba(255,216,107,.12), inset 0 1px 0 rgba(255,216,107,.14);
     text-align:left;
+    transition:background .18s ease, border-color .18s ease, transform .18s ease;
   }
+  .daily-card:hover{ border-color:rgba(255,216,107,.62); transform:translateY(-1px); }
   .daily-card-head{
     display:flex; justify-content:space-between; align-items:center; gap:10px;
     font-size:11px; letter-spacing:1px; text-transform:uppercase; color:#ffd86b;
     margin-bottom:8px;
+    cursor:pointer; user-select:none;
+  }
+  .daily-card-toggle{
+    margin-left:auto; border:0; background:transparent; color:#ffd86b;
+    font-size:18px; line-height:1; cursor:pointer;
+    transition:transform .18s ease, color .18s ease;
+  }
+  .daily-card.expanded .daily-card-toggle{
+    transform:rotate(180deg); color:var(--neon);
   }
   .daily-card-title{
     font-size:14px; color:#fff5bf; letter-spacing:.7px; font-weight:700;
@@ -1366,6 +1377,15 @@
   .daily-mission-list, .weekly-goal-list, .friend-activity-list{
     display:flex; flex-direction:column; gap:7px; margin:8px 0 0;
   }
+  .daily-card-body{
+    display:grid; grid-template-rows:0fr; opacity:0; overflow:hidden;
+    transition:grid-template-rows .22s ease, opacity .18s ease, margin-top .18s ease;
+  }
+  .daily-card.expanded .daily-card-body{
+    grid-template-rows:1fr; opacity:1; margin-top:8px;
+  }
+  .daily-card-body-inner{ min-height:0; overflow:hidden; visibility:hidden; }
+  .daily-card.expanded .daily-card-body-inner{ visibility:visible; }
   .start-panel .daily-mission-list{
     max-height:122px;
     overflow:auto;
@@ -3321,14 +3341,19 @@
       <div class="daily-card-head">
         <span>Daily Challenge</span>
         <span id="dailyChallengeDate">---</span>
+        <button id="dailyChallengeToggle" class="daily-card-toggle" type="button" aria-expanded="false" aria-label="Expand daily challenge">⌄</button>
       </div>
-      <div class="daily-card-title">Signal locked for today</div>
-      <div id="dailyChallengeCopy" class="daily-card-copy">Shared seed. Fixed modifiers. One shot to climb today.</div>
-      <div id="dailyChallengePills" class="daily-pill-row"></div>
-      <div id="dailyMissionList" class="daily-mission-list"></div>
-      <div id="dailyChallengeCallout" class="daily-callout"></div>
-      <div class="daily-action-row">
-        <div class="btn" id="startDailyRunBtn">Play Daily</div>
+      <div class="daily-card-title">Same run for everyone</div>
+      <div id="dailyChallengeCopy" class="daily-card-copy">Daily run: everyone gets the same setup and upgrades are turned off.</div>
+      <div class="daily-card-body">
+        <div class="daily-card-body-inner">
+          <div id="dailyChallengePills" class="daily-pill-row"></div>
+          <div id="dailyMissionList" class="daily-mission-list"></div>
+          <div id="dailyChallengeCallout" class="daily-callout"></div>
+          <div class="daily-action-row">
+            <div class="btn" id="startDailyRunBtn">Play Daily</div>
+          </div>
+        </div>
       </div>
     </div>
     <div class="start-action-grid">
@@ -3360,11 +3385,11 @@
     <div class="sidebar-tab" id="lbTabAllTime">📅 All Time</div>
   </div>
   <div class="lb-sidebar-head">
-    <div class="lb-sidebar-title" id="lbSidebarTitle">Today's Best</div>
+    <div class="lb-sidebar-title" id="lbSidebarTitle">Top Scores Today</div>
     <button id="lbSidebarRefreshBtn" class="lb-sidebar-refresh-btn" type="button" title="Refresh leaderboard" aria-label="Refresh leaderboard">🔄</button>
   </div>
-  <div class="lb-sidebar-subtitle">Can you beat the high score?</div>
-  <div id="lbSidebarList"><div class="lb-sidebar-empty">No scores yet today</div></div>
+  <div class="lb-sidebar-subtitle">See the highest scores right now.</div>
+  <div id="lbSidebarList"><div class="lb-sidebar-empty">No scores posted today yet</div></div>
   <div class="lb-sidebar-cta">
     <button id="lbSidebarOpenBoard" class="btn lb-sidebar-btn" type="button">View Full Leaderboard</button>
   </div>
@@ -3392,9 +3417,8 @@
     <div class="guide-row"><div class="guide-key">Controls</div>A/D or Arrow keys to move. On touch, drag or tap. P or Esc pauses. M mutes.</div>
     <div class="guide-row"><div class="guide-key">Score</div>Center clears give PERFECT bonus. Tight edge clears give RISK bonus. Clean clears build combo.</div>
     <div class="guide-row"><div class="guide-key">Power-ups</div>Shield, Magnet, Time Slow, Dash, 2x score, Invincibility, and bonus Shards can spawn.</div>
-    <div class="guide-row"><div class="guide-key">Shards</div>Main upgrade currency. Earn them from runs, missions, streak rewards, and daily rewards.</div>
-    <div class="guide-row"><div class="guide-key">Flux</div>Rare cosmetic currency. You get it from full weekly clears, daily Gold tier, 7-day streaks, and High Roller.</div>
-    <div class="guide-row"><div class="guide-key">Daily</div>One shared daily run for everyone. It has 3 score targets: Bronze, Silver, and Gold. Gold is the top target.</div>
+    <div class="guide-row"><div class="guide-key">Shards</div>Earn Shards from runs and goals. Spend them on upgrades and cosmetics.</div>
+    <div class="guide-row"><div class="guide-key">Daily</div>One shared run for everyone. Upgrades are off, so the daily board is skill-only.</div>
     <div class="guide-row"><div class="guide-key">Streak</div>Play on new days to build streak. A one-day miss can be forgiven once. Longer breaks reset it.</div>
     <div class="guide-row"><div class="guide-key">Board</div>Signed-in bests submit automatically when they qualify for the leaderboard.</div>
   </div>
@@ -3607,7 +3631,6 @@
     <div id="upgradesCloseX" class="upgrades-close-x" title="Close">✕</div>
     <div class="title">Upgrades</div>
     <div id="currency" class="currency">Neon Shards: 0</div>
-    <div id="fluxCurrency" class="currency">Flux Tokens: 0</div>
     <div class="upgrade-tabs" id="upgradeTabs">
       <div class="upgrade-tab active" data-cat="all">All</div>
       <div class="upgrade-tab" data-cat="performance">⚙️ Performance</div>
@@ -3924,26 +3947,24 @@
       </div>
       <div class="slide">
         <h3>Shards And Upgrades</h3>
-        <p>Neon Shards <img src="shard.png" alt="Shard" class="shard-icon"> are the main upgrade currency.</p>
+        <p>Neon Shards <img src="shard.png" alt="Shard" class="shard-icon"> are the only progression currency.</p>
         <p>You earn them from runs, combos, missions, streak rewards, and daily challenge rewards.</p>
         <p>Spend them in Upgrades to improve clarity, control, and reward flow.</p>
       </div>
       <div class="slide">
-        <h3>Flux Tokens</h3>
-        <p>Flux Tokens are the rarer currency used for shop cosmetics.</p>
-        <p>You get them from four places only: full weekly clear, daily Gold tier, every 7th streak day, and High Roller.</p>
-        <p>If you were wondering where Flux comes from, that is the full list.</p>
+        <h3>Cosmetics</h3>
+        <p>Cosmetics also use Shards, so there is no second currency to learn.</p>
       </div>
       <div class="slide">
         <h3>Daily Challenge</h3>
         <p>The Daily Challenge is one shared seeded run for every player that day.</p>
-        <p>It has three score targets: Bronze, Silver, and Gold.</p>
-        <p>Gold is the highest target, and clearing it also gives 1 Flux Token.</p>
+        <p>It has three score targets. The top target pays the largest Shard bonus.</p>
+        <p>The top target gives an extra Shard payout.</p>
       </div>
       <div class="slide">
         <h3>Streaks And Weekly Goals</h3>
         <p>Playing on a new day gives a streak chest. Every 7th streak day adds a bigger reward.</p>
-        <p>A full weekly goal clear gives a Shard payout plus 2 Flux Tokens.</p>
+        <p>A full weekly goal clear gives a larger Shard payout.</p>
         <p>If you miss one day, grace can save the streak once. Longer gaps reset it.</p>
       </div>
       <div class="slide">
@@ -4120,6 +4141,8 @@ const FIREBASE_CONFIG = firebaseConfig;
   const dailyChallengePillsEl = document.getElementById("dailyChallengePills");
   const dailyMissionListEl = document.getElementById("dailyMissionList");
   const dailyChallengeCalloutEl = document.getElementById("dailyChallengeCallout");
+  const dailyChallengeCardEl = document.getElementById("dailyChallengeCard");
+  const dailyChallengeToggleEl = document.getElementById("dailyChallengeToggle");
   const startDailyRunBtnEl = document.getElementById("startDailyRunBtn");
   const dailyChallengeFriendsBtnEl = document.getElementById("dailyChallengeFriendsBtn");
   const habitSummaryGridEl = document.getElementById("habitSummaryGrid");
@@ -4485,8 +4508,10 @@ const FIREBASE_CONFIG = firebaseConfig;
     ctx.imageSmoothingEnabled = true;
     state.renderProfile = profile;
     if (typeof player !== "undefined"){
+      const metrics = worldMetrics();
+      player.r = metrics.playerRadius;
       player.x = preservePlayer
-        ? clamp(prevPlayerRatio * w, 14, Math.max(14, w - 14))
+        ? clamp(prevPlayerRatio * w, metrics.sideMargin, Math.max(metrics.sideMargin, w - metrics.sideMargin))
         : w * 0.5;
     }
     initVisualCaches();
@@ -4526,6 +4551,7 @@ const FIREBASE_CONFIG = firebaseConfig;
     audioMuted: false,
     audioFade: null,
     activeMusic: null,
+    lastPassSfxAt: 0,
     combo: 0,
     comboTimer: 0,
     nearTimer: 0,
@@ -4538,6 +4564,7 @@ const FIREBASE_CONFIG = firebaseConfig;
     scanlinePattern: null,
     renderProfile: null,
     playerHistory: [],
+    lastPlayerHistorySample: -999,
     visualTime: 0,
     frameIntervalMs: 1000 / 60,
     frameAccumulatorMs: 0,
@@ -4602,6 +4629,7 @@ const FIREBASE_CONFIG = firebaseConfig;
     lastRunLeaderboardUpdate: null,
     dangerZoneTimer: 0,
     bossGateTimer: 0,
+    trailTimer: 0,
     perfectCount: 0,
     streakBonusCount: 0,
     stats: {
@@ -4769,7 +4797,7 @@ const FIREBASE_CONFIG = firebaseConfig;
     const firefoxFactor = PLATFORM_FLAGS.isFirefox ? 0.8 : 1;
     const mobileFactor = PLATFORM_FLAGS.isMobile ? 0.82 : 1;
     const effectFactor = motionFactor * firefoxFactor * mobileFactor;
-    const dprCapBase = PLATFORM_FLAGS.isFirefox ? 1.35 : (PLATFORM_FLAGS.isMobile ? 1.6 : 2);
+    const dprCapBase = PLATFORM_FLAGS.isFirefox ? 1.15 : (PLATFORM_FLAGS.isMobile ? 1.6 : 2);
     const dprCap = motionPreset === "low"
       ? Math.min(dprCapBase, 1.15)
       : motionPreset === "med"
@@ -4778,19 +4806,19 @@ const FIREBASE_CONFIG = firebaseConfig;
     return {
       dprCap,
       allowCanvasFeedback: !PLATFORM_FLAGS.isFirefox && motionPreset === "high",
-      blobCount: PLATFORM_FLAGS.isFirefox ? 2 : 3,
-      auroraRibbonCount: PLATFORM_FLAGS.isFirefox ? 2 : 3,
-      pulseRingCount: PLATFORM_FLAGS.isFirefox ? 3 : 4,
-      fogWispCount: PLATFORM_FLAGS.isFirefox ? 3 : 5,
-      slowRippleCount: PLATFORM_FLAGS.isFirefox ? 2 : 3,
-      verticalGridLines: PLATFORM_FLAGS.isFirefox ? 10 : 14,
-      horizontalGridLines: PLATFORM_FLAGS.isFirefox ? 7 : 10,
-      starCanvasSize: PLATFORM_FLAGS.isFirefox ? 384 : 512,
-      noiseCanvasSize: PLATFORM_FLAGS.isFirefox ? 96 : 128,
+      blobCount: PLATFORM_FLAGS.isFirefox ? 1 : 3,
+      auroraRibbonCount: PLATFORM_FLAGS.isFirefox ? 1 : 3,
+      pulseRingCount: PLATFORM_FLAGS.isFirefox ? 2 : 4,
+      fogWispCount: PLATFORM_FLAGS.isFirefox ? 2 : 5,
+      slowRippleCount: PLATFORM_FLAGS.isFirefox ? 1 : 3,
+      verticalGridLines: PLATFORM_FLAGS.isFirefox ? 8 : 14,
+      horizontalGridLines: PLATFORM_FLAGS.isFirefox ? 6 : 10,
+      starCanvasSize: PLATFORM_FLAGS.isFirefox ? 320 : 512,
+      noiseCanvasSize: PLATFORM_FLAGS.isFirefox ? 80 : 128,
       speedLineCount: Math.max(18, Math.round(POLISH.speedLineCount * effectFactor)),
-      maxParticles: Math.max(110, Math.round(POLISH.maxParticles * effectFactor)),
+      maxParticles: Math.max(90, Math.round(POLISH.maxParticles * effectFactor)),
       trailLengthMul: PLATFORM_FLAGS.isFirefox ? 0.82 : 1,
-      glowMul: PLATFORM_FLAGS.isFirefox ? 0.78 : 1,
+      glowMul: PLATFORM_FLAGS.isFirefox ? 0.58 : 1,
       scanlineAlphaMul: PLATFORM_FLAGS.isFirefox ? 0.55 : 1,
       noiseAlphaMul: PLATFORM_FLAGS.isFirefox ? 0.75 : 1,
       washAlphaMul: PLATFORM_FLAGS.isFirefox ? 0.82 : 1,
@@ -5045,7 +5073,6 @@ const FIREBASE_CONFIG = firebaseConfig;
     streakChest: 25,
     streak7Bonus: 90,
     weeklyCompleteShards: 120,
-    weeklyCompleteFlux: 2,
     socialSend: 12,
     socialAccept: 12,
     dailyTiers: { bronze: 40, silver: 80, gold: 140 }
@@ -5167,6 +5194,10 @@ const FIREBASE_CONFIG = firebaseConfig;
     return COSMETICS.find(c => c.id === id) || null;
   }
 
+  function getCosmeticShardPrice(cosmetic){
+    return Math.max(0, Math.round((cosmetic?.price || 0) * 180));
+  }
+
   function currentDailyEntry(){
     const key = utcDateKey();
     const existing = state.dailyHistory[key];
@@ -5225,6 +5256,37 @@ const FIREBASE_CONFIG = firebaseConfig;
 
   function lerp(a, b, t){
     return a + (b - a) * t;
+  }
+
+  function frameRateIndependentEase(perFrameEaseAt60, dt){
+    return 1 - Math.pow(1 - perFrameEaseAt60, Math.max(0, dt) * 60);
+  }
+
+  const GAME_WORLD = {
+    referenceWidth: 900,
+    minScale: 0.62,
+    maxScale: 1.18,
+    maxGapRatio: 0.32
+  };
+
+  function worldScale(){
+    return clamp((w || GAME_WORLD.referenceWidth) / GAME_WORLD.referenceWidth, GAME_WORLD.minScale, GAME_WORLD.maxScale);
+  }
+
+  function worldMetrics(){
+    const scale = worldScale();
+    const width = Math.max(320, w || GAME_WORLD.referenceWidth);
+    return {
+      width,
+      scale,
+      sideMargin: clamp(width * 0.065, 24 * scale, 64 * scale),
+      minGap: clamp(width * 0.16, 68 * scale, 112 * scale),
+      maxGap: clamp(width * GAME_WORLD.maxGapRatio, 96 * scale, 190 * scale),
+      playerRadius: 10 * scale,
+      playerSpeed: 620 * scale,
+      playerAccel: 18000 * scale,
+      playerFriction: 20000 * scale
+    };
   }
 
   function mulberry32(seed){
@@ -5852,7 +5914,7 @@ const FIREBASE_CONFIG = firebaseConfig;
 
   function refreshShardDisplays(animateLive = false){
     if (currencyEl) currencyEl.innerHTML = `${PROGRESSION.currencyName}: ${state.shards} <img src="shard.png" alt="Shard" class="shard-icon">`;
-    if (fluxCurrencyEl) fluxCurrencyEl.textContent = `Flux Tokens: ${state.fluxTokens || 0}`;
+    if (fluxCurrencyEl) fluxCurrencyEl.textContent = "Cosmetics use Shards";
     const mainMenuShardsEl = document.getElementById("mainMenuShards");
     if (mainMenuShardsEl) mainMenuShardsEl.innerHTML = `<img src="shard.png" alt="Shard" class="shard-icon-sm"> ${state.shards} Neon Shards`;
     if (liveShardValueEl) liveShardValueEl.textContent = state.shards.toLocaleString();
@@ -5868,20 +5930,21 @@ const FIREBASE_CONFIG = firebaseConfig;
     const daily = state.dailyChallenge || currentDailyEntry();
     if (dailyChallengeDateEl) dailyChallengeDateEl.textContent = utcDateLabelFromKey(daily.date);
     if (dailyChallengeCopyEl){
-      dailyChallengeCopyEl.textContent = `${daily.theme.name} theme. ${daily.pos.name} helps, ${daily.neg.name} fights back.`;
+      dailyChallengeCopyEl.textContent = `Daily run: upgrades are off. Today's setup uses ${daily.theme.name}, ${daily.pos.name}, and ${daily.neg.name}.`;
     }
     if (dailyChallengePillsEl){
       dailyChallengePillsEl.innerHTML = [
         `<span class="daily-pill">${daily.theme.name}</span>`,
         `<span class="daily-pill">${daily.pos.icon || "+"} ${daily.pos.name}</span>`,
         `<span class="daily-pill warn">${daily.neg.icon || "-"} ${daily.neg.name}</span>`,
-        `<span class="daily-pill gold">Gold ${daily.targetGold.toLocaleString()}</span>`
+        `<span class="daily-pill good">Upgrades Off</span>`,
+        `<span class="daily-pill gold">Score Goal ${daily.targetGold.toLocaleString()}</span>`
       ].join("");
     }
     if (dailyMissionListEl){
       const missionRows = daily.missions.slice(0, 2).map(m => {
         const done = (daily.claimedRewards.completedMissionIds || []).includes(m.id);
-        return `<div class="daily-mission-item"><div><strong>${escText(m.name)}</strong><div>${escText(m.desc || "Fixed daily objective")}</div></div><div class="meta">${done ? "Done" : `${m.reward} shards`}</div></div>`;
+        return `<div class="daily-mission-item"><div><strong>${escText(m.name)}</strong><div>${escText(m.desc || "Fixed daily objective")}</div></div><div class="meta">${done ? "Done" : `${m.reward} Shards`}</div></div>`;
       });
       if (daily.missions.length > 2){
         missionRows.push(`<div class="daily-mission-item"><div><strong>${daily.missions.length - 2} more missions</strong><div>Open the daily run to see the full board.</div></div><div class="meta">Live</div></div>`);
@@ -5890,11 +5953,11 @@ const FIREBASE_CONFIG = firebaseConfig;
     }
     if (dailyChallengeCalloutEl){
       const tiers = [];
-      if (daily.claimedRewards.first) tiers.push("First clear claimed");
-      if (daily.claimedRewards.bronze) tiers.push("Bronze claimed");
-      if (daily.claimedRewards.silver) tiers.push("Silver claimed");
-      if (daily.claimedRewards.gold) tiers.push("Gold claimed");
-      dailyChallengeCalloutEl.textContent = `Best today: ${(daily.bestScore || 0).toLocaleString()}${tiers.length ? ` | ${tiers.join(" | ")}` : ""}`;
+      if (daily.claimedRewards.first) tiers.push("First completion earned");
+      if (daily.claimedRewards.bronze) tiers.push("Score goal 1 earned");
+      if (daily.claimedRewards.silver) tiers.push("Score goal 2 earned");
+      if (daily.claimedRewards.gold) tiers.push("Final score goal earned");
+      dailyChallengeCalloutEl.textContent = `Your best today: ${(daily.bestScore || 0).toLocaleString()}${tiers.length ? ` | ${tiers.join(" | ")}` : ""}`;
     }
   }
 
@@ -5907,12 +5970,12 @@ const FIREBASE_CONFIG = firebaseConfig;
         { label: "Streak", value: `${state.streakCount || 0} days` },
         { label: "Today", value: state.todayCompleted ? "Done" : "Open" },
         { label: "Daily Best", value: (state.dailyChallenge && state.dailyChallenge.bestScore || 0).toLocaleString() },
-        { label: "Flux", value: `${state.fluxTokens || 0}` }
+        { label: "Shards", value: `${state.shards || 0}` }
       ].map(item => `<div class="habit-stat"><div class="label">${item.label}</div><div class="value">${item.value}</div></div>`).join("");
       if (habitStatusPillsEl){
         habitStatusPillsEl.innerHTML = [
-          `<span class="habit-pill ${state.todayCompleted ? "good" : ""}">${state.todayCompleted ? "Today's run complete" : "Daily rewards still open"}</span>`,
-          `<span class="habit-pill ${streakGrace ? "warn" : ""}">${streakGrace ? "Grace saved your streak" : "No grace used"}</span>`
+          `<span class="habit-pill ${state.todayCompleted ? "good" : ""}">${state.todayCompleted ? "Daily run finished" : "Daily run rewards available"}</span>`,
+          `<span class="habit-pill ${streakGrace ? "warn" : ""}">${streakGrace ? "Streak protection used" : "Streak protection available"}</span>`
         ].join("");
       }
     }
@@ -5951,7 +6014,7 @@ const FIREBASE_CONFIG = firebaseConfig;
         <div class="vault-preview" style="--preview-accent:${cosmetic.preview.accent};--preview-core:${cosmetic.preview.core};${cosmetic.asset ? `background-image:url('${escText(cosmetic.asset)}');background-size:cover;background-position:center;` : ""}"></div>
         <div class="vault-name">${escText(cosmetic.name)}</div>
         <div class="vault-meta">${escText(cosmetic.desc)}</div>
-        <div class="vault-price">${owned ? (equipped ? "Equipped" : "Owned") : `${cosmetic.price} Flux`}</div>
+        <div class="vault-price">${owned ? (equipped ? "Equipped" : "Owned") : `${getCosmeticShardPrice(cosmetic)} Shards`}</div>
         <div class="btn upg-buy-btn" data-act="${owned ? "equip" : "buy"}" data-cosmetic="${id}">${owned ? (equipped ? "Equipped" : "Equip") : "Unlock"}</div>
       </div>`;
     }).join("");
@@ -6061,12 +6124,20 @@ const FIREBASE_CONFIG = firebaseConfig;
     renderHabitSidebar();
   }
 
+  function isDailyFairRun(){
+    return state.currentRunType === "daily";
+  }
+
+  function runUpgradeLevel(id){
+    return isDailyFairRun() ? 0 : (+state.upgrades[id] || 0);
+  }
+
   function applyUpgrades(){
-    const control = state.upgrades.control || 0;
-    const combo = state.upgrades.combo || 0;
-    const glow = state.upgrades.glow || 0;
-    const trail = state.upgrades.trail || 0;
-    const pulse = state.upgrades.pulse || 0;
+    const control = runUpgradeLevel("control");
+    const combo = runUpgradeLevel("combo");
+    const glow = runUpgradeLevel("glow");
+    const trail = runUpgradeLevel("trail");
+    const pulse = runUpgradeLevel("pulse");
     state.upgradeEffects = {
       controlBoost: 1 + control * UPGRADE_SCALING.controlPerLevel,
       comboExtend: 1 + combo * UPGRADE_SCALING.comboPerLevel,
@@ -6322,10 +6393,12 @@ const FIREBASE_CONFIG = firebaseConfig;
 
   function resetGame(){
     applyUpgrades();
+    const metrics = worldMetrics();
+    player.r = metrics.playerRadius;
     state.time = 0;
     state.score = 0;
     // Starting Boost upgrade: bonus score at run start
-    if (state.upgrades.starting) state.score = Math.round(state.upgrades.starting * UPGRADE_SCALING.startingScorePerLevel);
+    if (runUpgradeLevel("starting")) state.score = Math.round(runUpgradeLevel("starting") * UPGRADE_SCALING.startingScorePerLevel);
     gates.length = 0;
     particles.length = 0;
     orbs.length = 0;
@@ -6364,6 +6437,7 @@ const FIREBASE_CONFIG = firebaseConfig;
     state.readyTimer = 0.7;
     state.paused = false;
     state.playerHistory = [];
+    state.lastPlayerHistorySample = -999;
     state.gateCount = 0;
     state.bestCombo = 0;
     state.nearCount = 0;
@@ -6380,16 +6454,17 @@ const FIREBASE_CONFIG = firebaseConfig;
     state.invincible = false;
     state.invincibleTimer = 0;
     state.powerupsCollected = 0;
-    state.powerupTimer = POWERUPS.spawnInterval * getFortuneSpawnMultiplier(state.upgrades.fortune || 0);
+    state.powerupTimer = POWERUPS.spawnInterval * getFortuneSpawnMultiplier(runUpgradeLevel("fortune"));
     state.runStreakCount = 0;
     state.dangerZoneTimer = 15;
     state.bossGateTimer = 20;
+    state.trailTimer = 0;
     state.perfectCount = 0;
     state.streakBonusCount = 0;
     state.runStreakCount = 0;
     
     // Check for shield spawn from upgrade
-    if (state.upgrades.shield && Math.random() < getShieldStartChance(state.upgrades.shield)){
+    if (runUpgradeLevel("shield") && Math.random() < getShieldStartChance(runUpgradeLevel("shield"))){
       state.hasShield = true;
       shieldIndicatorEl.classList.add("active");
     } else {
@@ -6644,7 +6719,8 @@ const FIREBASE_CONFIG = firebaseConfig;
     }
     if (!state.loggedParams){
       const profile = state.runProfile;
-      const maxGapShift = player.speed * profile.minPassInterval * TUNING.reachFactor;
+      const metrics = worldMetrics();
+      const maxGapShift = metrics.playerSpeed * profile.minPassInterval * TUNING.reachFactor;
       console.log("[NeonSlip] fairness params:", {
         minPassInterval: profile.minPassInterval,
         maxPassInterval: profile.maxPassInterval,
@@ -6675,6 +6751,7 @@ const FIREBASE_CONFIG = firebaseConfig;
 
   function gameOver(){
     setMode("over");
+    state.score = Math.floor(state.score);
     state.lastRunPreviousBest = state.best;
     const isNewBest = state.score > state.best;
     state.lastRunWasNewBest = isNewBest;
@@ -6802,7 +6879,7 @@ const FIREBASE_CONFIG = firebaseConfig;
     }
     
     // Check for revival upgrade (once per run)
-    if (!state.revivalUsed && state.upgrades.revival && Math.random() < getRevivalChance(state.upgrades.revival)){
+    if (!state.revivalUsed && runUpgradeLevel("revival") && Math.random() < getRevivalChance(runUpgradeLevel("revival"))){
       state.revivalUsed = true;
       state.flash = 0.15;
       state.shake = 0.2;
@@ -6841,6 +6918,8 @@ const FIREBASE_CONFIG = firebaseConfig;
 
   // Director: track recent average x to bias future gaps.
   function recordPlayerX(){
+    if (state.time - state.lastPlayerHistorySample < 0.08) return;
+    state.lastPlayerHistorySample = state.time;
     state.playerHistory.push({ x: player.x, t: state.time });
     const cutoff = state.time - TUNING.directorWindowSec;
     while (state.playerHistory.length && state.playerHistory[0].t < cutoff){
@@ -6856,13 +6935,14 @@ const FIREBASE_CONFIG = firebaseConfig;
   }
 
   function chooseGapCenter(gapW, passETA, intensityN){
-    const minCenter = 40 + gapW / 2;
-    const maxCenter = w - 40 - gapW / 2;
+    const metrics = worldMetrics();
+    const minCenter = metrics.sideMargin + gapW / 2;
+    const maxCenter = w - metrics.sideMargin - gapW / 2;
     let center = clamp(w * 0.5 + patternOffset(), minCenter, maxCenter);
 
     if (state.lastGapCenter != null && state.lastPassETA != null){
       const timeDelta = Math.max(0.05, passETA - state.lastPassETA);
-      const maxShift = player.speed * timeDelta * TUNING.reachFactor;
+      const maxShift = metrics.playerSpeed * timeDelta * TUNING.reachFactor;
       const bias = Math.min(0.9, 0.55 + intensityN * 0.25 + state.runMods.patternBias);
       const patternCenter = clamp(w * 0.5 + patternOffset(), minCenter, maxCenter);
       const avgX = avgPlayerX();
@@ -6907,7 +6987,7 @@ const FIREBASE_CONFIG = firebaseConfig;
     // Spawn new powerups
     state.powerupTimer -= dt;
     const spawnRate = POWERUPS.spawnInterval / (state.runMods.powerupBoost || 1);
-    const fortuneMul = getFortuneSpawnMultiplier(state.upgrades.fortune || 0);
+    const fortuneMul = getFortuneSpawnMultiplier(runUpgradeLevel("fortune"));
     if (state.powerupTimer <= 0){
       spawnPowerup();
       state.powerupTimer = spawnRate * fortuneMul;
@@ -7009,7 +7089,7 @@ const FIREBASE_CONFIG = firebaseConfig;
         break;
       case "magnet":
         state.magnetActive = true;
-        const magnetBonus = (state.upgrades.magnet || 0) * UPGRADE_SCALING.magnetSecondsPerLevel;
+        const magnetBonus = runUpgradeLevel("magnet") * UPGRADE_SCALING.magnetSecondsPerLevel;
         state.magnetTimer = powerup.type.duration + magnetBonus;
         magnetIndicatorEl.classList.add("active");
         magnetIndicatorEl.textContent = `🧲 MAGNET ${state.magnetTimer.toFixed(1)}s`;
@@ -7052,14 +7132,18 @@ const FIREBASE_CONFIG = firebaseConfig;
     const intensityN = intensityNorm();
     const intensityVal = intensity();
     const p = state.runProfile;
-    let gapW = Math.max(p.minGap, p.baseGap - (intensityVal - 1) * p.gapShrinkPerIntensity);
-    if (state.gateCount < 12) gapW += 20;
-    gapW = Math.max(p.minGap, gapW * state.runMods.gapMul);
+    const metrics = worldMetrics();
+    const scaledBaseGap = p.baseGap * metrics.scale;
+    const scaledShrink = p.gapShrinkPerIntensity * metrics.scale;
+    let gapW = Math.max(metrics.minGap, scaledBaseGap - (intensityVal - 1) * scaledShrink);
+    if (state.gateCount < 12) gapW += 20 * metrics.scale;
+    gapW = Math.max(metrics.minGap, gapW * state.runMods.gapMul);
     // Chaos: randomize gap width per gate for extra unpredictability
     if (state.runMods.chaosMode){
       gapW *= 0.65 + randRange(0, 1) * 0.9;
-      gapW = Math.max(p.minGap * 0.85, gapW);
+      gapW = Math.max(metrics.minGap * 0.85, gapW);
     }
+    gapW = clamp(gapW, metrics.minGap, metrics.maxGap);
     const y = yOverride != null ? yOverride : -40 - Math.round((state.runMods.visionBoost - 1) * 350);
     const playerY = player.y();
     let speed = Math.max(p.baseSpeed, speedAtTime()) * state.runMods.speedMul;
@@ -7157,7 +7241,7 @@ const FIREBASE_CONFIG = firebaseConfig;
             Math.abs(px - g.gapX),
             Math.abs(px - (g.gapX + g.gapW))
           );
-          const dangerBoost = 1 + (state.upgrades.danger || 0) * UPGRADE_SCALING.dangerPerLevel;
+          const dangerBoost = 1 + runUpgradeLevel("danger") * UPGRADE_SCALING.dangerPerLevel;
           let bonus = edgeDist < 18 ? Math.round(8 * dangerBoost) : edgeDist < 35 ? Math.round(4 * dangerBoost) : 2;
           let style = "";
           if (centerDist < 6){
@@ -7185,7 +7269,7 @@ const FIREBASE_CONFIG = firebaseConfig;
           state.runStreakCount += 1;
           if (state.runStreakCount % 10 === 0){
             const streakBonus = Math.min(500, 50 + (state.runStreakCount / 10) * 25);
-            const upgradeBonus = (state.upgrades.streak || 0) * UPGRADE_SCALING.streakPerLevel;
+            const upgradeBonus = runUpgradeLevel("streak") * UPGRADE_SCALING.streakPerLevel;
             const totalBonus = Math.floor(streakBonus * (1 + upgradeBonus));
             state.score += totalBonus;
             state.shards += Math.floor(totalBonus / 10);
@@ -7315,6 +7399,7 @@ const FIREBASE_CONFIG = firebaseConfig;
   }
 
   function updatePlayer(dt){
+    const metrics = worldMetrics();
     const controlBoost = state.upgradeEffects.controlBoost || 1;
     const intensityBoost = 1 + intensityNorm() * 0.35;
     const dashBoost = state.dashActive ? 1.5 : 1;
@@ -7322,10 +7407,10 @@ const FIREBASE_CONFIG = firebaseConfig;
     const smoothBoost = state.runMods.smoothMove || 1;
     const speedBoost = state.runMods.speedBoost || 1;
     const effectiveAccelMul = controlBoost * smoothBoost * controlPenalty * intensityBoost * dashBoost;
-    const maxSpeed = player.speed * intensityBoost * dashBoost * controlPenalty * speedBoost;
+    const maxSpeed = metrics.playerSpeed * intensityBoost * dashBoost * controlPenalty * speedBoost;
     const move = (input.right ? 1 : 0) - (input.left ? 1 : 0);
     // Mirror bias: constant directional pull (applied to rest velocity in all cases)
-    const mirrorPull = state.runMods.mirror ? state.runMods.mirrorDir * 350 : 0;
+    const mirrorPull = state.runMods.mirror ? state.runMods.mirrorDir * 350 * metrics.scale : 0;
     if (player.targetX != null){
       const dx = player.targetX - player.x;
       // Far targets: go at full speed for snappy response; near targets: proportional slow-down
@@ -7333,23 +7418,23 @@ const FIREBASE_CONFIG = firebaseConfig;
         ? Math.sign(dx) * maxSpeed
         : clamp(dx * (maxSpeed / 40), -maxSpeed, maxSpeed);
       desired += mirrorPull;
-      const dv = clamp(desired - player.vx, -player.accel * effectiveAccelMul * dt, player.accel * effectiveAccelMul * dt);
+      const dv = clamp(desired - player.vx, -metrics.playerAccel * effectiveAccelMul * dt, metrics.playerAccel * effectiveAccelMul * dt);
       player.vx += dv;
       player.x += player.vx * dt;
     } else if (move !== 0){
       let desired = move * maxSpeed + mirrorPull;
-      const dv = clamp(desired - player.vx, -player.accel * effectiveAccelMul * dt, player.accel * effectiveAccelMul * dt);
+      const dv = clamp(desired - player.vx, -metrics.playerAccel * effectiveAccelMul * dt, metrics.playerAccel * effectiveAccelMul * dt);
       player.vx += dv;
       player.x += player.vx * dt;
     } else {
       // Idle: decelerate toward mirrorPull (drift even without input when mirror is active)
       const restVelocity = mirrorPull;
-      const dv = clamp(restVelocity - player.vx, -player.friction * controlBoost * intensityBoost * dt, player.friction * controlBoost * intensityBoost * dt);
+      const dv = clamp(restVelocity - player.vx, -metrics.playerFriction * controlBoost * intensityBoost * dt, metrics.playerFriction * controlBoost * intensityBoost * dt);
       player.vx += dv;
       if (Math.abs(player.vx - restVelocity) < 6 && restVelocity === 0) player.vx = 0;
       player.x += player.vx * dt;
     }
-    player.x = Math.max(14, Math.min(w - 14, player.x));
+    player.x = clamp(player.x, metrics.sideMargin, Math.max(metrics.sideMargin, w - metrics.sideMargin));
   }
 
   function spawnParticles(x, y){
@@ -7378,7 +7463,7 @@ const FIREBASE_CONFIG = firebaseConfig;
       p.x += p.vx * dt;
       p.y += p.vy * dt;
       p.vy += 180 * dt;
-      p.vx *= 0.98;
+      p.vx *= Math.pow(0.98, dt * 60);
       if (p.life > 0){
         particles[write++] = p;
       }
@@ -7387,7 +7472,11 @@ const FIREBASE_CONFIG = firebaseConfig;
   }
 
   function updateTrail(dt){
-    trail.push({ x: player.x, y: player.y(), life: 1 });
+    state.trailTimer -= dt;
+    if (state.trailTimer <= 0){
+      trail.push({ x: player.x, y: player.y(), life: 1 });
+      state.trailTimer += 1 / 60;
+    }
     const profile = state.renderProfile || buildRenderProfile();
     const maxLen = Math.max(4, Math.floor(POLISH.trailLength * motionScale() * profile.trailLengthMul));
     const excess = trail.length - maxLen;
@@ -7452,9 +7541,10 @@ const FIREBASE_CONFIG = firebaseConfig;
       refreshShardDisplays(state.mode === "play" && renderedShardCount != null && state.shards > renderedShardCount);
       renderedShardCount = state.shards;
     }
-    state.uiScore += (state.score - state.uiScore) * POLISH.uiEase;
-    state.uiBest += (state.best - state.uiBest) * POLISH.uiEase;
-    state.uiIntensity += (intensity() - state.uiIntensity) * POLISH.uiEase;
+    const uiEase = frameRateIndependentEase(POLISH.uiEase, dt);
+    state.uiScore += (state.score - state.uiScore) * uiEase;
+    state.uiBest += (state.best - state.uiBest) * uiEase;
+    state.uiIntensity += (intensity() - state.uiIntensity) * uiEase;
 
     if (state.scorePulse > 0) state.scorePulse -= dt;
     if (state.dangerPulse > 0) state.dangerPulse -= dt;
@@ -8498,7 +8588,7 @@ const FIREBASE_CONFIG = firebaseConfig;
         // in sync with gate movement (which also uses dtScaled).  Real-world
         // timers such as state.slowMo and powerup durations still use raw dt.
         state.time += dtScaled;
-        state.score += Math.floor(dtScaled * 8);
+        state.score += dtScaled * 8;
       state.intensityPeak = Math.max(state.intensityPeak, intensity());
       if (state.announceCooldown > 0) state.announceCooldown -= dt;
       if (intensityNorm() > 0.85 && state.announceCooldown <= 0){
@@ -8612,6 +8702,9 @@ const FIREBASE_CONFIG = firebaseConfig;
     src.start();
   }
   function sfxPass(){
+    const now = audioCtx ? audioCtx.currentTime : 0;
+    if (now && now - state.lastPassSfxAt < 0.045) return;
+    state.lastPassSfxAt = now;
     playTone(680, 0.08, "triangle", 0.08);
     playTone(920, 0.06, "sine", 0.06);
   }
@@ -9213,7 +9306,7 @@ const FIREBASE_CONFIG = firebaseConfig;
     if (!sidebarEl || !listEl) return;
     // Only show on start screen
     if (state.mode !== "start"){ sidebarEl.classList.remove("active"); return; }
-    if (titleEl) titleEl.textContent = lbSidebarTab === "today" ? "Today's Best" : "All-Time Best";
+    if (titleEl) titleEl.textContent = lbSidebarTab === "today" ? "Top Scores Today" : "Top Scores Overall";
     if (loading){
       listEl.innerHTML = '<div class="lb-sidebar-empty"><span class="lb-loading">⟳</span> Loading…</div>';
       sidebarEl.classList.add("active");
@@ -9223,7 +9316,7 @@ const FIREBASE_CONFIG = firebaseConfig;
       ? deduplicateByUid(lbEntries.filter(e => isToday(e.date)))
       : deduplicateByUid(lbEntries.slice(0, 50));
     if (!entries.length){
-      listEl.innerHTML = `<div class="lb-sidebar-empty">No scores ${lbSidebarTab === "today" ? "today" : "yet"}</div>`;
+      listEl.innerHTML = `<div class="lb-sidebar-empty">${lbSidebarTab === "today" ? "No scores posted today yet" : "No scores posted yet"}</div>`;
       sidebarEl.classList.add("active");
       return;
     }
@@ -9307,7 +9400,7 @@ const FIREBASE_CONFIG = firebaseConfig;
     if (allComplete && !state.weeklyProgress.claimed){
       state.weeklyProgress.claimed = true;
       state.shards += HABIT_REWARDS.weeklyCompleteShards;
-      state.fluxTokens += HABIT_REWARDS.weeklyCompleteFlux;
+      state.shards += 360;
       announce("WEEKLY TARGETS COMPLETE!");
     }
   }
@@ -9334,7 +9427,7 @@ const FIREBASE_CONFIG = firebaseConfig;
       state.stats.totalShardsEarned = (state.stats.totalShardsEarned || 0) + HABIT_REWARDS.streakChest;
       if (state.streakCount > 0 && state.streakCount % 7 === 0){
         state.shards += HABIT_REWARDS.streak7Bonus;
-        state.fluxTokens += 1;
+        state.shards += 180;
       }
       state.lastActiveDate = todayKey;
       state.todayCompleted = true;
@@ -9359,7 +9452,7 @@ const FIREBASE_CONFIG = firebaseConfig;
       if ((run.score || 0) >= daily.targetGold && !daily.claimedRewards.gold){
         daily.claimedRewards.gold = true;
         state.shards += HABIT_REWARDS.dailyTiers.gold;
-        state.fluxTokens += 1;
+        state.shards += 180;
       }
       state.stats.dailyBestScore = Math.max(state.stats.dailyBestScore || 0, daily.bestScore || 0);
       syncDailyState();
@@ -10580,7 +10673,7 @@ const FIREBASE_CONFIG = firebaseConfig;
       { label: "Shards Earned",  value: (s.totalShardsEarned || 0).toLocaleString() },
       { label: "Streak Days",    value: (state.streakCount || 0).toLocaleString() },
       { label: "Daily Best",     value: ((state.dailyChallenge && state.dailyChallenge.bestScore) || 0).toLocaleString() },
-      { label: "Flux Tokens",    value: (state.fluxTokens || 0).toLocaleString() }
+      { label: "Shards",         value: (state.shards || 0).toLocaleString() }
     ].map(item => `<div class="stat-card"><div class="stat-value">${item.value}</div><div class="stat-label">${item.label}</div></div>`).join('');
     statsPanelEl.classList.add("active");
   }
@@ -10609,7 +10702,7 @@ const FIREBASE_CONFIG = firebaseConfig;
       if (!state.achievementsUnlocked.includes(id)){
         state.achievementsUnlocked.push(id);
         const ach = ACHIEVEMENTS.list.find(a => a.id === id);
-        if (id === "high_roller") state.fluxTokens += 1;
+        if (id === "high_roller") state.shards += 180;
         if (id === "survivor" && !state.ownedCosmetics.includes("trail_mint")) state.ownedCosmetics.push("trail_mint");
         if (ach) setTimeout(() => announce(`${ach.icon} ${ach.name.toUpperCase()}!`), 200);
         return true;
@@ -12129,11 +12222,23 @@ const FIREBASE_CONFIG = firebaseConfig;
     state.currentRunType = "daily";
     state.dailyChallenge = currentDailyEntry();
     track("daily_play_click", { surface: "daily_card", dailySeed: state.dailyChallenge?.seed || "" });
-    if (!ensureLegalConsentForGameplay("open-mods")) return;
     generateRunProfile();
     selectRunMods();
-    modsPanelEl.classList.add("active");
+    if (!ensureLegalConsentForGameplay("start-game")) return;
+    startGame();
   });
+  function setDailyCardExpanded(expanded){
+    if (!dailyChallengeCardEl || !dailyChallengeToggleEl) return;
+    dailyChallengeCardEl.classList.toggle("expanded", expanded);
+    dailyChallengeToggleEl.setAttribute("aria-expanded", expanded ? "true" : "false");
+    dailyChallengeToggleEl.setAttribute("aria-label", expanded ? "Collapse daily challenge" : "Expand daily challenge");
+  }
+  if (dailyChallengeCardEl){
+    dailyChallengeCardEl.addEventListener("click", (e) => {
+      if (e.target.closest("#startDailyRunBtn")) return;
+      setDailyCardExpanded(!dailyChallengeCardEl.classList.contains("expanded"));
+    });
+  }
   document.getElementById("tryAgainBtn").addEventListener("click", (e) => {
     e.stopPropagation();
     initAudio();
@@ -12694,8 +12799,9 @@ const FIREBASE_CONFIG = firebaseConfig;
       const cosmetic = getCosmeticById(id);
       if (!cosmetic) return;
       if (act === "buy"){
-        if ((state.fluxTokens || 0) < cosmetic.price) return;
-        state.fluxTokens -= cosmetic.price;
+        const shardPrice = getCosmeticShardPrice(cosmetic);
+        if ((state.shards || 0) < shardPrice) return;
+        state.shards -= shardPrice;
         if (!state.ownedCosmetics.includes(id)) state.ownedCosmetics.push(id);
       }
       if (act === "buy" || act === "equip"){
